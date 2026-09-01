@@ -19,7 +19,7 @@ const TOL = 4;
 /** [label, selector, figmaY] — y is the element's top in the 1440x9849 frame. */
 const ANCHORS = [
   ["hero section", "main > section:nth-of-type(1)", 0],
-  ["intro headline", "main > section:nth-of-type(2) h2", 1235],
+  ["intro headline", "main > section:nth-of-type(2) h2", 1129],
   ["collections carousel", "main > section:nth-of-type(3)", 1715],
   ["applications heading", "main > section:nth-of-type(4) h2", 2986],
   ["applications tabs", '[role="tablist"][aria-label="Project sectors"]', 3141],

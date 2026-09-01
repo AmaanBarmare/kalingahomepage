@@ -1,4 +1,5 @@
 import { Hero } from "@/components/home/hero";
+import { IntroSplash } from "@/components/ui/intro-splash";
 import { Intro } from "@/components/home/intro";
 import { CollectionsCarousel } from "@/components/home/collections-carousel";
 import { Applications } from "@/components/home/applications";
@@ -13,8 +14,8 @@ import { SiteFooter } from "@/components/home/site-footer";
  * Kalinga Stone homepage — Figma 544:3926, 1440 x 9849.
  *
  * Section order and the y each one starts at in the frame:
- *      0  Hero
- *   1071  Intro
+ *      0  Hero          (navbar 0-90 over an 892-tall clip)
+ *   1129  Intro
  *   1715  Collections carousel   (Component 102)
  *   2986  Applications           (heading -> tabs -> progress rule -> card rail)
  *   4092  MaxGuard
@@ -30,6 +31,7 @@ import { SiteFooter } from "@/components/home/site-footer";
 export default function HomePage() {
   return (
     <main>
+      <IntroSplash />
       <Hero />
       <Intro />
       <CollectionsCarousel />

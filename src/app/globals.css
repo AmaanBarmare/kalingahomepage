@@ -18,6 +18,12 @@
 
   --font-display: var(--font-halogen), "Futura", "Century Gothic", sans-serif;
   --font-body: var(--font-neue-haas), "Helvetica Neue", Arial, sans-serif;
+  /* The nav drawer (709:6387) specifies Haas Grot Disp ROUND at 45 Light /
+     65 Medium / 75 Bold. Only the Round 25 XThin is licensed here so far, so
+     this points at the Display cut — same family, square terminals instead of
+     rounded. When the three OTFs land, add them to fonts.ts and change this
+     ONE line to var(--font-neue-haas-round). */
+  --font-nav: var(--font-neue-haas), "Helvetica Neue", Arial, sans-serif;
 
   /* The design frame is 1440 wide with an 80px gutter — derived once, from the
      first-section x of every band (hero text 80, strip 82, progress rule 80,
@@ -167,6 +173,12 @@
 /* Scroll-reveal. The resting (hidden) state is CSS so that reduced-motion and
    no-JS readers are never left looking at an invisible page — see
    src/components/ui/reveal.tsx. */
+/* Set by the inline script in layout.tsx before first paint, so a visitor who
+   has already seen the intro this tab never sees it flash. */
+[data-intro-seen="1"] #ks-intro {
+  display: none !important;
+}
+
 .ks-reveal {
   opacity: 0;
   transform: translate3d(0, 18px, 0);

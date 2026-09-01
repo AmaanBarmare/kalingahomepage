@@ -18,6 +18,74 @@ const LOREM_SHORT =
 const LOREM_DUMMY =
   "is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since.";
 
+/** One entry under a drawer section. */
+export type NavChild = { label: string; href: string };
+/** A drawer section: a heading with a chevron and a collapsible child list. */
+export type NavSection = { label: string; href: string; children: NavChild[] };
+
+/**
+ * Site navigation — 709:6387 "Frame 552", six variants of one 1440 x 90 bar.
+ * Variant1 is the closed bar; Variant2 is the open drawer with everything
+ * collapsed; Variants 3-6 each expand one section.
+ *
+ * Two Figma spellings are preserved deliberately, same rule as the footer's
+ * MAXGAURD: "TERAZZO" (709:6683) and "TERAM AND CONDITIONS" (709:6666). Both
+ * are wrong and both stay until the client corrects the board, so the
+ * discrepancy is visible rather than silently patched.
+ */
+export const nav: {
+  sections: NavSection[];
+  inquiry: { lead: string; email: string };
+  legal: NavChild[];
+} = {
+  sections: [
+    {
+      label: "Engineered Surfaces",
+      href: "/collections",
+      children: [
+        { label: "Elixir - Premium Edition", href: "/collections/elixir" },
+        { label: "Quartz", href: "/collections/quartz" },
+        { label: "Marble", href: "/collections/marble" },
+        { label: "Terazzo", href: "/collections/terrazzo" },
+        { label: "Porcelain", href: "/collections/porcelain" },
+      ],
+    },
+    {
+      label: "Karigare",
+      href: "/karigare",
+      children: [
+        { label: "Base", href: "/karigare/base" },
+        { label: "Form", href: "/karigare/form" },
+      ],
+    },
+    {
+      label: "Projects",
+      href: "/projects",
+      children: [
+        { label: "Residential", href: "/projects/residential" },
+        { label: "Commercial", href: "/projects/commercial" },
+        { label: "Hospitality", href: "/projects/hospitality" },
+        { label: "Healthcare", href: "/projects/healthcare" },
+      ],
+    },
+    {
+      label: "World of Kalinga",
+      href: "/about",
+      children: [
+        { label: "About", href: "/about" },
+        { label: "Blogs", href: "/blogs" },
+        { label: "Media", href: "/media" },
+      ],
+    },
+  ],
+  inquiry: { lead: "Any inquiry", email: "info@kalingastone.com" },
+  legal: [
+    { label: "Privacy Policy", href: "/privacy-policy" },
+    { label: "Teram and Conditions", href: "/terms" },
+    { label: "Policy", href: "/policy" },
+  ],
+};
+
 export const hero = {
   headline: "is simply dummy text",
   body: LOREM_SHORT,

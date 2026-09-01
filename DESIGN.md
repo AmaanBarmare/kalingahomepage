@@ -288,6 +288,93 @@ three colours, so it has to inherit. The footer tile repeats it on a measured
 
 ---
 
+## Intro, navbar and the resized hero
+
+### The hero band went 1071 -> 892, and nothing below it moved
+
+`544:4024` is now **1440 x 892** at y0, and the floating translucent logo bar is
+gone — replaced by the solid 90px navbar. The trap: the board did **not** pull
+the rest of the page up. Matching each section against Figma's own render:
+
+| section | y | shift |
+|---|---|---|
+| intro headline | 1129 | **-106** |
+| collections … footer | 1715 … 9075 | **0** (r = 1.000) |
+
+So the hero lost 179px and the intro absorbed all of it — 73 above the headline
+(padding 164 -> 237) and 106 below the mark (130 -> 236). Shrink the hero
+without re-padding the intro and all thirteen sections below it sit 179px high.
+
+New hero geometry, rebased to the 1440 x 892 clip:
+
+| element | node | x | y |
+|---|---|---|---|
+| clip | 544:4024 | 0 | 0 (1440 x 892) |
+| scrim | 544:4026 | -8 | 469, 1489 x 423 -> bottom 47.42% (was 39.5%) |
+| headline | 544:4027 | 80 | 702 |
+| body | 544:4028 | 900 | 711 |
+| button | 544:4029 | 900 | 785 |
+
+The clip is 892 tall with its **top 90px hidden behind an opaque bar** — not an
+802-tall clip sitting below the bar. `object-cover` on 802 crops the frame
+differently and moves the horizon.
+
+### Navbar — 709:6387, six variants of one 1440 x 90 bar
+
+Bar: white, lockup 308 x 35.93 at x80 y27, hamburger 36 x 32 at x1324 y29
+(1324 + 36 = 1360 = 1440 - 80).
+
+Drawer `709:6661`: **521 x 937 at x919**, flush right and starting at the top of
+the page, so it covers the bar's right end including the hamburger. Fill
+**#70020f — not** the brand ruby `#70000e`; the extra green is real.
+
+- close 46 x 41 at x460 y15, white plate, X 32 at x7 y4.5
+- sections 404 wide at x58 y113, **one every 136px while collapsed** = a 40px
+  header + a 96px gap, so the gap is fixed and an expanded list simply pushes
+  the sections below it down. Children start 48 below the header top, 36 pitch.
+- inquiry x45 y794 · rule x45 y839 w425 · legal x45 y858, items on a 21px gap
+
+Casing is not what the export implies. Figma reports `capitalize` on the
+inquiry paragraph with `lowercase` on the spans inside it; the spans win and it
+renders **"Any inquiry info@kalingastone.com"** — sentence case, lowercase
+email, bold + underlined. Title-casing it gives "Info@Kalingastone.Com". The
+legal row is **full uppercase**. Read the rendered board, not the class list.
+
+Two more preserved Figma spellings, same rule as the footer's MAXGAURD:
+**TERAZZO** (709:6683) and **TERAM AND CONDITIONS** (709:6666).
+
+### The drawer type is the Round cut, and three weights are missing
+
+709:6387 specifies **Haas Grot Disp R Trial** — Round — at 45 Light, 65 Medium
+and 75 Bold. Only Round 25 XThin is licensed here (it was supplied for the
+MaxGuard ghost). `--font-nav` in globals.css therefore resolves to the Display
+cut: same family, square terminals instead of rounded. When the three OTFs
+arrive, add them to `fonts.ts` and change that **one line** to
+`var(--font-neue-haas-round)`.
+
+### The intro overlay
+
+Full-bleed hero clip under a centred lockup, dismissed by whichever comes first:
+a 7s timer, any scroll/wheel/touch, or any pointer or key press.
+
+**Once per tab**, via `sessionStorage` — closing the tab replays it, navigating
+away and back inside the tab skips it. `localStorage` would suppress it forever;
+no storage would replay it on every internal navigation.
+
+It is **server-rendered** so a first-time visitor has it in the very first
+frame. Deciding in an effect would paint the page and then drop the intro on top
+of it — and would trip the same `set-state-in-effect` rule reveal.tsx had to be
+rewritten for, which is why the skip decision goes through
+`useSyncExternalStore` with a `false` server snapshot.
+
+The mirror-image flash — a returning visitor briefly seeing an overlay that
+hydration then removes — is handled by the inline script in `layout.tsx`, which
+stamps `data-intro-seen` on `<html>` before first paint so CSS hides it. The
+same `<noscript>` rule hides it outright, which matters: with JS off nothing
+would ever dismiss it and the page would be permanently covered.
+
+---
+
 ## Two faces sit inches apart on the application cards
 
 The room caption and the material link are **different typefaces**, and they are

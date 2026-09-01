@@ -74,12 +74,17 @@ against its known y in the Figma frame. **The bar is 4px** — currently 15/15.
    parks the other slides off-canvas or below the clip boundary — see DESIGN.md
    before "simplifying" any of them into a grid.
 
-4. **The MaxGuard band is two photographic layers.** The couple is cut out of
+4. **The hero is 892 tall now, and the intro absorbs the difference.** The
+   band shrank from 1071, but Figma did NOT move anything below it — collections
+   still starts at 1715. The 179px lives in the intro's padding. Change the hero
+   height without re-padding the intro and all thirteen sections below go wrong.
+
+5. **The MaxGuard band is two photographic layers.** The couple is cut out of
    the scene and drawn back on top so the ghost type passes *behind* them. And
    the scene node claims `x-16 width 1472` while Figma actually crops it to
    1440 at 1:1 — believing the box zooms the kitchen 2%. See DESIGN.md.
 
-5. **Neither video looped, and measuring that needs a denominator.** A seam is
+6. **Neither video looped, and measuring that needs a denominator.** A seam is
    only meaningful against a *typical* frame delta. The visualiser's first read
    was "341x" because the baseline was sampled from two frozen frames — its
    source holds 101 frozen transitions out of 299. The real figure was 17x.
@@ -89,6 +94,9 @@ against its known y in the Figma frame. **The bar is 4px** — currently 15/15.
 
 - Testimonial videos — the four cards currently render poster frames with the
   play control disabled.
+- **Three nav fonts.** The drawer needs Haas Grot Disp **Round** 45 Light,
+  65 Medium and 75 Bold; only Round 25 XThin is licensed here. `--font-nav` in
+  globals.css falls back to the Display cut until they land — see DESIGN.md.
 - Eleven image plates are below 2× DPR because the supplied sources are
   1280–1920px. Not a pipeline limit; see DESIGN.md § Assets.
 - Both clips are under 2× too (hero 0.89×, visualiser 1.33×). The hero is also
