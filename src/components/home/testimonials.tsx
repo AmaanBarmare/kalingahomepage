@@ -26,6 +26,12 @@ import { testimonials } from "@/lib/content";
  * momentum — driving scrollLeft from pointermove on top of that would double
  * every swipe. Drag is wired for MOUSE ONLY.
  *
+ * THE PLAY MARK IS BAKED INTO THE POSTERS. Every testimonial still has the
+ * ring-and-triangle drawn into the image itself, so an overlaid one renders a
+ * second, offset mark. The button stays — it is the click target and carries
+ * the label — but it draws nothing. If the client later supplies clean posters
+ * without the mark, the overlay has to come back.
+ *
  * There is a "Scrim" vector (544:3976) at x865 y7214 covering only the top
  * third of the cards. It does not appear in the rendered frame and no plausible
  * edge-fade has that geometry, so it is treated as a stray layer and omitted.
@@ -88,18 +94,14 @@ export function Testimonials() {
                   draggable={false}
                   className="object-cover"
                 />
+                {/* No drawn play mark — the poster already carries one (see
+                    the note above). This is the click target only. */}
                 <button
                   type="button"
                   disabled={!card.videoHref}
                   aria-label={`Play testimonial — ${card.role}, ${card.place}`}
-                  className="absolute inset-0 grid place-items-center transition-colors duration-300 hover:bg-black/10 disabled:cursor-default"
-                >
-                  <span className="grid size-[62px] place-items-center rounded-full border border-white/90 transition-transform duration-500 ease-[var(--ease-out-expo)] group-hover:scale-105">
-                    <svg viewBox="0 0 24 24" className="ml-[3px] size-[22px] fill-white" aria-hidden>
-                      <path d="M8 5v14l11-7z" />
-                    </svg>
-                  </span>
-                </button>
+                  className="absolute inset-0 transition-colors duration-300 hover:bg-black/10 disabled:cursor-default"
+                />
               </div>
 
               <figcaption className="mt-[10px] flex items-center">
