@@ -21,11 +21,20 @@ import { contact } from "@/lib/content";
  *     chevron rotate-180, grid-template-rows 0fr -> 1fr so the height animates
  *     without being measured, --ease-out-expo.
  *
- * IT OPENS UPWARD, and that is forced rather than chosen. The CTA's base sits
- * 70.3px above the band's bottom edge (see contact-band.tsx), and the footer
- * begins immediately below, so a downward panel would be born inside the
- * footer. `bottom-full` puts it over the band's own scrim, which is at or near
- * black by that height, so white-on-dark holds.
+ * IT OPENS DOWNWARD, like a dropdown should. That costs two things, both paid
+ * in contact-band.tsx: the CTA's base sits only 70.3px above the band's bottom
+ * edge, so the panel crosses into the footer's top padding — which means the
+ * band cannot clip (`overflow-hidden` is gone) and has to out-stack the footer
+ * (`z-20`, since the footer is a later sibling and would otherwise paint over
+ * the open panel). The footer's first 84px are empty background, so the panel
+ * lands on flat black and white-on-dark holds.
+ *
+ * The panel is SOLID ink, not the translucent plate the menu bar uses. Opening
+ * downward lands its last 14px across the footer lockup — 70.3px from the CTA's
+ * base to the band edge, plus 87px to the logo's ink — and a 95%-opacity blur
+ * over a logo reads as muddy rather than as a card sitting on top. Overlapping
+ * page content is what a dropdown is supposed to do; looking half-transparent
+ * while doing it is not.
  *
  * The panel is `w-max min-w-full`: the trigger reads "Download brochure" but
  * the items are longer, and letting the panel match the longest item keeps the
@@ -86,14 +95,14 @@ export function BrochureMenu() {
       {/* 0fr -> 1fr animates the height without anyone having to measure it. */}
       <div
         id={panelId}
-        className="absolute bottom-full left-0 z-20 grid w-max min-w-full transition-[grid-template-rows] duration-500 ease-[var(--ease-out-expo)]"
+        className="absolute top-full left-0 z-20 grid w-max min-w-full transition-[grid-template-rows] duration-500 ease-[var(--ease-out-expo)]"
         style={{ gridTemplateRows: open ? "1fr" : "0fr" }}
       >
         <ul
           role="menu"
           aria-label={contact.cta.label}
-          className={`overflow-hidden border-white bg-ink/95 backdrop-blur-sm transition-[opacity,border-width] duration-300 ${
-            open ? "border-x border-t opacity-100" : "border-0 opacity-0"
+          className={`overflow-hidden border-white bg-ink transition-[opacity,border-width] duration-300 ${
+            open ? "border-x border-b opacity-100" : "border-0 opacity-0"
           }`}
         >
           {contact.brochures.map((b) => (

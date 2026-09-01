@@ -31,8 +31,8 @@ import { contact } from "@/lib/content";
  * over photography casts a visible colour wash.
  *
  * The CTA is a MENU now, not a link — the chevron Figma draws over it
- * (695:2576) is a disclosure, and it opens the four collection brochures.
- * See brochure-menu.tsx for why the panel opens upward.
+ * (695:2576) is a disclosure, and it opens the four collection brochures
+ * downward, over the footer's top padding. See brochure-menu.tsx.
  *
  * Content bottom-aligns on the button's base at y9088.7, which is 70.3px up
  * from 9159 = 10.98%. Headline x84 y8903, body x87 y8975 (698 wide), button
@@ -40,7 +40,14 @@ import { contact } from "@/lib/content";
  */
 export function ContactBand() {
   return (
-    <section className="relative isolate w-full overflow-hidden bg-black" aria-labelledby="contact-heading">
+    // NO `overflow-hidden`, and z-20: the brochure menu opens DOWNWARD out of
+    // the CTA, which puts it past this section's bottom edge and over the
+    // footer's top padding. Clipping here would cut it off 70px in. Nothing
+    // else overflows — `Image fill` is inset-0 and `object-cover` crops inside
+    // its own box, so the clip was belt-and-braces to begin with. The z-20
+    // beats the footer, which is a later sibling and would otherwise paint on
+    // top of the open panel.
+    <section className="relative isolate z-20 w-full bg-black" aria-labelledby="contact-heading">
       <div className="relative aspect-9/4 min-h-120 w-full">
         <Image src="/images/contact.webp" alt="" fill sizes="100vw" className="object-cover" />
 
