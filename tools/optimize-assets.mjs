@@ -14,7 +14,7 @@
  *     a request to make of the client, not a pipeline bug. `npm run assets:audit`
  *     reports the difference.
  *
- * Usage:  node tools/optimize-assets.mjs [--audit]
+ * Usage:  node tools/optimize-assets.mjs [--audit] [--collections]
  */
 import sharp from "sharp";
 import { mkdir, stat } from "node:fs/promises";
@@ -33,15 +33,14 @@ const PLATES = [
   // --- hero -------------------------------------------------------------
   { src: "hero-raw1.png", out: "hero.webp", display: [1440, 1071], node: "544:4024" },
 
-  // --- collections carousel (Component 102) ------------------------------
-  // Figma renders one slide and parks three more below the clip boundary. These
-  // four are the NAMED layers off each parked slide, not the instance's raw
-  // fill list — matching them by eye off the raw list gets the pairing wrong
-  // (the terrazzo slide's plate is the blue-curve aerial, not the bath).
-  { src: "col-quartz-bianco.png", out: "collection-quartz.webp", display: [1457, 1124], node: "260:2475" },
-  { src: "col-marble-clay.png", out: "collection-marble.webp", display: [1457, 1124], node: "333:2488" },
-  { src: "col-aug29-1129.png", out: "collection-terrazzo.webp", display: [1457, 1124], node: "333:2497" },
-  { src: "col-aug29-1155.png", out: "collection-porcelain.webp", display: [1457, 1124], node: "333:2507" },
+  // --- homepage collections scroll story --------------------------------
+  // These are the four user-supplied production plates. Keep their own native
+  // crop and never upscale; the two larger sources are capped at a 2880px 2x
+  // master and the two smaller sources remain at their full native width.
+  { src: "collections-scroll-quartz.png", out: "collection-scroll-quartz.webp", display: [1440, 1000], group: "collections" },
+  { src: "collections-scroll-marble.png", out: "collection-scroll-marble.webp", display: [1440, 1000], group: "collections" },
+  { src: "collections-scroll-terrazzo.png", out: "collection-scroll-terrazzo.webp", display: [1440, 1000], group: "collections" },
+  { src: "collections-scroll-porcelain.png", out: "collection-scroll-porcelain.webp", display: [1440, 1000], group: "collections" },
 
   // --- applications strip (544:3950) -------------------------------------
   // Figma draws 3 cards; the strip's rawImages carry 4 scenes + 1 material swatch.
@@ -98,11 +97,11 @@ const PLATES = [
   { src: "contact-raw1.png", out: "contact.webp", display: [1672, 640], node: "544:4017" },
 ];
 
-async function build({ audit }) {
+async function build({ audit, plates = PLATES }) {
   await mkdir(OUT_DIR, { recursive: true });
   const rows = [];
 
-  for (const p of PLATES) {
+  for (const p of plates) {
     const srcPath = path.join(RAW_DIR, p.src);
     if (!existsSync(srcPath)) {
       rows.push({ ...p, error: "MISSING SOURCE" });
@@ -162,4 +161,6 @@ function report(rows) {
 }
 
 const audit = process.argv.includes("--audit");
-report(await build({ audit }));
+const collectionsOnly = process.argv.includes("--collections");
+const plates = collectionsOnly ? PLATES.filter((plate) => plate.group === "collections") : PLATES;
+report(await build({ audit, plates }));

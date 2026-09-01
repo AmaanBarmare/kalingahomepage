@@ -97,18 +97,12 @@ export const intro = {
   body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
 } as const;
 
-/**
- * Collections carousel — Component 102 (544:4012).
- *
- * Figma renders one slide and parks the other three below the clip boundary at
- * 0.757 scale. Surface counts and titles are read off those parked copies
- * (333:2490 Natural Marble / 40, 333:2500 terrazzo / 30, 333:2510 Porcelain / 70).
- */
+/** Homepage collection story, in the order each plate enters on scroll. */
 export const collections = [
-  { title: "Quartz", body: LOREM_SHORT, surfaces: "30 surfaces", image: "/images/collection-quartz.webp", href: "/collections/quartz" },
-  { title: "Natural Marble", body: LOREM_SHORT, surfaces: "40 surfaces", image: "/images/collection-marble.webp", href: "/collections/marble" },
-  { title: "Terrazzo", body: LOREM_SHORT, surfaces: "30 surfaces", image: "/images/collection-terrazzo.webp", href: "/collections/terrazzo" },
-  { title: "Porcelain", body: LOREM_SHORT, surfaces: "70 surfaces", image: "/images/collection-porcelain.webp", href: "/collections/porcelain" },
+  { title: "Quartz", body: LOREM_SHORT, surfaces: "30 surfaces", image: "/images/collection-scroll-quartz.webp", href: "/collections/quartz" },
+  { title: "Marble", body: LOREM_SHORT, surfaces: "40 surfaces", image: "/images/collection-scroll-marble.webp", href: "/collections/marble" },
+  { title: "Terrazzo", body: LOREM_SHORT, surfaces: "30 surfaces", image: "/images/collection-scroll-terrazzo.webp", href: "/collections/terrazzo" },
+  { title: "Porcelain", body: LOREM_SHORT, surfaces: "70 surfaces", image: "/images/collection-scroll-porcelain.webp", href: "/collections/porcelain" },
 ] as const;
 
 /**
@@ -232,26 +226,26 @@ export const testimonials = {
   ],
 } as const;
 
-/** One run of the contact paragraph: plain, emphasised, or a link. */
-export type ContactRun = { text: string; strong?: boolean; href?: string };
-
-/** Contact band — 544:4021/4022/4023. This copy is real, not placeholder. */
-export const contact: {
-  headline: string;
-  body: ContactRun[];
-  cta: { label: string; href: string };
-} = {
+/**
+ * Contact band — 544:4021 / 544:4022 / 544:4023.
+ *
+ * The body used to be real Client Care copy. The board now carries lorem there
+ * (544:4022 is literally named after it), so this follows the board. The
+ * paragraph it replaced is kept here verbatim so restoring it is one edit and
+ * not a trip through git:
+ *
+ *   Please contact Kalinga Stone Client Care Department on **Monday - Sunday,
+ *   10 a.m. - 8 p.m.** (except National Holidays) via email at
+ *   **info@kalingastone.com** or by calling **+91 8879070029**.
+ *
+ * The CTA changed with it: "Contact Us" -> "Download brochure", and it now
+ * carries a chevron (695:2576) drawn over the button.
+ */
+export const contact = {
   headline: "Lorem ipsum",
-  body: [
-    { text: "Please contact Kalinga Stone Client Care Department on " },
-    { text: "Monday - Sunday, 10 a.m. - 8 p.m.", strong: true },
-    { text: " (except National Holidays) via email at " },
-    { text: "info@kalingastone.com", strong: true, href: "mailto:info@kalingastone.com" },
-    { text: " or by calling " },
-    { text: "+91 8879070029", strong: true, href: "tel:+918879070029" },
-  ],
-  cta: { label: "Contact Us", href: "/contact" },
-};
+  body: LOREM_SHORT,
+  cta: { label: "Download brochure", href: "/brochure" },
+} as const;
 
 export type FooterGroup = { title: string | null; links: string[]; headingStyle?: boolean };
 

@@ -20,9 +20,18 @@ import type { ComponentProps, ReactNode } from "react";
 type Variant = "outline" | "outline-ink" | "ruby";
 
 const BASE =
-  "inline-flex h-[42.7px] items-center justify-center whitespace-nowrap px-[24px] " +
+  "inline-flex h-[42.7px] items-center justify-center whitespace-nowrap pl-6 " +
   "text-[11.272px] uppercase tracking-[1.0247px] font-body font-normal " +
   "transition-colors duration-300 ease-[var(--ease-out-expo)]";
+
+/**
+ * `trailing` is the contact band's chevron (695:2576). Figma draws it as a
+ * loose vector ON TOP of the button rather than inside the component, and pays
+ * for it out of the right padding: the label ends at x254.3, the chevron runs
+ * 267.3 -> 279, and the box closes at 297. So 13px of gap and 18px of right
+ * padding, against the plain button's symmetric 24.
+ */
+const TRAILING = "gap-3.25 pr-4.5";
 
 const VARIANTS: Record<Variant, string> = {
   // On photography — hero, MaxGuard, contact band, carousel slides.
@@ -35,14 +44,20 @@ const VARIANTS: Record<Variant, string> = {
 
 type Props = {
   variant?: Variant;
+  /** Icon rendered after the label — see TRAILING for the spacing it buys. */
+  trailing?: ReactNode;
   children: ReactNode;
   className?: string;
 } & Omit<ComponentProps<typeof Link>, "className" | "children">;
 
-export function KsButton({ variant = "outline", children, className = "", ...rest }: Props) {
+export function KsButton({ variant = "outline", trailing, children, className = "", ...rest }: Props) {
   return (
-    <Link className={`${BASE} ${VARIANTS[variant]} ${className}`} {...rest}>
+    <Link
+      className={`${BASE} ${trailing ? TRAILING : "pr-6"} ${VARIANTS[variant]} ${className}`}
+      {...rest}
+    >
       {children}
+      {trailing}
     </Link>
   );
 }

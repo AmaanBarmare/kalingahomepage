@@ -30,3 +30,16 @@ export function ChevronIcon(props: SVGProps<SVGSVGElement>) {
     </svg>
   );
 }
+
+/**
+ * The 11.67 x 6.06 chevron drawn over the contact band's CTA (695:2576). It is
+ * a stroked open chevron, not the filled ChevronIcon above — Figma keeps it as
+ * a loose vector on top of the button rather than inside the component.
+ */
+export function ChevronDownIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 11.6732 6.05665" fill="none" aria-hidden focusable="false" {...props}>
+      <path d="M0.324326 0.380543L6.19099 5.38054L11.3243 0.380543" stroke="currentColor" />
+    </svg>
+  );
+}
