@@ -22,6 +22,7 @@ npm run dev          # http://localhost:3000
 | [src/components/home/](src/components/home/) | one file per section |
 | [src/components/ui/](src/components/ui/) | `KsButton`, `TabBar`, `Reveal`, `SectionHeading`, the mark, the logo |
 | [tools/optimize-assets.mjs](tools/optimize-assets.mjs) | the image pipeline |
+| [tools/optimize-video.mjs](tools/optimize-video.mjs) | the video pipeline — watermark, trim, loop, encode |
 | [tools/verify.mjs](tools/verify.mjs) | measures the running page against Figma |
 
 ## Scripts
@@ -33,6 +34,9 @@ npm run lint           # eslint
 
 npm run assets         # rebuild public/images from assets-src/
 npm run assets:audit   # report DPR / size per plate without writing
+
+npm run video          # rebuild public/videos from assets-src/video/
+npm run video:audit    # report DPR / crop / loop maths without writing
 
 npm run verify         # measure the running page against the Figma frame
 npm run verify:shots   # ...and write a full-page screenshot
@@ -70,10 +74,19 @@ against its known y in the Figma frame. **The bar is 4px** — currently 15/15.
    parks the other slides off-canvas or below the clip boundary — see DESIGN.md
    before "simplifying" any of them into a grid.
 
+4. **Neither video looped, and measuring that needs a denominator.** A seam is
+   only meaningful against a *typical* frame delta. The visualiser's first read
+   was "341x" because the baseline was sampled from two frozen frames — its
+   source holds 101 frozen transitions out of 299. The real figure was 17x.
+   `npm run video` folds the tail back over the head to close both.
+
 ## Outstanding
 
 - Testimonial videos — the four cards currently render poster frames with the
   play control disabled.
 - Eleven image plates are below 2× DPR because the supplied sources are
   1280–1920px. Not a pipeline limit; see DESIGN.md § Assets.
+- Both clips are under 2× too (hero 0.89×, visualiser 1.33×). The hero is also
+  16:9 in a 1.345 box, so `object-cover` throws away 24.4% of its width — it
+  wants a re-render at the section's aspect, not a harder crop.
 - Only `/` exists, so footer and CTA links prefetch to 404s in the console.

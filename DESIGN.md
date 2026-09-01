@@ -188,11 +188,12 @@ from what the layout implies. Nothing here is transcribed from a spec.
 | Where | What |
 |---|---|
 | Global | `Reveal` — 18px rise + fade, 900ms expo-out, fires once, never replays |
-| Hero | 18s 1.06→1.00 drift on the plate. Kept small deliberately: the source is 1280px on a 1440px box, and a larger scale makes the softness obvious |
+| Hero | a looping video plate. The 18s drift the still used is **dropped** — the clip carries its own camera moves and the two fought each other |
 | Collections | 6s auto-advance, 1100ms glide; pauses on hover/focus |
 | Applications | 5s auto-advance, 780ms glide; pauses on hover/focus |
 | Karigare | scroll-linked parallax, per-plate depth 10–34px, via `animation-timeline: view()` — zero JS, and browsers without it render the plates at rest, which *is* the Figma frame |
 | Testimonials | mouse drag on a native scroll rail |
+| Video | clips play only while on-screen and never start under `prefers-reduced-motion`; the poster stands in |
 
 Every one of them is off under `prefers-reduced-motion`. The reveal's resting
 (hidden) state lives in CSS rather than React state so that reduced-motion
@@ -287,6 +288,87 @@ three colours, so it has to inherit. The footer tile repeats it on a measured
 
 ---
 
+## Video
+
+`npm run video` rebuilds `public/videos` from `assets-src/video`;
+`npm run video:audit` reports without writing. Two clips, **2.7 MB** for a
+browser that takes WebM (4.0 MB if it falls back to MP4).
+
+| Clip | Source | Ships | Box | DPR |
+|---|---|---|---|---|
+| `hero` | 1280×720 24fps 10.0s | 216f / 9.00s — webm 870 KB, mp4 1514 KB | 1440×1071 | **0.89×** |
+| `visualiser` | 1920×1080 30fps 10.0s | 204f / 6.80s — webm 1829 KB, mp4 2387 KB | 1440×815 | **1.33×** |
+
+WebM is listed first in the `<source>` order because VP9 won on both axes: at
+matched SSIM it came in ~25% under H.264. CRFs are per-clip, from a sweep —
+the visualiser is a far denser render, and at the hero's setting its **MP4 came
+out larger than the source file**.
+
+`hero.webp` and `visualiser.webp` are still built by the image pipeline but are
+no longer referenced by the page — the posters come from the clips' own first
+frames, because a poster that does not match frame 0 shows as a jump the moment
+the video starts. They are left in place as stills for whoever needs them; drop
+the two rows from `optimize-assets.mjs` if you want the ~1.1 MB back.
+
+### The hero's Gemini watermark
+
+A sparkle at **x1137..1182 y576..622** (46×47, inset 97px from both the right
+and bottom edges). Located by accumulating a high-pass residual over all 240
+frames: the fixed glyph reinforces, the panning marble cancels.
+
+It is a constant white composite. Solving per-pixel across the clip gives
+alpha **[0.315, 0.314, 0.315]** over RGB — equal across channels, i.e. a
+neutral overlay, which is what makes the solve trustworthy — peaking at 0.37
+over [241.2, 239.2, 235.9]. Two independent estimators (regression against an
+inpainted background, and a DC root-find) agreed to within 2%.
+
+Un-blending that recovers the *true* marble rather than inventing it, and it
+fixes the interior — but the glyph's anti-aliased edge cannot be pinned
+precisely enough, and every variant left a visible rim. **`delogo` measured
+better**: it takes the region's mean temporal residual to 0.06 against a
+clean-marble floor of 8.15, an order of magnitude *below* the surrounding
+noise, with frame-to-frame flicker unchanged at 0.90× the surround.
+
+It interpolates rather than recovers — but the marble there carries only
+**2.24 levels RMS** of high-frequency detail, so there is nothing to preserve.
+That measurement is what settles the choice; without it the "recover the real
+pixels" argument sounds better than it is.
+
+### Neither clip looped, and one had a dead tail
+
+Measured against a *typical* frame delta, not against zero:
+
+- hero last→first = **21×** a normal frame step
+- visualiser = **17×** — and it holds **101 frozen frame-transitions of 299**,
+  including a 49-frame (1.63 s) completely static tail and a 22-frame freeze
+  after the opening. Trimming to frames 23..250 leaves 25 frozen transitions,
+  longest run 3 frames.
+
+Both seams are closed by folding the tail back over the head:
+
+```
+O(t) = orig(t)·(t/X) + orig(t+L)·(1 − t/X)    t < X
+O(t) = orig(t)                                t ≥ X        L = N − X
+```
+
+which is continuous at the wrap by construction. Shipped: hero **1.04×**,
+visualiser **1.73×** — the loop point is now no more visible than an ordinary
+frame transition.
+
+Watch the denominator here. The visualiser's seam first measured as *341×*
+because the "typical" delta was sampled from frames 0→1 — which sit inside
+that head freeze. Sampling a frozen pair makes any seam look catastrophic.
+
+### The hero clip is 16:9 and its box is not
+
+1.778 against a box of 1.345, so `object-cover` **hides 24.4% of the width** —
+and at 1280px on a 1440px box it is already under 1×. It is an 8-shot montage
+(slab, hand, kitchen, living room, bath, edge, arch, slab), so it is worth
+re-rendering at 1920×1440 or wider rather than cropping harder. The visualiser
+has no such problem: 1.778 against 1.767 loses 0.6%.
+
+---
+
 ## Known Figma-side issues — do not "fix" these
 
 - **`MAXGAURD`** is misspelled in the footer (`544:4401`). Reproduced as-is so
@@ -329,6 +411,9 @@ The build now solves to the same [1.00, 1.00, 1.00] against Figma.
    control on each. `videoHref` is `null` in `content.ts`, so the card renders
    as a poster with a disabled control rather than a dead link.
 2. **Higher-resolution imagery**, or approval to super-resolve — see Assets.
+   The two clips have the same problem: the hero is 0.89× and the visualiser
+   1.33× against their boxes. The hero also wants a re-render at the section's
+   1.345 aspect rather than 16:9 — see Video.
 3. Routes other than `/` do not exist yet, so `next/link` prefetches to
    `/collections`, `/contact` etc. return 404 in the console. Expected: only the
    homepage was in scope.

@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { BackgroundVideo } from "@/components/ui/background-video";
 import { KsButton } from "@/components/ui/ks-button";
 import { Reveal } from "@/components/ui/reveal";
 import { SectionHeading } from "@/components/ui/section-heading";
@@ -23,12 +23,17 @@ export function Visualiser() {
 
       <Reveal delay={140}>
         <div id="visualiser-plate" className="relative mt-[51px] aspect-[1440/815] w-full overflow-hidden bg-placeholder">
-          <Image
-            src="/images/visualiser.webp"
+          {/* A slow dolly push-in, so it loops. The seam is real — frame 0 is
+              wide, the last frame is pushed in — but the clip sits mid-page and
+              is paused whenever it is off-screen, so the cut lands far less
+              often than the hero's would. preload="none": it is ~4800px down. */}
+          <BackgroundVideo
+            src="visualiser"
+            poster="/images/visualiser-poster.webp"
             alt="A double-height living room finished in Kalinga Stone surfaces"
-            fill
-            sizes="100vw"
-            className="object-cover"
+            loop
+            preload="none"
+            className="absolute inset-0 h-full w-full object-cover"
           />
         </div>
       </Reveal>

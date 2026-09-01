@@ -10,7 +10,9 @@
     "assets": "node tools/optimize-assets.mjs",
     "assets:audit": "node tools/optimize-assets.mjs --audit",
     "verify": "node tools/verify.mjs",
-    "verify:shots": "node tools/verify.mjs --shots"
+    "verify:shots": "node tools/verify.mjs --shots",
+    "video": "node tools/optimize-video.mjs",
+    "video:audit": "node tools/optimize-video.mjs --audit"
   },
   "dependencies": {
     "next": "16.3.4",
