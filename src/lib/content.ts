@@ -15,6 +15,10 @@
 const LOREM_SHORT =
   "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
 
+/** 665:15192 stops one clause earlier than LOREM_SHORT. Figma's, verbatim. */
+const LOREM_BRIEF =
+  "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt.";
+
 const LOREM_DUMMY =
   "is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since.";
 
@@ -185,7 +189,11 @@ export const applications = {
 
 /** MaxGuard band — 542:5281 and siblings. */
 export const maxguard = {
-  ghost: ["lorem", "ipsum", "cal"],
+  // The board's ghost headline ("lorem" / "ipsum" / "cal", set behind a cutout
+  // of the couple) is gone — 665:15191 and 665:15192 are a real headline and
+  // body in its place.
+  headline: "Lorem ipsum",
+  body: LOREM_BRIEF,
   cta: { label: "Discover MaxGuard", href: "/maxguard" },
   appPrompt: "Download the App",
   stores: [

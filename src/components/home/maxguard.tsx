@@ -4,54 +4,50 @@ import { Reveal } from "@/components/ui/reveal";
 import { maxguard } from "@/lib/content";
 
 /**
- * MaxGuard band — the band runs y4092 -> 4747 (655 tall). Every node below is
- * rebased to that top and expressed as a percentage of the 1440 x 655 box, so
- * the whole composition scales as one piece.
+ * MaxGuard band — y4092 -> 4747, 655 tall. Every node is rebased to that top and
+ * expressed as a percentage of the 1440 x 655 box, so the composition scales as
+ * one piece.
  *
- *   542:5281  scene           x   0   y   0     1440 x 655   <- see note below
- *   551:5465  ghost "lorem"   x 434   y  78      343.9 x 95.53
- *   551:5466  ghost "ipsum"   x 684   y 192      333 x 92
- *   551:5468  ghost "cal"     x 684   y 284      210 x 95
- *   551:5467  foreground      x 215   y 106      723 x 418    <- 1:1, no scaling
- *   542:5282  warranty badge  x1176   y  21      197 x 132
- *   542:5290  KS/Button       x 649   y 500      184.19 x 42.69
- *   542:5283  MaxGuard lockup x  60   y 520.8    273.25 x 59.17
- *   542:5289  store badges    x 340   y 570.41   248.01 x 41.61
- *   542:5284  "Download..."   x  80.9 y 580.85   253 x 21
+ *   542:5281  scene            x    0  y   0    1440 x 655
+ *   551:5470  scrim            x   -3  y 328    1459 x 327
+ *   665:15196 scrim            x   -3  y 325    1459 x 327
+ *   542:5283  MaxGuard lockup  x   56  y  23     273.25 x 59.17
+ *   542:5282  warranty badge   x 1176  y  21     197 x 132
+ *   665:15191 LOREM IPSUM      x   79  y 464     442 x 47
+ *   665:15192 body             x   79  y 521     487 x 50
+ *   542:5284  Download the App x   80.9 y 580.85 251 x 21
+ *   665:15367 google play      x  348  y 571      39 x 39
+ *   665:15352 app store        x  400  y 571      39 x 39
+ *   542:5290  KS/Button        x 1165  y 562     184.19 x 42.69
  *
- * THE SCENE IS TWO LAYERS, NOT ONE. 551:5467 is the same couple cut out of
- * 542:5281 and drawn back on top, so the ghost type sits BETWEEN them — that is
- * what puts the "I" of IPSUM behind the man's head. Compositing the type over a
- * single flat plate is wrong and reads immediately as wrong. Template-matching
- * the cutout against Figma's own render of the frame puts it at (215, 106) at
- * scale 1.000 with r = 0.9996 — the node's coordinates, taken literally.
- *
- * Note it does NOT sit exactly on the couple already in the scene: the closest
- * fit to those pixels would be (224, 109) at 702x406. The cutout is deliberately
- * a touch larger and higher, so it fully covers the pair underneath. Do not
- * "correct" it onto the background couple — that reintroduces a visible edge.
+ * REBUILT. The board dropped the whole two-layer composition this used to be:
+ * there is no ghost headline any more, and no cutout of the couple laid back
+ * over it, so `maxguard-foreground.webp` and the `ghost` copy are gone with
+ * them. The lockup moved from the bottom left to the top left, the CTA moved
+ * from the middle to the bottom right and became the ruby Style=Primary, and a
+ * real headline and body arrived where the ghost type used to be.
  *
  * THE PLATE'S NODE BOX LIES. 542:5281 reports x-16 and width 1472, which reads
  * like a 16px bleed on each edge — but Figma CROPS the fill to the frame rather
- * than scaling into that box. Matching a clean background patch (the left
- * cabinets, clear of the badge, type and cutout) against Figma's own render of
- * the frame gives scale 1.000 at offset (0,0), r = 0.998: the scene is 1:1
- * across 1440. Scaling it to 1472 zooms the whole kitchen ~2% and drags every
- * landmark right. Everything here is positioned against 1440 / 655; the earlier
- * pass divided the ghost x by 1472 and sat ~10px left as a result.
+ * than scaling into that box, and matching a clean background patch against the
+ * board's own render gives scale 1.000 at offset (0,0), r = 0.998. The scene is
+ * 1:1 across 1440; scaling it to 1472 zooms the kitchen ~2%.
  *
- * Ghost type is Haas Grot Disp **Round** 25 XThin 90 / +13.5 — the only use of
- * the Round cut or of a sub-300 weight anywhere on the page. It is pure white at
- * FULL opacity, not a tint: alpha-solving the stroke against its own background
- * in the Figma render gives [1.00, 1.00, 1.00], a coherent per-channel alpha and
- * therefore a valid solve. It reads soft because the face is XThin.
+ * THE SCRIM IS DIAGONAL, and that is not guessable from the node list — the two
+ * rects are plain boxes over the bottom half. Dividing the board's render by the
+ * untouched source gives the alpha per tile, and the map is not horizontal: at
+ * y550 it runs 0.74 at the left edge and 0.02 at the right. A plane fit puts the
+ * axis at 193.2deg, within 3deg of the contact band's own 195.8deg, and along
+ * that axis the profile is clean and monotone — flat zero from 22% to 68%, then
+ * the ramp below. The stops are those measurements.
  *
- * "Download the App" is **Halogen Medium 13.053 / +4.3511** (542:5284) — the
- * display face, not the body one, and much wider tracking than it looks.
+ * "Download the App" is Halogen **Bold** 13.053 / +4.3511 (542:5284) — the
+ * display face, a heavier weight than it looks, and much wider tracking. It is
+ * white now that it sits on the scrim rather than on the lockup's light plate.
  *
- * The badge, lockup and store strip are alpha-bearing originals. Figma's own
- * `export` of each has opaque white flattened behind it, invisible in Figma
- * (they sit on white there) and a white box over the photograph here.
+ * The badge and lockup are alpha-bearing originals. Figma's own `export` of each
+ * flattens opaque white behind it, invisible in Figma (they sit on white there)
+ * and a white box over the photograph here.
  */
 
 const PCT = (v: number, total: number) => `${(v / total) * 100}%`;
@@ -60,54 +56,47 @@ const Y = (v: number) => PCT(v, 655);
 /** px in the 1440 frame -> vw, so type scales with the plate like the images do */
 const VW = (px: number) => `${((px / 1440) * 100).toFixed(5)}vw`;
 
-const GHOST = [
-  { x: 434, y: 78 },
-  { x: 684, y: 192 },
-  { x: 684, y: 284 },
-];
+/** Solved off the board: 193.2deg, flat to 68%, then the measured ramp. */
+const SCRIM =
+  "linear-gradient(193.2deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 67.5%, rgba(0,0,0,0.24) 72.5%, " +
+  "rgba(0,0,0,0.45) 77.5%, rgba(0,0,0,0.57) 82.5%, rgba(0,0,0,0.68) 87.5%, " +
+  "rgba(0,0,0,0.78) 92.5%, rgba(0,0,0,0.90) 100%)";
+
+const STORE_ICONS = ["/icons/google-play.svg", "/icons/app-store.svg"];
 
 export function MaxGuard() {
   return (
     <section className="relative isolate w-full overflow-hidden bg-ink" aria-label="MaxGuard">
       <div className="relative aspect-1440/655 w-full">
-        {/* 1. the scene, 1:1 across the frame */}
-        <Image
-          src="/images/maxguard-scene.webp"
-          alt="A kitchen with MaxGuard-protected surfaces"
-          fill
-          priority={false}
-          sizes="100vw"
-          className="object-cover"
-        />
-
-        {/* 2. the ghost headline, over the scene but under the couple */}
-        <div className="pointer-events-none absolute inset-0" aria-hidden>
-          {maxguard.ghost.map((word, i) => (
-            <span
-              key={word}
-              className="ghost-display absolute text-white"
-              style={{
-                left: X(GHOST[i].x),
-                top: Y(GHOST[i].y),
-                fontSize: `clamp(28px, ${VW(90)}, 90px)`,
-                letterSpacing: `clamp(4px, ${VW(13.5)}, 13.5px)`,
-              }}
-            >
-              {word}
-            </span>
-          ))}
+        {/* The node is 1472 wide at x-16 and its fill is a 3:2 image drawn at
+            1472 x 981.4 with the top 234.2 cropped away, so the wrapper is the
+            node box and object-position carries the crop: 234.2 / (981.4 - 655)
+            = 71.76%. Letting the image simply cover the band instead centres it
+            and moves every landmark up ~90px. */}
+        <div
+          className="absolute inset-y-0 overflow-hidden"
+          style={{ left: X(-16), width: X(1472) }}
+        >
+          <Image
+            src="/images/maxguard-scene.webp"
+            alt="A kitchen with MaxGuard-protected surfaces"
+            fill
+            sizes="103vw"
+            className="object-cover"
+            style={{ objectPosition: "50% 71.76%" }}
+          />
         </div>
 
-        {/* 3. the couple, cut out of the scene and laid back over the type */}
+        <div className="pointer-events-none absolute inset-0" style={{ background: SCRIM }} />
+
         <Image
-          src="/images/maxguard-foreground.webp"
-          alt=""
-          aria-hidden
-          width={723}
-          height={418}
-          sizes="51vw"
-          className="pointer-events-none absolute"
-          style={{ left: X(215), top: Y(106), width: X(723), height: Y(418) }}
+          src="/images/maxguard-logo.webp"
+          alt="MaxGuard — Building Trust. Delivering Value."
+          width={546}
+          height={119}
+          sizes="19vw"
+          className="absolute"
+          style={{ left: X(56), top: Y(23), width: X(273.25), height: "auto" }}
         />
 
         <div className="absolute" style={{ left: X(1176), top: Y(21), width: X(197) }}>
@@ -123,24 +112,37 @@ export function MaxGuard() {
           </Reveal>
         </div>
 
-        <div className="absolute" style={{ left: X(649), top: Y(500) }}>
-          <KsButton href={maxguard.cta.href} variant="outline">
-            {maxguard.cta.label}
-          </KsButton>
+        <div className="absolute" style={{ left: X(79), top: Y(464), width: X(487) }}>
+          <Reveal>
+            <h2
+              className="font-display font-medium text-white uppercase"
+              style={{
+                fontSize: `clamp(19px, ${VW(30)}, 30px)`,
+                letterSpacing: `clamp(3px, ${VW(5)}, 5px)`,
+                lineHeight: 1.58,
+              }}
+            >
+              {maxguard.headline}
+            </h2>
+          </Reveal>
+
+          <Reveal delay={120}>
+            <p
+              className="font-body font-light text-[#eee]"
+              style={{
+                marginTop: Y(12.2),
+                fontSize: `clamp(12px, ${VW(16)}, 16px)`,
+                letterSpacing: `clamp(0.5px, ${VW(1)}, 1px)`,
+                lineHeight: 1.5,
+              }}
+            >
+              {maxguard.body}
+            </p>
+          </Reveal>
         </div>
 
-        <Image
-          src="/images/maxguard-logo.webp"
-          alt="MaxGuard — Building Trust. Delivering Value."
-          width={546}
-          height={119}
-          sizes="19vw"
-          className="absolute"
-          style={{ left: X(60), top: Y(520.8), width: X(273.25), height: "auto" }}
-        />
-
         <p
-          className="absolute font-display font-medium whitespace-nowrap text-ink uppercase"
+          className="absolute font-display font-bold whitespace-nowrap text-white uppercase"
           style={{
             left: X(80.89),
             top: Y(580.85),
@@ -152,33 +154,26 @@ export function MaxGuard() {
           {maxguard.appPrompt}
         </p>
 
-        {/* One 248 x 41.6 strip holds both badges; each link shows its half. */}
-        <div
-          className="absolute flex"
-          style={{ left: X(339.99), top: Y(570.41), width: X(248.01), height: Y(41.61) }}
-        >
-          {maxguard.stores.map((store, i) => (
-            <a
-              key={store.label}
-              href={store.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={store.label}
-              className="block h-full overflow-hidden transition-opacity hover:opacity-80"
-              style={{ width: "50%" }}
-            >
-              <span
-                className="block h-full"
-                style={{
-                  width: "200%",
-                  marginLeft: i === 0 ? 0 : "-100%",
-                  backgroundImage: "url(/images/app-badges.webp)",
-                  backgroundSize: "100% 100%",
-                  backgroundRepeat: "no-repeat",
-                }}
-              />
-            </a>
-          ))}
+        {/* Two separate 39 x 39 marks on a 52px pitch — 665:15367 and 665:15352,
+            not the single flattened strip the board used to carry. */}
+        {maxguard.stores.map((store, i) => (
+          <a
+            key={store.label}
+            href={store.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={store.label}
+            className="absolute transition-opacity hover:opacity-80"
+            style={{ left: X(348 + i * 52), top: Y(571), width: X(39), height: Y(39) }}
+          >
+            <Image src={STORE_ICONS[i]} alt="" width={39} height={39} className="h-full w-full" />
+          </a>
+        ))}
+
+        <div className="absolute" style={{ left: X(1165), top: Y(562) }}>
+          <KsButton href={maxguard.cta.href} variant="ruby">
+            {maxguard.cta.label}
+          </KsButton>
         </div>
       </div>
     </section>

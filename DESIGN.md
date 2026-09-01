@@ -405,72 +405,66 @@ already carried; only the faces were corrected here.
 
 ---
 
-## The MaxGuard band is two photographic layers, not one
+## The MaxGuard band was rebuilt — the ghost type is gone
 
-`551:5467` is the **same couple, cut out** of the scene `542:5281` and drawn
-back on top. The ghost type sits between them, which is what puts the "I" of
-IPSUM behind the man's head. Composited over a single flat plate the type runs
-across their faces, and it reads as wrong instantly.
+The board dropped the whole two-layer composition this section used to be. There
+is **no ghost headline any more, and no cutout of the couple** laid back over it,
+so `maxguard-foreground.webp` and the `ghost` copy went with them. What arrived
+instead:
 
-Layer order, bottom to top: scene -> ghost type -> cutout -> badge, button,
-lockup, app row. (Figma stacks the cutout above the UI too, but the overlap is
-transparent there, and a photo layer over a link would eat the click.)
+| | was | is |
+| --- | --- | --- |
+| MaxGuard lockup | bottom left, y520.8 | **top left**, x56 y23 |
+| headline | ghost type behind the couple | `665:15191` LOREM IPSUM, x79 y464 |
+| body | — | `665:15192`, x79 y521, 487 wide |
+| CTA | outline, mid-band x649 y500 | **ruby** Style=Primary, x1165 y562 |
+| store badges | one flattened 248 x 41.6 strip | two 39 x 39 marks, x348 and x400 |
+| "Download the App" | Halogen Medium, ink | Halogen **Bold**, white |
+| scrim | none | two rects over the bottom half |
 
-| node | element | x | y | size |
-|---|---|---|---|---|
-| 542:5281 | scene | 0 | 0 | 1440 x 655 |
-| 551:5465 | ghost "lorem" | 434 | 78 | 343.9 x 95.53 |
-| 551:5466 | ghost "ipsum" | 684 | 192 | 333 x 92 |
-| 551:5468 | ghost "cal" | 684 | 284 | 210 x 95 |
-| 551:5467 | **cutout** | 215 | 106 | 723 x 418 |
-| 542:5282 | warranty badge | 1176 | 21 | 197 x 132 |
-| 542:5290 | KS/Button | 649 | 500 | 184.19 x 42.69 |
-| 542:5283 | MaxGuard lockup | 60 | 520.8 | 273.25 x 59.17 |
-| 542:5289 | store badges | 339.99 | 570.41 | 248.01 x 41.61 |
-| 542:5284 | "Download the App" | 80.89 | 580.85 | 253 x 21 |
+Headline is Halogen Medium 30 / +5 / 1.58 white; body is Haas Grot Disp Trial 45
+Light 16 / +1 / 1.5 on `#EEEEEE`. The body string stops one clause earlier than
+the hero's — `LOREM_BRIEF`, not `LOREM_SHORT`.
 
-### The scene node's box lies about its own size
+### The fill moved, and the old note about it was wrong
 
-`542:5281` reports **x -16, width 1472** — which reads as a 16px bleed past both
-frame edges, and that is how the previous pass built it. It is wrong. Figma
-**crops** the fill to the frame rather than scaling into that box. Matching a
-clean background patch (the left cabinets — clear of the badge, the type and the
-cutout) against Figma's own render of the frame returns **scale 1.000 at offset
-(0, 0), r = 0.998**. Scaling the plate to 1472 zooms the whole kitchen ~2% and
-drags every landmark right.
+`542:5281` is 1472 wide at x-16 and its fill is a 3:2 image drawn at 1472 x
+981.4 with the top 234.2 cropped away — `object-position: 50% 71.76%` inside a
+wrapper that is the node box, not the band. An earlier pass concluded the fill
+sat 1:1 across 1440 and that the 1536 x 1024 `mg-raw1.png` was "a different,
+more zoomed render". Both were true of the old board and are false now: the
+1536 x 1024 file **is** the current fill, byte for byte, and letting it simply
+cover the band centres it and moves every landmark up ~90px.
 
-Worse, the previous pass divided the ghost x by 1472 while those x values are
-frame coordinates, so the type sat ~10px left of where it belongs. If a divisor
-is ever in doubt, render the frame from Figma and match a patch — do not reason
-about it from the node box.
+### The scrim is diagonal, and the node list cannot tell you that
 
-### The cutout does not sit on the couple already in the scene
+The two rects (`551:5470`, `665:15196`) are plain boxes over the bottom half.
+Dividing the board's render by the untouched fill gives the alpha per tile, and
+the map is not horizontal — at y550 it runs **0.74 at the left edge and 0.02 at
+the right**. A plane fit puts the axis at **193.2deg**, within 3deg of the
+contact band's own 195.8deg, and along that axis the profile is clean and
+monotone: flat zero from 22% to 68%, then 0.24 / 0.45 / 0.57 / 0.68 / 0.78 /
+0.90. Composited back over the fill, that reproduces the board to a median of
+1 level across the counter and 2 across the text block.
 
-Template-matching the cutout against Figma's frame render gives (215, 106) at
-scale 1.000, r = **0.9996** — the node's coordinates taken literally. But the
-placement that best fits the *background* couple is (224, 109) at 702 x 406.
-The cutout is deliberately a touch larger and higher so it fully covers the pair
-underneath. Do not "correct" it onto them: that reintroduces a visible edge.
+### One thing that is NOT reproduced
 
-### "Download the App" is the display face
+A soft, lighter, lower-contrast haze covers roughly x0-500 y0-275 — behind the
+MaxGuard lockup. It is worth knowing what it is *not*, because each of these was
+tested and rejected:
 
-`542:5284` is **Halogen Medium 13.053 / +4.3511**, not the body font at 13 / +3.
-The tracking is nearly half again what it looks like, and it is the difference
-between a 253px run and a 170px one.
+- **not a blur** — fitting Gaussians from sigma 1 to 25 never improves the
+  correlation over sigma 0.
+- **not a global image adjustment** — the tone curve it implies (highlights
+  crushed 248 -> 142) makes every other region *worse* when applied, 1 -> 3.
+- **not a linear gradient on the scrim axis** — adding one there leaves the
+  top-left at 41 and damages the top-right.
+- **not a node** — nothing in the band's metadata sits there, and the fill is
+  confirmed byte-identical.
 
-### Ghost widths do not match their frames, and that is fine
-
-Rendered vs Figma box: lorem 340.8 / 343.9, ipsum 300.3 / 333, cal 188 / 210.
-Only lorem is close — and lorem is the one that settles it, because the three
-boxes are hand-drawn (heights 95.53 / 92 / 95 for identical one-line text at one
-size). One font at one size and tracking: if one word matches, they all do, and
-the boxes are the loose thing.
-
-Verified against Figma's own render of the band: median per-pixel difference
-**3.67**, with the scene and the couple both at mean 5.6 — WebP and resampling
-noise. The amplified difference map is thin edge outlines only.
-
----
+Best guess is an effect on the scene layer that the API does not expose —
+Figma's progressive blur, a background blur, or a masked overlay. Everything
+else in the band matches; ask the designer what that layer is.
 
 ## Video
 
@@ -674,17 +668,101 @@ applications section's own top (Figma y2839) and rebases the anchors below 1715
 by it. Anchors above stay absolute, and each rebased anchor still checks its own
 spacing — the overshoot is one number, not fifteen fudge factors.
 
+## The intro's bar is the menu bar — 615:2395
+
+The intro screen carries a **translucent centred plate**, not the page's white
+navbar. That plate went missing when the hero was rebuilt at 892 and grew the
+solid bar; `615:2395` is it, and it is now its own component:
+
+  plate   330 x 70 at y13, fill `rgba(248,246,243,0.14)`, 1px border
+          `rgba(255,255,255,0.67)`
+  lockup  285 x 32.087 inside it — 22.5 clear left and right, 18.95 top and
+          bottom, i.e. simply centred at 285 wide, which is the lockup
+          component's natural 329 scaled 0.8663.
+
+Figma puts the plate 26px left of centre. That is an artefact of the component
+being 1396 wide inside a 1440 frame (22 + 672 = 694 against a centre of 720),
+not a design decision — on the page it is centred.
+
+**Not built: the mega-menu.** The variant also carries four panels — Engineered
+Surfaces (Quartz, Marble, Terazzo, Porcelian Tiles, **Elixir · Premium
+Edition**), Karigare (Base, Form), Projects (Residential, Commercial,
+Healthcare, Hospitality), World of Kalinga (About, Media, **Blogs**) — as rows
+of 226 x 186 image cards 25px below the bar, 47px apart, each a cover image
+under a 0.2 black wash with a Halogen Bold 20/+2 white label at y147 carrying a
+`-3px 4px 5.5px rgba(0,0,0,0.35)` shadow. Variant6's bar has **no labels to open
+them from**, so there is nothing to hang the hover on. Elixir and Blogs are also
+new — neither is in the hamburger drawer's four sections.
+
+### Two bugs the intro had been carrying
+
+**The 7s hold never happened.** `getSnapshot` is re-read on every render, and
+the intro wrote its own `ks-intro-seen` flag on mount — so the next render read
+that flag back, decided the intro had been seen, and unmounted it on the spot.
+StrictMode's second pass was enough to trigger it. The flag is now written after
+the fade completes, when the component is on its way out anyway, so nothing it
+reads can change underneath it while it is on screen. Measured: present at 1.5s
+and 5.5s, gone by 8.1s (7000 + 900).
+
+**The picture jumped at handover.** Both the intro and the hero run
+`object-cover` over the same 16:9 clip, but a viewport-shaped box and the hero's
+1440 x 892 crop it differently — 1484 wide against 1586, a ~7% zoom the moment
+the intro handed over. The intro's clip is now boxed to the hero's own aspect
+and top-anchored; both video elements measure 1440 x 892 at y0, so the handover
+is a pure fade.
+
+**A hydration warning came with it.** The pre-paint script stamps
+`data-intro-seen` on `<html>`, which the server HTML cannot carry, so React
+flagged the attribute. `suppressHydrationWarning` on `<html>` is the fix; it
+only reaches one level deep, so nothing else on the page is silenced.
+
+## The collections scroll story hands over by rising, not fading
+
+Each material owns one viewport of scroll: its plate contracts from full-bleed
+to 0.7569, then the next plate takes the screen. What was wrong was the handover
+— the incoming plate simply cross-faded in at full size, so nothing moved and
+the next material appeared on top of the shrinking one out of nowhere.
+
+**The incoming plate is what the shrink reveals.** While the current plate
+contracts, the next one's top edge is pinned to the current one's BOTTOM edge,
+so the gap the shrink opens is never empty — it is always filled by the material
+coming next. Then it climbs the rest of the way:
+
+| the plate in front is at | the incoming plate |
+| --- | --- |
+| 0 → 0.45 | y 100% → 87.845%, tracking the shrinking bottom edge |
+| 0.45 → 1 | y 87.845% → 0, covering as it goes |
+
+87.845% is `50 + restScale x 50` — the resting plate's own bottom edge, so the
+two segments meet exactly and there is no seam at 0.45.
+
+A first attempt ran the rise strictly *after* the shrink. That gave motion but
+still failed the brief: the gap stayed white for the whole contraction, and you
+only saw the next material once the current one had finished. The point is being
+able to watch it arrive as the picture gets smaller.
+
+**Outgoing plates do not fade.** They hold their resting pose at opacity 1,
+because at rest consecutive plates are the same size in the same place, so the
+one on top occludes the one below exactly. A plate more than a stage away parks
+at y = 100% — one viewport down, clipped by the sticky box — and its opacity
+flips while it is still fully below the fold, so the switch is never seen.
+
+Everything derives from page scroll and nothing is stored, so the sequence
+reverses exactly: measured 7/7 sampled stages byte-identical on the way back up.
+
 ## Known Figma-side issues — do not "fix" these
 
 - **`MAXGAURD`** is misspelled in the footer (`544:4401`). Reproduced as-is so
   the discrepancy stays visible. Worth raising with the designer.
+- **`615:2395` Variant6 has mega-menu panels but no labels on the bar to open
+  them.** Ask for the variant that shows the menu labels before wiring hover.
 - **The contact paragraph is lorem again** (`544:4022`). It used to be the real
   Client Care copy. Kept verbatim in a comment in content.ts — see above.
 - **`544:3976` "Scrim"** — a vector at x865 y7214 covering only the top third of
   the testimonial cards. It does not appear in the rendered frame and no
   plausible edge-fade has that geometry. Treated as a stray layer and omitted.
-- **`551:5470` "Rectangle 152"** is at **x1456** on a 1440-wide frame — parked
-  off-canvas. Not built. (Amaha Part 1 §3: check `0 ≤ x < frameWidth` first.)
+- **`551:5470` "Rectangle 152"** used to be parked off-canvas at x1456. It has
+  since moved on-canvas to x-3 y4420 and is now one of the MaxGuard scrims.
 - Card captions are hand-placed: rule widths 23.18 vs 28.39, caption tops
   8162.42 vs 8173.58. The *text* tops land within 2.4px, so one uniform value
   is correct and the variance is noise.
@@ -720,6 +798,8 @@ The build now solves to the same [1.00, 1.00, 1.00] against Figma.
    as a poster with a disabled control rather than a dead link.
 2. **Higher-resolution imagery**, or approval to super-resolve — see Assets.
    The new contact plate is 1440px against a 1440px box, i.e. exactly 1x.
+   Quartz is now the client's 9176 x 5164 Michelangelo plate and caps at the
+   2880 master; Marble is the only collection plate still source-limited.
    The two clips have the same problem: the hero is 0.89× and the visualiser
    1.33× against their boxes. The hero also wants a re-render at the section's
    1.345 aspect rather than 16:9 — see Video.

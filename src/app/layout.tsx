@@ -21,7 +21,16 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${halogen.variable} ${neueHaas.variable} ${neueHaasRound.variable}`}>
+    // suppressHydrationWarning covers exactly one attribute: the pre-paint
+    // script below stamps data-intro-seen on this element, so the server HTML
+    // and the hydrating client necessarily disagree about it. React only
+    // suppresses the warning one level deep, so this does not hide anything
+    // else on the page.
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${halogen.variable} ${neueHaas.variable} ${neueHaasRound.variable}`}
+    >
       <head>
         {/* Runs BEFORE first paint. The intro overlay is server-rendered so a
             first-time visitor sees it in the very first frame; this stamps the

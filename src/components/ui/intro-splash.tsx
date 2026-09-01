@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
-import { KalingaLogo } from "@/components/ui/kalinga-logo";
+import { MenuBar } from "@/components/ui/menu-bar";
 
 /**
  * Full-bleed intro. The hero clip plays edge to edge under a centred lockup,
@@ -23,6 +23,14 @@ import { KalingaLogo } from "@/components/ui/kalinga-logo";
  * in an effect instead would paint the page first and drop the intro on top of
  * it a moment later — and it is also the `set-state-in-effect` lint error that
  * reveal.tsx already had to be rewritten to avoid.
+ *
+ * WHY THE FLAG IS WRITTEN LAST, NOT ON MOUNT
+ * getSnapshot is re-read on EVERY render, so writing the seen flag on mount
+ * armed a trap: the next render — StrictMode's second pass is enough — read the
+ * flag back, returned true, and unmounted the intro on the spot. The 7s hold
+ * never happened. The flag is now written after the fade completes, by which
+ * point this component is on its way out anyway, so nothing it reads can change
+ * underneath it while it is on screen.
  *
  * A returning visitor would then get the opposite flash: the overlay in the HTML,
  * removed once hydration reads sessionStorage. The inline script in layout.tsx
@@ -57,12 +65,6 @@ export function IntroSplash() {
 
   useEffect(() => {
     if (skip || phase !== "showing") return;
-    try {
-      sessionStorage.setItem(INTRO_KEY, "1");
-    } catch {
-      /* private mode — it simply plays again next load */
-    }
-
     void videoRef.current?.play().catch(() => {});
 
     const prevOverflow = document.body.style.overflow;
@@ -88,10 +90,17 @@ export function IntroSplash() {
   }, [skip, phase, dismiss]);
 
   // Unmount only once the fade has finished, so the video is not torn out from
-  // under its own transition.
+  // under its own transition — and only THEN record that it has been seen.
   useEffect(() => {
     if (phase !== "leaving") return;
-    const t = window.setTimeout(() => setPhase("done"), FADE_MS);
+    const t = window.setTimeout(() => {
+      try {
+        sessionStorage.setItem(INTRO_KEY, "1");
+      } catch {
+        /* private mode — it simply plays again next load */
+      }
+      setPhase("done");
+    }, FADE_MS);
     return () => window.clearTimeout(t);
   }, [phase]);
 
@@ -108,27 +117,33 @@ export function IntroSplash() {
         pointerEvents: phase === "leaving" ? "none" : "auto",
       }}
     >
-      <video
-        ref={videoRef}
-        poster="/images/hero-poster.webp"
-        autoPlay
-        muted
-        loop
-        playsInline
-        preload="auto"
-        className="absolute inset-0 h-full w-full object-cover"
-      >
-        <source src="/videos/hero.webm" type="video/webm" />
-        <source src="/videos/hero.mp4" type="video/mp4" />
-      </video>
-
-      {/* The lockup sits on the bar's own 27px baseline so it does not jump
-          when the intro hands over to the navbar. */}
-      <div className="absolute inset-x-0 top-6.75 flex justify-center">
-        <span className="block origin-top scale-[0.7] sm:scale-[0.85] lg:scale-[0.936]">
-          <KalingaLogo href={null} />
-        </span>
+      {/* The clip is boxed to the HERO's 1440 x 892 and top-anchored, not to the
+          viewport. Both use object-cover on a 16:9 source, so a viewport-shaped
+          box crops it differently: 1440 x 835 scales the frame to 1484 wide,
+          1440 x 892 to 1586. Letting the intro use the viewport therefore made
+          the picture jump ~7% larger the moment the intro handed over. Boxed
+          this way the two crops are identical and the handover is a pure fade.
+          min-h-full keeps it covering a window taller than 61.944vw. */}
+      <div className="absolute inset-x-0 top-0 h-[61.944vw] min-h-full overflow-hidden">
+        <video
+          ref={videoRef}
+          poster="/images/hero-poster.webp"
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          className="h-full w-full object-cover"
+        >
+          <source src="/videos/hero.webm" type="video/webm" />
+          <source src="/videos/hero.mp4" type="video/mp4" />
+        </video>
       </div>
+
+      {/* 615:2395 — the translucent plate that floats over the clip. href is
+          null because every pointerdown here dismisses the intro, so a link to
+          the page we are already on would only ever swallow that click. */}
+      <MenuBar href={null} className="absolute inset-x-0 top-0" />
     </div>
   );
 }

@@ -96,7 +96,12 @@ against its known y in the Figma frame. **The bar is 4px** — currently 15/15.
    rebuilt. Do not "restore" it to the vector mark — that tile repeats at half
    the pitch and is the wrong motif.
 
-8. **Neither video looped, and measuring that needs a denominator.** A seam is
+8. **The intro's clip is boxed to the HERO's aspect, not the viewport.** Both
+   run `object-cover` on the same 16:9 source; a viewport-shaped box crops it
+   differently and the picture jumps ~7% at handover. Keep `h-[61.944vw]` on
+   that wrapper in sync with the hero's `aspect-1440/892`.
+
+9. **Neither video looped, and measuring that needs a denominator.** A seam is
    only meaningful against a *typical* frame delta. The visualiser's first read
    was "341x" because the baseline was sampled from two frozen frames — its
    source holds 101 frozen transitions out of 299. The real figure was 17x.
