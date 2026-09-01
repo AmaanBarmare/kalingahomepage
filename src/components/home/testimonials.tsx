@@ -26,11 +26,9 @@ import { testimonials } from "@/lib/content";
  * momentum — driving scrollLeft from pointermove on top of that would double
  * every swipe. Drag is wired for MOUSE ONLY.
  *
- * THE PLAY MARK IS BAKED INTO THE POSTERS. Every testimonial still has the
- * ring-and-triangle drawn into the image itself, so an overlaid one renders a
- * second, offset mark. The button stays — it is the click target and carries
- * the label — but it draws nothing. If the client later supplies clean posters
- * without the mark, the overlay has to come back.
+ * THE PLAY MARK IS BAKED INTO THE POSTERS at inconsistent sizes. A uniform,
+ * opaque-backed control is drawn over every baked mark so all four cards expose
+ * the same 120px desktop / 100px mobile target without editing the portraits.
  *
  * There is a "Scrim" vector (544:3976) at x865 y7214 covering only the top
  * third of the cards. It does not appear in the rendered frame and no plausible
@@ -94,14 +92,20 @@ export function Testimonials() {
                   draggable={false}
                   className="object-cover"
                 />
-                {/* No drawn play mark — the poster already carries one (see
-                    the note above). This is the click target only. */}
                 <button
                   type="button"
                   disabled={!card.videoHref}
                   aria-label={`Play testimonial — ${card.role}, ${card.place}`}
-                  className="absolute inset-0 transition-colors duration-300 hover:bg-black/10 disabled:cursor-default"
-                />
+                  className="absolute top-1/2 left-1/2 z-10 flex size-[100px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-2 border-white bg-ink/85 text-white shadow-[0_4px_20px_rgba(20,16,14,0.24)] backdrop-blur-[3px] transition-colors duration-300 hover:bg-ink/75 disabled:cursor-default lg:size-[120px]"
+                >
+                  <svg
+                    aria-hidden
+                    viewBox="0 0 40 48"
+                    className="ml-1 h-[42px] w-[36px] lg:h-[48px] lg:w-[40px]"
+                  >
+                    <path d="M4 3.5L37 24 4 44.5V3.5Z" fill="currentColor" />
+                  </svg>
+                </button>
               </div>
 
               <figcaption className="mt-[10px] flex items-center">
