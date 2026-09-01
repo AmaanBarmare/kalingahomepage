@@ -1,28 +1,18 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
 # dependencies
 /node_modules
 /.pnp
 .pnp.*
-.yarn/*
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/versions
 
-# testing
-/coverage
-
-# next.js
+# next
 /.next/
 /out/
-
-# production
 /build
+next-env.d.ts
 
 # misc
 .DS_Store
 *.pem
+/coverage
 
 # debug
 npm-debug.log*
@@ -30,12 +20,24 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
+# env
 .env*
+!.env.example
 
-# vercel
+# vercel / typescript
 .vercel
-
-# typescript
 *.tsbuildinfo
-next-env.d.ts
+
+# Figma metadata dumps — regenerate with get_metadata, do not commit
+/.figma/
+
+# Raw Figma exports. These are the INPUT to tools/optimize-assets.mjs and are
+# large PNGs; the committed WebP masters under public/images are the artefact
+# that matters. Figma's asset URLs expire after ~7 days, so if these are ever
+# needed again they must be re-pulled from the file, not from a link.
+/assets-src/
+
+# Re-allow the committed, optimised media.
+!/public/images/
+!/public/icons/
+!/public/fonts/

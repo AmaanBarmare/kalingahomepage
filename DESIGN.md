@@ -1,0 +1,334 @@
+# Kalinga homepage — design reference
+
+Everything measured, every deviation, and every thing that surprised us. The
+companion to [CLAUDE.md](CLAUDE.md) (how to work) and
+[amahafigmapage.md](amahafigmapage.md) (mistakes already paid for once).
+
+**Figma:** `5SkKc300bE566PF5ltUzqi` — "Kalinga Design 2.0", frame `544:3926`,
+**1440 × 9849**. Page gutter is **80** (derived from hero text x80, strip x82,
+progress rule x80, footer column x79 — measured once, per Amaha Part 1 §4).
+
+Verified with `npm run verify`: **15/15 anchors within 4px**, page renders
+1440 × 9819 against Figma's 9849.
+
+---
+
+## Tokens
+
+Read straight off Figma's variable set — do not invent values here.
+
+| Token | Value | Used for |
+|---|---|---|
+| `ink` | `#14100e` | body text, second tab bar's active fill, scrim end-stop |
+| `ruby` | `#70000e` | the page's only accent — logo, marks, first tab bar, one CTA |
+| `ruby-pressed` | `#4a000e` | CTA pressed |
+| `off-white` | `#f8f6f3` | **unused on this frame** (bands sample `#ffffff` every time) |
+| `line-soft` | `#e4dfd8` | tab borders, progress-rule track |
+| `gray-6` | `#f2f2f2` | hero headline — *not* pure white |
+| `placeholder` | `#cfc8c0` | image placeholders |
+
+## Type
+
+Figma carries exactly **two** named text styles. Everything else on the page is
+one of them, scaled.
+
+| Style | Spec |
+|---|---|
+| Heading | Halogen **Medium** 40 / 1.58 / +5, uppercase |
+| Body Copy | Neue Haas Grot **Disp** 45 Light 16 / 1.5 / +1 |
+
+Utilities live in [globals.css](src/app/globals.css): `.heading`, `.body-copy`
+and `.ghost-display`. If you catch yourself writing
+`text-[16px] leading-[1.5] tracking-[1px]`, you meant `.body-copy`. The
+collection slides' Halogen Regular 45.603 / +6.8404 is set inline in `cqw`
+rather than as a utility, because it has to scale with the carousel — see
+[collections-carousel.tsx](src/components/home/collections-carousel.tsx).
+
+`.heading` is `clamp(26px, 4.5vw, 40px)`. The `4.5vw` term only bites below
+~889px, so every viewport at or above 1024 still gets Figma's exact 40 / +5.
+
+### Fonts
+
+All nine faces are self-hosted, converted OTF → WOFF2 (700 KB → 278 KB,
+identical outlines):
+
+```
+Halogen-{Light,Regular,Medium,Bold}                  → --font-halogen
+NeueHaasGrotDisp-{45Light,55Roman,65Medium,75Bold}-Trial → --font-neue-haas
+NeueHaasGrotDispRound-25XThin-Trial                  → --font-neue-haas-round
+```
+
+The body face is Neue Haas Grotesk **Display**. Not `Text`, not `Round` — those
+ship under near-identical filenames and look subtly wrong.
+
+The **Round** cut is loaded separately, as its own family, and used by exactly
+one node: the MaxGuard ghost headline (`551:5465`), Round 25 XThin 90 / +13.5.
+Folding it into `neueHaas` as a 200 weight would let the browser substitute
+Round for Display body copy, which is why it gets its own `localFont` call.
+
+Verified against Figma: `"lorem"` renders 341px of glyphs against Figma's
+343.9px text frame (−2.9). `"ipsum"` and `"cal"` sit 33 and 22 short of *their*
+frames, but those frames are hand-drawn — the three boxes have heights 95.5 /
+92 / 95 for identical one-line text at one size. One font, one size, one
+tracking: if one word matches, they all do, and the boxes are the loose thing.
+
+---
+
+## Section reference
+
+y values are the element's top in the 1440 × 9849 frame.
+
+| y | Section | Key values |
+|---|---|---|
+| 0 | **Hero** | plate 1440×1071 full bleed. Logo bar 409×58 at x516 y38, `rgba(248,246,243,0.14)`, radius 2 — **no nav links in the frame**. Scrim y648→1071, transparent→`#000`, straight down. Headline x80 y842 w493 `#f2f2f2`; body x900 y851 w460; CTA x900 y925. Headline ends 968 and CTA ends 967.7 — the columns are **bottom-aligned on 968**, not top-aligned |
+| 1071 | **Intro** | headline 1235 (w644, 2 lines) → +31 → body 1392 (w539, 4 lines) → +68 → ruby mark 1556. All three centre on x720 |
+| 1715 | **Collections** | Component 102 — a **vertical carousel**, see below |
+| 2839 | **Applications** | heading 2986 → tabs 3141 → progress rule 3230 → active card 3259. Card rail, see below |
+| 4092 | **MaxGuard** | plate 1472×655 at x-16. Ghost text x434/684/684 at y78/192/284. Badge x1176 y21 197×132. CTA x649 y500. Lockup x60 y521. Store badges x340 y570 |
+| 4747 | **Visualiser** | heading 4894 → plate 5065 (1449×815 at x-9) → CTA 5927. **The page's only filled button** — Figma's Style=Primary, "Ruby CTA" |
+| 6050 | **Karigare** | heading 6136 → collage 6286. Component 101, 1420×860 **at x60** |
+| 7146 | **Testimonials** | heading 7273 → tabs 7434 → cards 7555 → mark 8328 |
+| 8519 | **Contact** | plate 1672×640 at x-114 runs to 9159, i.e. 84px *under* the opaque footer. Visible band is **556**, not 640 |
+| 9075 | **Footer** | 1440×774, see below |
+
+**Section boxes are driven off 1440, not off the plate width.** Several plates
+bleed past the frame (1457, 1472, 1449, 1672). Sizing the section's aspect box
+off the plate makes the section short — this cost a full measurement round and
+produced the −318px cumulative drift on the first verify pass.
+
+---
+
+## The three carousels
+
+Figma cannot show motion, so all three arrive looking like static sections.
+Each one only reconciles numerically under the animated reading.
+
+### Collections (Component 102) — vertical
+
+Figma draws one slide and parks three more below the clip boundary.
+
+1. The instance is 1124 tall but its first slide is 1022.636 — a 73px band left over.
+2. Slide 2 sits at top 1050.85, left 177.06, w 1102.886. In page space that is
+   x168.6 y2765.9 w1102.9 — **exactly** the beige sliver visible under the
+   Quartz slide in the rendered frame. It is the next slide peeking.
+3. `1102.886 / 1457 = 0.7569`, and every type size on the parked slides is the
+   active slide's size × that same 0.7569 (45.603 → 34.519, 18.241 → 13.808).
+   One slide at two scales, not four designs.
+
+So the slide scales as a unit. Sized in `cqw` against the frame so the scale is
+one transform rather than a table of breakpoint values.
+
+Slides: Quartz / 30 · Natural Marble / 40 · Terrazzo / 30 · Porcelain / 70.
+The peeking slide is the only affordance in the frame, so it *is* the control.
+
+### Applications (544:3950) — horizontal, active card pushes
+
+```
+SP/Kitchen      x0    y10   460 × 600
+SP/Bathroom     x484  y-15  498 × 650   ← active
+SP/Living Room  x1006 y10   460 × 600
+
+gaps      484-460 = 24  and  1006-(484+498) = 24     → one 24px gutter
+scale     498/460 = 1.0826, 650/600 = 1.0833         → one uniform scale
+centring  600×1.0833 = 650; half the 50px growth is 25; 10-25 = -15  → exact
+```
+
+The active card **pushes, it does not scale**. A transform-scale about the
+centre would put it at 465..963; Figma has it at 484..982 with the next card
+displaced by exactly the 38px of growth. So width/height animate and the flex
+row reflows.
+
+The active card also moves its label from the bottom (512/534) to the top
+(30/52) and gains the material swatch at (287,521) 191×107.
+
+Content runs to 1466 inside a 1250 frame → the rail scrolls. The strip's
+rawImages carry **four** scenes plus the swatch, not the three the frame draws.
+
+Vertical overflow is *not* clipped: in Figma the active card renders 3256..3904
+against a 3274..3894 frame. Reproduced with `-my-[25px] py-[25px]`, since
+`overflow-x: hidden` alone would force the other axis to `auto`.
+
+### Testimonials (Groups 196/197/199) — horizontal drag rail
+
+Card origins 82 / 432.16 / 780.66 / 1130.54 → deltas 350.16, 348.5, 349.88.
+A 321-wide card on a **349.5 pitch** (28.5 gutter). The fourth runs to 1451.5
+and is clipped by the 1440 frame — the tell that it is a rail, not a three-up.
+
+Drag is wired for **mouse only**. This is a real scroll container, so touch
+already has native panning with momentum; driving `scrollLeft` from
+`pointermove` on top of that doubles every swipe.
+
+`snap-mandatory` was removed: it forced `scrollLeft` past the container's left
+padding, rendering the first card flush at x0 instead of on the 82px gutter.
+The design shows the fourth card clipped mid-plate anyway — free positioning,
+not snapped.
+
+---
+
+## The "progress" rule (544:3948)
+
+1280 × 2 at x80, track `#e4dfd8`. Measured ruby fill runs **x560..1058**
+(499 wide). The active card's page box is 566..1064 (498 wide) — a 1:1 mirror
+to within 6px.
+
+So despite the layer name it marks the **focus slot**, not progress. Because
+the rail recentres the active card into that slot, it is stationary. Kept as
+drawn. If a travelling progress bar is ever wanted, that is a one-line change
+in [applications.tsx](src/components/home/applications.tsx) — but it would be a
+deviation from the frame, not a fix.
+
+---
+
+## Motion
+
+`get_motion_context` on the frame returns an **empty node list** — Figma carries
+no keyframe data for this file. Every animation is therefore authored, derived
+from what the layout implies. Nothing here is transcribed from a spec.
+
+| Where | What |
+|---|---|
+| Global | `Reveal` — 18px rise + fade, 900ms expo-out, fires once, never replays |
+| Hero | 18s 1.06→1.00 drift on the plate. Kept small deliberately: the source is 1280px on a 1440px box, and a larger scale makes the softness obvious |
+| Collections | 6s auto-advance, 1100ms glide; pauses on hover/focus |
+| Applications | 5s auto-advance, 780ms glide; pauses on hover/focus |
+| Karigare | scroll-linked parallax, per-plate depth 10–34px, via `animation-timeline: view()` — zero JS, and browsers without it render the plates at rest, which *is* the Figma frame |
+| Testimonials | mouse drag on a native scroll rail |
+
+Every one of them is off under `prefers-reduced-motion`. The reveal's resting
+(hidden) state lives in CSS rather than React state so that reduced-motion
+readers — and readers with no JS at all, via a `<noscript>` rule — can never be
+left looking at an invisible page.
+
+The applications reel rebases from the third copy to the first with the
+transition suppressed **from state**, not by writing `track.style.transition`
+imperatively: React re-applies the style prop on the next render, and clearing
+it to `""` later loses it permanently. The same suppression covers the **cards**,
+not just the track — the rebase changes which element is active, so a card
+keeping its own transition would visibly shrink while its twin grew.
+
+---
+
+## Assets
+
+`npm run assets` rebuilds `public/images` from `assets-src/`;
+`npm run assets:audit` reports without writing. **26 plates, 2.85 MB total.**
+
+### Figma's 2× export is a pure upscale — do not use it
+
+Round-tripping each export through its own source resolution gives PSNR
+**52.8 / 41.2 / 38.5 dB** (hero / visualiser / MaxGuard). That is no detail
+above the source Nyquist: the 2880px exports carry nothing the originals don't,
+at 1.2–5.3 MB each. The pipeline works from the raw fills and **never upscales**
+— target width is `min(display × 2, source width)`.
+
+### Eleven plates are below 2× DPR, and it is not the pipeline
+
+| Plate | Source | Display | DPR |
+|---|---|---|---|
+| hero | 1280×720 | 1440×1071 | **0.89** |
+| contact | 1672×940 | 1672×640 | **1.00** |
+| maxguard-scene | 1536×1024 | 1472×655 | **1.04** |
+| collection × 4 | 1536–1672 | 1457 | **1.05–1.15** |
+| testimonial 1–3 | 387–388×712 | 321×646 | **1.21** |
+| visualiser | 1920×1080 | 1449×815 | **1.33** |
+
+These are client-supplied AI renders at modest resolution. A plate under 2×
+**because the table threw pixels away** is a one-number fix; a plate under 2×
+**because the source is 1×** is a request to make of the client. These are all
+the second kind. Options: re-render at higher resolution, or run super-resolution
+(offered, not yet done — it invents detail, which on marble veining is the
+client's call).
+
+### Three exports had white flattened behind them
+
+`badge-warranty`, `maxguard-logo` and `app-badges` are alpha-bearing in their
+raw form; Figma's `export` composites them onto opaque white. Invisible in
+Figma, a white box over the photograph on the page. The pipeline uses the raws.
+
+`maxguard-logo` is worse: all four of `542:5283`'s rawImages are the *"Powered
+by MAXGUARD"* lockup, while the band actually uses the plain mark — which
+exists **only** as the flattened export. So it is unmixed back to straight
+alpha rather than composited:
+
+```
+a = 1 - min(r,g,b)/255          # greys and the red X both survive this
+c = (c_over - (1-a)·255) / a
+```
+
+→ 25.9% inked, 74.1% transparent.
+
+### After replacing any file under `public/images`
+
+```
+rm -rf .next/cache/images
+```
+
+Next keys its image cache by **pathname, not content**. Replacing
+`maxguard-logo.webp` on disk changed nothing on the page until this was
+cleared — the old lockup kept serving through a rebuild. The tell is the served
+aspect ratio, not the bytes on disk:
+
+```
+curl -s "localhost:3100/_next/image?url=%2Fimages%2Fmaxguard-logo.webp&w=640&q=75" -o /tmp/x.webp
+```
+
+### Icons
+
+`kalinga-mark.svg`, `kalinga-wordmark.svg`, `socials.svg`, `search.svg`,
+`gps.svg` all carry **literal fills** (`#70000E` / `white`), because they are
+served through `next/image`, which renders an SVG as an isolated document that
+never inherits `currentColor`.
+
+The Kalinga mark is *also* inlined as JSX in
+[kalinga-mark.tsx](src/components/ui/kalinga-mark.tsx), because it is used as a
+ruby divider, a white footer watermark, **and** the footer's tiled background —
+three colours, so it has to inherit. The footer tile repeats it on a measured
+**48px period** at 0..21 luminance over black.
+
+---
+
+## Known Figma-side issues — do not "fix" these
+
+- **`MAXGAURD`** is misspelled in the footer (`544:4401`). Reproduced as-is so
+  the discrepancy stays visible. Worth raising with the designer.
+- **`544:3976` "Scrim"** — a vector at x865 y7214 covering only the top third of
+  the testimonial cards. It does not appear in the rendered frame and no
+  plausible edge-fade has that geometry. Treated as a stray layer and omitted.
+- **`551:5470` "Rectangle 152"** is at **x1456** on a 1440-wide frame — parked
+  off-canvas. Not built. (Amaha Part 1 §3: check `0 ≤ x < frameWidth` first.)
+- Card captions are hand-placed: rule widths 23.18 vs 28.39, caption tops
+  8162.42 vs 8173.58. The *text* tops land within 2.4px, so one uniform value
+  is correct and the variance is noise.
+- The header bar carries **no navigation** — the lockup alone. All site
+  navigation is in the footer. That is what the frame contains.
+
+## The ghost headline is pure white, not a tint
+
+An earlier pass rendered the MaxGuard ghost text at 55% white — plausible, and
+wrong. Alpha-solving the stroke against its own background in the Figma render
+(sample the composite, solve per channel) gives **[1.00, 1.00, 1.00]**: a
+coherent per-channel alpha, which is what a *valid* solve looks like. An
+incoherent result would have meant the assumption was wrong.
+`get_design_context` independently says plain `text-white`, no opacity.
+
+The headline reads soft because the face is XThin, not because it is faded.
+The build now solves to the same [1.00, 1.00, 1.00] against Figma.
+
+## Deviations, stated
+
+- **Copy is Figma's lorem ipsum, verbatim**, including `"Lorem ipsum hakdinaik
+  ahdk"`. Only the contact paragraph and footer nav are real. All of it lives in
+  [content.ts](src/lib/content.ts) so real copy drops in without touching layout.
+- **No copyright line in the footer.** An earlier pass added one; Figma has
+  none, so it was removed rather than kept as unrequested scope.
+- The heading clamp below 889px (see Type).
+
+## Outstanding
+
+1. **Testimonial videos.** The four plates are poster frames; Figma draws a play
+   control on each. `videoHref` is `null` in `content.ts`, so the card renders
+   as a poster with a disabled control rather than a dead link.
+2. **Higher-resolution imagery**, or approval to super-resolve — see Assets.
+3. Routes other than `/` do not exist yet, so `next/link` prefetches to
+   `/collections`, `/contact` etc. return 404 in the console. Expected: only the
+   homepage was in scope.

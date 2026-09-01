@@ -106,8 +106,15 @@ export const testimonials = {
   ],
 } as const;
 
+/** One run of the contact paragraph: plain, emphasised, or a link. */
+export type ContactRun = { text: string; strong?: boolean; href?: string };
+
 /** Contact band — 544:4021/4022/4023. This copy is real, not placeholder. */
-export const contact = {
+export const contact: {
+  headline: string;
+  body: ContactRun[];
+  cta: { label: string; href: string };
+} = {
   headline: "Lorem ipsum",
   body: [
     { text: "Please contact Kalinga Stone Client Care Department on " },
@@ -118,10 +125,22 @@ export const contact = {
     { text: "+91 8879070029", strong: true, href: "tel:+918879070029" },
   ],
   cta: { label: "Contact Us", href: "/contact" },
-} as const;
+};
+
+export type FooterGroup = { title: string | null; links: string[]; headingStyle?: boolean };
 
 /** Footer — 555:2863. */
-export const footer = {
+export const footer: {
+  findAStore: { title: string; body: string; placeholder: string };
+  follow: {
+    title: string;
+    body: string;
+    linkText: string;
+    socials: { name: string; href: string }[];
+  };
+  columns: { groups: FooterGroup[] }[];
+  legal: string[];
+} = {
   findAStore: {
     title: "Find a store",
     body: "Enter a location to find the closest Kalinga Stone stores",
@@ -154,4 +173,4 @@ export const footer = {
     },
   ],
   legal: ["Conditions of service", "Terms of use", "Privacy policy"],
-} as const;
+};

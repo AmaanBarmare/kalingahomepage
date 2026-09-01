@@ -37,3 +37,26 @@ export const neueHaas = localFont({
     { path: "../../public/fonts/NeueHaasGrotDisp-75Bold-Trial.woff2", weight: "700", style: "normal" },
   ],
 });
+
+/**
+ * Neue Haas Grot Display **Round**, 25 XThin — one weight, one node.
+ *
+ * The MaxGuard ghost headline (Figma 551:5465) is the only place on the page
+ * that uses the Round cut, and the only thing anywhere below weight 300. It is
+ * loaded separately rather than folded into `neueHaas` because it is a
+ * different typeface, not a lighter weight of the same one: mixing them into
+ * one family would let the browser substitute Round for Display body copy.
+ */
+export const neueHaasRound = localFont({
+  variable: "--font-neue-haas-round",
+  display: "swap",
+  preload: false, // one decorative headline, below the fold
+  fallback: ["Helvetica Neue", "Helvetica", "Arial", "sans-serif"],
+  src: [
+    {
+      path: "../../public/fonts/NeueHaasGrotDispRound-25XThin-Trial.woff2",
+      weight: "200",
+      style: "normal",
+    },
+  ],
+});

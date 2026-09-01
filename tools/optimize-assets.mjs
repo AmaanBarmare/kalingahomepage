@@ -17,7 +17,7 @@
  * Usage:  node tools/optimize-assets.mjs [--audit]
  */
 import sharp from "sharp";
-import { mkdir, readdir, stat } from "node:fs/promises";
+import { mkdir, stat } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
 
@@ -34,12 +34,14 @@ const PLATES = [
   { src: "hero-raw1.png", out: "hero.webp", display: [1440, 1071], node: "544:4024" },
 
   // --- collections carousel (Component 102) ------------------------------
-  // Figma renders one slide; the other four are the instance's own rawImages.
-  { src: "comp102-01.png", out: "collection-quartz.webp", display: [1457, 1124], node: "544:4012" },
-  { src: "comp102-03.png", out: "collection-marble.webp", display: [1457, 1124], node: "544:4012" },
-  { src: "comp102-06.png", out: "collection-terrazzo.webp", display: [1457, 1124], node: "544:4012" },
-  { src: "comp102-07.png", out: "collection-porcelain.webp", display: [1457, 1124], node: "544:4012" },
-  { src: "comp102-10.png", out: "collection-onyx.webp", display: [1457, 1124], node: "544:4012" },
+  // Figma renders one slide and parks three more below the clip boundary. These
+  // four are the NAMED layers off each parked slide, not the instance's raw
+  // fill list — matching them by eye off the raw list gets the pairing wrong
+  // (the terrazzo slide's plate is the blue-curve aerial, not the bath).
+  { src: "col-quartz-bianco.png", out: "collection-quartz.webp", display: [1457, 1124], node: "260:2475" },
+  { src: "col-marble-clay.png", out: "collection-marble.webp", display: [1457, 1124], node: "333:2488" },
+  { src: "col-aug29-1129.png", out: "collection-terrazzo.webp", display: [1457, 1124], node: "333:2497" },
+  { src: "col-aug29-1155.png", out: "collection-porcelain.webp", display: [1457, 1124], node: "333:2507" },
 
   // --- applications strip (544:3950) -------------------------------------
   // Figma draws 3 cards; the strip's rawImages carry 4 scenes + 1 material swatch.
@@ -54,18 +56,30 @@ const PLATES = [
   // alpha-bearing originals: the Figma `export` of each of these has WHITE
   // flattened behind it, which is invisible in Figma and wrong on the page.
   { src: "badge-warranty.png", out: "badge-warranty.webp", display: [197, 132], node: "542:5282", alpha: true },
-  { src: "maxguard-raw2.png", out: "maxguard-logo.webp", display: [273, 59], node: "542:5283", alpha: true },
+  // Figma's four rawImages for 542:5283 are all the "Powered by MAXGUARD"
+  // lockup; the plain mark the band actually uses exists ONLY as the flattened
+  // export, so maxguard-lockup.png is that export with the white unmixed back
+  // out to straight alpha (see the note in tools/unmix notes / DESIGN.md).
+  { src: "maxguard-lockup.png", out: "maxguard-logo.webp", display: [273, 59], node: "542:5283", alpha: true },
 
   // --- surface visualiser --------------------------------------------------
   { src: "vis-raw1.png", out: "visualiser.webp", display: [1449, 815], node: "544:4015" },
 
   // --- karigare collage (Component 101) ------------------------------------
-  { src: "karigare-21.png", out: "karigare-1.webp", display: [520, 300], node: "544:4013" },
-  { src: "karigare-24.png", out: "karigare-2.webp", display: [520, 300], node: "544:4013" },
-  { src: "karigare-27.png", out: "karigare-3.webp", display: [520, 300], node: "544:4013" },
-  { src: "karigare-28.png", out: "karigare-4.webp", display: [520, 300], node: "544:4013" },
-  { src: "karigare-29.png", out: "karigare-5.webp", display: [520, 300], node: "544:4013" },
-  { src: "karigare-31.png", out: "karigare-6.webp", display: [520, 300], node: "544:4013" },
+  // Named layers in Figma's own child order, which is the z-order: 1 sits at the
+  // back, 6 on top. Every plate is ~430 x 242 (16:9), so the display box is the
+  // same for all six.
+  { src: "kari-1-inlay.png", out: "karigare-1.webp", display: [430, 242], node: "233:1033" },
+  { src: "kari-2-hydra.png", out: "karigare-2.webp", display: [432, 243], node: "233:1034" },
+  { src: "kari-3-aug31.png", out: "karigare-3.webp", display: [431, 243], node: "233:1035" },
+  { src: "kari-4-form2a.png", out: "karigare-4.webp", display: [430, 242], node: "233:1036" },
+  { src: "kari-5-form2.png", out: "karigare-5.webp", display: [430, 242], node: "233:1037" },
+  { src: "kari-6-form1.png", out: "karigare-6.webp", display: [431, 242], node: "233:1038" },
+
+  // --- store badges (542:5285) ---------------------------------------------
+  // One 894x150 plate holding both badges; the alpha-bearing original, since
+  // Figma's export flattens white behind it.
+  { src: "appbadge-1.png", out: "app-badges.webp", display: [248, 42], node: "542:5285", alpha: true },
 
   // --- testimonials (video poster frames) -----------------------------------
   { src: "testi-b1.png", out: "testimonial-1.webp", display: [321, 646], node: "544:3983" },

@@ -37,24 +37,15 @@
    find yourself writing `text-[16px] leading-[1.5] tracking-[1px]`, you meant
    `.body-copy`.
 --------------------------------------------------------------------------- */
+/* 4.5vw only bites below ~889px, so every viewport at or above the design's
+   1024 breakpoint still gets Figma's exact 40 / +5. Below that the heading
+   scales rather than wrapping a two-word line onto three. */
 @utility heading {
   font-family: var(--font-display);
   font-weight: 500;
-  font-size: 40px;
+  font-size: clamp(26px, 4.5vw, 40px);
   line-height: 1.58;
-  letter-spacing: 5px;
-  text-transform: uppercase;
-}
-
-/* The collection slides use Halogen *Regular* at 45.6/+6.84 — same style, one
-   weight down and one step up in size. Kept separate so the carousel can scale
-   it without disturbing the section headings. */
-@utility heading-slide {
-  font-family: var(--font-display);
-  font-weight: 400;
-  font-size: 45.6px;
-  line-height: 1.58;
-  letter-spacing: 6.84px;
+  letter-spacing: clamp(3px, 0.56vw, 5px);
   text-transform: uppercase;
 }
 
@@ -66,19 +57,11 @@
   letter-spacing: 1px;
 }
 
-@utility label-caps {
-  font-family: var(--font-body);
-  font-weight: 400;
-  text-transform: uppercase;
-  letter-spacing: 0.88px;
-}
-
 /* MaxGuard's ghost headline. Figma specifies Haas Grot Disp *Round* 25 XThin
-   at 90/+13.5 — the only place on the page that uses the Round cut or a weight
-   below 300. Falls back to the lightest available Disp weight until
-   NeueHaasGrotDispRound-25XThin-Trial.woff2 is supplied. */
+   at 90/+13.5 — the only place on the page that uses the Round cut, and the
+   only thing anywhere below weight 300. */
 @utility ghost-display {
-  font-family: var(--font-neue-haas-round, var(--font-body));
+  font-family: var(--font-neue-haas-round), var(--font-body);
   font-weight: 200;
   font-size: 90px;
   line-height: normal;
@@ -156,5 +139,50 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+}
+
+/* Scroll-linked drift for the Karigare collage. Zero JS: browsers without
+   scroll-driven animations simply render the plates at rest, which is the
+   Figma frame. Guarded on reduced-motion as well as support. */
+@keyframes ks-parallax {
+  from {
+    transform: translate3d(0, var(--drift, 20px), 0);
+  }
+  to {
+    transform: translate3d(0, calc(var(--drift, 20px) * -1), 0);
+  }
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .ks-parallax {
+      animation: ks-parallax linear both;
+      animation-timeline: view();
+      animation-range: cover 0% cover 100%;
+    }
+  }
+}
+
+/* Scroll-reveal. The resting (hidden) state is CSS so that reduced-motion and
+   no-JS readers are never left looking at an invisible page — see
+   src/components/ui/reveal.tsx. */
+.ks-reveal {
+  opacity: 0;
+  transform: translate3d(0, 18px, 0);
+  transition:
+    opacity 900ms var(--ease-out-expo),
+    transform 900ms var(--ease-out-expo);
+}
+
+.ks-reveal.is-in {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ks-reveal {
+    opacity: 1;
+    transform: none;
   }
 }

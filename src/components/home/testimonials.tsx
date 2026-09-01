@@ -1,0 +1,121 @@
+"use client";
+
+import Image from "next/image";
+import { useRef, useState } from "react";
+import { KalingaMark } from "@/components/ui/kalinga-mark";
+import { Reveal } from "@/components/ui/reveal";
+import { SectionHeading } from "@/components/ui/section-heading";
+import { TabBar } from "@/components/ui/tab-bar";
+import { testimonials } from "@/lib/content";
+
+/**
+ * Testimonials — Figma 544:3970 (heading), 544:4001 (audience tabs),
+ * Groups 196/197/199 (cards), 551:5497 (closing mark).
+ *
+ * Card origins: 82 / 432.16 / 780.66 / 1130.54 -> deltas 350.16, 348.5, 349.88.
+ * A 321-wide card on a 349.5 pitch (28.5 gutter). The fourth runs to 1451.5 and
+ * is clipped by the 1440 frame, which is the tell that this is a rail and not a
+ * three-up grid.
+ *
+ * Caption: a 28 x 1 ruby rule vertically centred on the label, 10px before the
+ * text. Figma's per-card rule widths (23.18 vs 28.39) and caption offsets
+ * (8162.42 vs 8173.58) are hand-placed; the text tops land within 2.4px of each
+ * other, so one uniform value is correct and the variance is noise.
+ *
+ * This is a real scroll container, so touch already has native panning with
+ * momentum — driving scrollLeft from pointermove on top of that would double
+ * every swipe. Drag is wired for MOUSE ONLY.
+ *
+ * There is a "Scrim" vector (544:3976) at x865 y7214 covering only the top
+ * third of the cards. It does not appear in the rendered frame and no plausible
+ * edge-fade has that geometry, so it is treated as a stray layer and omitted.
+ */
+export function Testimonials() {
+  const [audience, setAudience] = useState(0);
+  const rail = useRef<HTMLDivElement>(null);
+  const drag = useRef<{ x: number; left: number } | null>(null);
+  const [dragging, setDragging] = useState(false);
+
+  function onPointerDown(e: React.PointerEvent) {
+    if (e.pointerType !== "mouse" || !rail.current) return;
+    drag.current = { x: e.clientX, left: rail.current.scrollLeft };
+    setDragging(true);
+  }
+  function onPointerMove(e: React.PointerEvent) {
+    if (!drag.current || !rail.current) return;
+    rail.current.scrollLeft = drag.current.left - (e.clientX - drag.current.x);
+  }
+  function endDrag() {
+    drag.current = null;
+    setDragging(false);
+  }
+
+  return (
+    <section className="bg-white pt-[127px] pb-[155px]" aria-labelledby="testimonials-heading">
+      <SectionHeading title={testimonials.headline} body={testimonials.body} />
+
+      <Reveal delay={160}>
+        <TabBar
+          className="mt-[41px]"
+          label="Audience"
+          items={testimonials.audiences}
+          active={audience}
+          onSelect={setAudience}
+          tone="ink"
+        />
+      </Reveal>
+
+      <div
+        id="testimonial-rail"
+        ref={rail}
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={endDrag}
+        onPointerLeave={endDrag}
+        className={`mt-[87px] flex gap-[28.5px] overflow-x-auto px-6 pb-2 [scrollbar-width:none] touch-pan-y lg:px-[82px] [&::-webkit-scrollbar]:hidden ${
+          dragging ? "cursor-grabbing select-none" : "cursor-grab"
+        }`}
+      >
+        {testimonials.cards.map((card, i) => (
+          <Reveal key={`${card.role}-${i}`} delay={i * 90} className="shrink-0">
+            <figure className="w-[260px] lg:w-[321px]">
+              <div className="relative aspect-[321/607.6] w-full overflow-hidden bg-ink">
+                <Image
+                  src={card.image}
+                  alt={`${card.role}, ${card.place}`}
+                  fill
+                  sizes="(max-width: 1024px) 260px, 321px"
+                  draggable={false}
+                  className="object-cover"
+                />
+                <button
+                  type="button"
+                  disabled={!card.videoHref}
+                  aria-label={`Play testimonial — ${card.role}, ${card.place}`}
+                  className="absolute inset-0 grid place-items-center transition-colors duration-300 hover:bg-black/10 disabled:cursor-default"
+                >
+                  <span className="grid size-[62px] place-items-center rounded-full border border-white/90 transition-transform duration-500 ease-[var(--ease-out-expo)] group-hover:scale-105">
+                    <svg viewBox="0 0 24 24" className="ml-[3px] size-[22px] fill-white" aria-hidden>
+                      <path d="M8 5v14l11-7z" />
+                    </svg>
+                  </span>
+                </button>
+              </div>
+
+              <figcaption className="mt-[10px] flex items-center">
+                <span aria-hidden className="h-px w-[28px] shrink-0 bg-ruby" />
+                <span className="ml-[10px] font-body text-[13px] tracking-[1.5px] text-ruby uppercase">
+                  {card.role} · {card.place}
+                </span>
+              </figcaption>
+            </figure>
+          </Reveal>
+        ))}
+      </div>
+
+      <Reveal delay={200}>
+        <KalingaMark className="mx-auto mt-[135px] h-[28.577px] w-[28px] text-ruby" />
+      </Reveal>
+    </section>
+  );
+}

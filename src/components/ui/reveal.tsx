@@ -1,22 +1,24 @@
 "use client";
 
-import { useEffect, useRef, useState, type ElementType, type ReactNode } from "react";
+import { useEffect, useRef, type ElementType, type ReactNode } from "react";
 
 /**
  * Scroll-triggered entrance.
  *
  * Figma carries no motion data for this file (get_motion_context returns an
- * empty node list), so this is authored rather than transcribed. It is
- * deliberately restrained: an 18px rise over 900ms on an expo-out curve, fired
- * once, never replayed on scroll-back. A luxury surfaces brand should not have
- * things springing about.
+ * empty node list), so this is authored rather than transcribed. Deliberately
+ * restrained: an 18px rise over 900ms on an expo-out curve, fired once and
+ * never replayed on scroll-back.
  *
- * Three things that keep it from being annoying:
- *  - it fires ONCE and then unobserves, so scrolling up doesn't re-animate;
- *  - under prefers-reduced-motion nothing is ever hidden, so there is no
- *    "invisible content" failure mode if the observer never fires;
- *  - the initial hidden state is applied on the client only, so content is
- *    present in the server HTML for crawlers and no-JS readers.
+ * The hidden state lives in CSS (`.ks-reveal`), not in React state, for three
+ * reasons:
+ *   - no setState inside an effect, which is both a lint error and a real
+ *     double-render;
+ *   - `prefers-reduced-motion` un-hides it in the stylesheet, so a reader who
+ *     asked for stillness never depends on JS running to see the page;
+ *   - a <noscript> rule does the same when JS never arrives, so there is no
+ *     way for content to be stranded invisible.
+ * The observer then only ever adds a class — a DOM write, not a state change.
  */
 export function Reveal({
   as: Tag = "div",
@@ -30,26 +32,21 @@ export function Reveal({
   className?: string;
 }) {
   const ref = useRef<HTMLElement>(null);
-  const [shown, setShown] = useState(false);
-  const [armed, setArmed] = useState(false);
 
   useEffect(() => {
-    // Never hide anything for a reader who asked for reduced motion.
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setShown(true);
-      return;
-    }
-    setArmed(true);
-
     const el = ref.current;
     if (!el) return;
 
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      el.classList.add("is-in");
+      return;
+    }
+
     const io = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
-          setShown(true);
-          io.disconnect();
-        }
+        if (!entry.isIntersecting) return;
+        el.classList.add("is-in");
+        io.disconnect();
       },
       { rootMargin: "0px 0px -12% 0px", threshold: 0.05 },
     );
@@ -60,12 +57,8 @@ export function Reveal({
   return (
     <Tag
       ref={ref}
-      className={className}
-      style={{
-        opacity: armed && !shown ? 0 : 1,
-        transform: armed && !shown ? "translate3d(0, 18px, 0)" : "none",
-        transition: `opacity 900ms var(--ease-out-expo) ${delay}ms, transform 900ms var(--ease-out-expo) ${delay}ms`,
-      }}
+      className={`ks-reveal ${className}`}
+      style={{ transitionDelay: `${delay}ms` }}
     >
       {children}
     </Tag>

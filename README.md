@@ -1,36 +1,79 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Kalinga Stone — homepage
 
-## Getting Started
+The Kalinga Stone homepage, built from Figma
+[`5SkKc300bE566PF5ltUzqi`](https://www.figma.com/design/5SkKc300bE566PF5ltUzqi/Kalinga-Design-2.0?node-id=544-3926)
+frame `544:3926` (1440 × 9849).
 
-First, run the development server:
+Next.js 16 (App Router) · React 19 · TypeScript · Tailwind v4.
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev          # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Where things are
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Path | What |
+|---|---|
+| [src/app/page.tsx](src/app/page.tsx) | composes the ten sections, in frame order |
+| [src/app/globals.css](src/app/globals.css) | design tokens + the five type utilities + motion |
+| [src/lib/content.ts](src/lib/content.ts) | **every string on the page**, in one file |
+| [src/lib/fonts.ts](src/lib/fonts.ts) | the two brand faces, self-hosted |
+| [src/components/home/](src/components/home/) | one file per section |
+| [src/components/ui/](src/components/ui/) | `KsButton`, `TabBar`, `Reveal`, `SectionHeading`, the mark, the logo |
+| [tools/optimize-assets.mjs](tools/optimize-assets.mjs) | the image pipeline |
+| [tools/verify.mjs](tools/verify.mjs) | measures the running page against Figma |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Scripts
 
-## Learn More
+```bash
+npm run dev            # dev server
+npm run build          # production build
+npm run lint           # eslint
 
-To learn more about Next.js, take a look at the following resources:
+npm run assets         # rebuild public/images from assets-src/
+npm run assets:audit   # report DPR / size per plate without writing
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+npm run verify         # measure the running page against the Figma frame
+npm run verify:shots   # ...and write a full-page screenshot
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+`verify` expects a server on `http://localhost:3000`; point it elsewhere with
+`URL=http://localhost:3100/ npm run verify`. It reports every anchor's delta
+against its known y in the Figma frame. **The bar is 4px** — currently 15/15.
 
-## Deploy on Vercel
+## Read these before changing anything
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- **[CLAUDE.md](CLAUDE.md)** — how work gets done here. Three rules: the 95%
+  confidence rule, plan → test → execute, and keep the files current.
+- **[DESIGN.md](DESIGN.md)** — every measured value, all three carousels
+  explained, the motion spec, the asset pipeline's reasoning, known Figma-side
+  errors, and what is still outstanding.
+- **[amahafigmapage.md](amahafigmapage.md)** — the playbook from a previous
+  Figma build. Different client, same failure modes. Worth reading once.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Three things that will bite you
+
+1. **Section boxes are sized off 1440, not off the plate.** Several plates bleed
+   past the frame (1457, 1472, 1449, 1672 wide). Driving a section's aspect box
+   off the plate width makes it short, and the error compounds down the page.
+
+2. **Clear the image cache after replacing anything in `public/images`.**
+   ```bash
+   rm -rf .next/cache/images
+   ```
+   Next keys it by pathname, not content, so a replaced file keeps serving the
+   old bytes through a full rebuild.
+
+3. **Three sections that look static are carousels.** Collections is vertical,
+   Applications and Testimonials are horizontal. Figma can't show motion, so it
+   parks the other slides off-canvas or below the clip boundary — see DESIGN.md
+   before "simplifying" any of them into a grid.
+
+## Outstanding
+
+- Testimonial videos — the four cards currently render poster frames with the
+  play control disabled.
+- Eleven image plates are below 2× DPR because the supplied sources are
+  1280–1920px. Not a pipeline limit; see DESIGN.md § Assets.
+- Only `/` exists, so footer and CTA links prefetch to 404s in the console.
