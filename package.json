@@ -9,6 +9,7 @@
     "lint": "eslint",
     "assets": "node tools/optimize-assets.mjs",
     "assets:audit": "node tools/optimize-assets.mjs --audit",
+    "brochures": "python3 tools/optimize-brochures.py",
     "verify": "node tools/verify.mjs",
     "verify:shots": "node tools/verify.mjs --shots",
     "video": "node tools/optimize-video.mjs",

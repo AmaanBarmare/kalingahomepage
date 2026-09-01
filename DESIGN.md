@@ -466,6 +466,68 @@ Best guess is an effect on the scene layer that the API does not expose —
 Figma's progressive blur, a background blur, or a masked overlay. Everything
 else in the band matches; ask the designer what that layer is.
 
+## The brochures were 1.8 GB, and two thirds of that was invisible
+
+The four collection brochures arrive as Illustrator print masters — PDF/1.4,
+612 x 846pt, every placed photograph a ~300ppi CMYK JPEG. 1812 MB across four
+files. `tools/optimize-brochures.py` takes them to **95 MB (19x)** with the
+worst sampled page at 29.4 dB and no visible change.
+
+### Most of the file is the editable .ai document, not artwork
+
+Illustrator's *Create PDF Compatible File* embeds the whole editable document
+inside the PDF, hung off `/PieceInfo << /Illustrator ... >>` on the catalogue
+and on **every page**. On Quartz that is **234 MB in 3733 objects** against
+79 MB of actual unique images, and nothing renders it — it exists so the PDF can
+be reopened in Illustrator. Dropping the key and garbage-collecting takes
+340 MB -> 112 MB **in two seconds with not one pixel changed**.
+
+Measure before compressing. Downsampling every image in Quartz to 150ppi saves
+less than deleting a key that no reader ever looks at.
+
+### Why this does not use PyMuPDF's `rewrite_images`
+
+The built-in only scales by **powers of two**, and skips anything it cannot
+halve into the target — aim at 200ppi and a 300ppi plate is left completely
+untouched, because 150 would undershoot. It also keeps CMYK. Same 150ppi target
+on Quartz:
+
+| path | result |
+| --- | --- |
+| `rewrite_images` | 71.4 MB |
+| arbitrary-ratio Lanczos + CMYK -> RGB | **26.0 MB** |
+
+Each image is resampled against **its widest placement on the page**, not its
+own dimensions — a plate drawn into half a column needs half the pixels
+whatever the source says. CMYK -> RGB goes through MuPDF's colour management
+rather than PIL, because these are Adobe-inverted CMYK JPEGs and PIL reads them
+wrong often enough to matter. Chroma subsampling is 4:2:2, not the 4:2:0
+default: these are photographs of stone and the veining lives in chroma.
+
+### The type is not at risk
+
+Zero embedded fonts, zero extractable text — every glyph is already vector
+outline, so downsampling the placed images cannot touch it. Verified by
+rendering: the logotype is pixel-identical before and after, and only the
+photography moves at all. That is what makes 150ppi safe here in a way it would
+not be for a text PDF.
+
+### Reading the PSNR
+
+Terrazzo's cover is the worst page in the set at 29.4 dB, and it is fine —
+terrazzo is dense high-frequency speckle, the hardest possible content for
+PSNR, where sub-pixel differences tank the metric without being visible. Checked
+at 1:1: aggregate, mirror edge and fixtures are indistinguishable. Use the
+number to find pages worth looking at, not as a verdict.
+
+### Cost
+
+`public/brochures` is **95 MB in the repo**, which is the real price of this
+decision. Halving it again means ~110ppi, which measured 3-4 dB worse and is
+visible on the stone. Worth revisiting only if deploy size becomes a problem.
+
+---
+
 ## Video
 
 `npm run video` rebuilds `public/videos` from `assets-src/video`;
