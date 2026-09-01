@@ -827,8 +827,9 @@ The build now solves to the same [1.00, 1.00, 1.00] against Figma.
    as a poster with a disabled control rather than a dead link.
 2. **Higher-resolution imagery**, or approval to super-resolve — see Assets.
    The new contact plate is 1440px against a 1440px box, i.e. exactly 1x.
-   Quartz is now the client's 9176 x 5164 Michelangelo plate and caps at the
-   2880 master; Marble is the only collection plate still source-limited.
+   Quartz (Figma 759:9016) replaced the Michelangelo slab and is a 1672 x 941
+   render, so it dropped from the 2880 master to 1.16x; with Marble at 1.03x
+   that is two of the four collection plates now source-limited.
    The two clips have the same problem: the hero is 0.89× and the visualiser
    1.33× against their boxes. The hero also wants a re-render at the section's
    1.345 aspect rather than 16:9 — see Video.

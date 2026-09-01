@@ -37,9 +37,11 @@ const PLATES = [
   // These are the four user-supplied production plates. Keep their own native
   // crop and never upscale; the two larger sources are capped at a 2880px 2x
   // master and the two smaller sources remain at their full native width.
-  // Quartz is the client's Michelangelo plate: 9176 x 5164, so it caps at the
-  // 2880 master rather than being source-limited like the other three.
-  { src: "quartz-michelangelo.png", out: "collection-scroll-quartz.webp", display: [1440, 1000], group: "collections" },
+  // Quartz is Figma 759:9016, a loose plate parked off-canvas at x-1227 y39002
+  // rather than placed in the home frame — it is the kitchen scene reshot, and
+  // it replaces the Michelangelo slab that stood here. Its native 1672 x 941 is
+  // BELOW the 2880 master (1.16x), which the audit flags; see README.
+  { src: "quartz-kitchen.png", out: "collection-scroll-quartz.webp", display: [1440, 1000], group: "collections" },
   { src: "collections-scroll-marble.png", out: "collection-scroll-marble.webp", display: [1440, 1000], group: "collections" },
   { src: "collections-scroll-terrazzo.png", out: "collection-scroll-terrazzo.webp", display: [1440, 1000], group: "collections" },
   { src: "collections-scroll-porcelain.png", out: "collection-scroll-porcelain.webp", display: [1440, 1000], group: "collections" },
