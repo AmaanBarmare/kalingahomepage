@@ -186,3 +186,267 @@
     transform: none;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   Browse by Space hover rail.
+
+   The interaction and card geometry come from the reference implementation.
+   This page keeps its existing 82px rail gutter, type treatment and scrims.
+   The rail is pinned to the 650px active height so hover never shifts the
+   sections below it.
+--------------------------------------------------------------------------- */
+.space-track {
+  --space-card-w: 460px;
+  --space-card-h: 600px;
+  --space-card-active-w: 498px;
+  --space-card-active-h: 650px;
+
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  height: var(--space-card-active-h);
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  padding-bottom: 8px;
+  cursor: grab;
+  user-select: none;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.space-track::-webkit-scrollbar {
+  display: none;
+}
+
+.space-track.is-dragging {
+  cursor: grabbing;
+  scroll-snap-type: none;
+}
+
+.space-card {
+  position: relative;
+  flex: 0 0 auto;
+  width: var(--space-card-w);
+  height: var(--space-card-h);
+  overflow: hidden;
+  isolation: isolate;
+  background: var(--color-stone-deep);
+  scroll-snap-align: start;
+  transition:
+    width 420ms var(--ease-glide),
+    height 420ms var(--ease-glide),
+    box-shadow 420ms var(--ease-glide);
+}
+
+.space-image {
+  --space-image-scale: 1.001;
+  --space-image-active-scale: 1.035;
+
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: block;
+  overflow: hidden;
+  transform: scale(var(--space-image-scale));
+  transition: transform 550ms var(--ease-glide);
+}
+
+/* Preserve this page's measured lower-corner scrim for the room caption. */
+.space-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background-image: linear-gradient(
+    198.185deg,
+    rgba(0, 0, 0, 0) 50.817%,
+    rgba(7, 6, 5, 0.5) 67.361%,
+    rgb(20, 16, 14) 97.235%
+  );
+}
+
+.space-cover-link {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}
+
+.space-cover-link:focus-visible {
+  outline: 2px solid var(--color-ruby);
+  outline-offset: -4px;
+}
+
+.space-card .cap {
+  position: absolute;
+  left: 28px;
+  bottom: 34px;
+  z-index: 3;
+  color: rgb(255, 255, 255);
+  pointer-events: none;
+  transition: bottom 420ms var(--ease-glide);
+}
+
+.space-card .cap .n {
+  font-family: var(--font-display);
+  font-size: 12px;
+  line-height: 1;
+  font-weight: 400;
+}
+
+.space-card .cap .t {
+  margin-top: 10px;
+  font-family: var(--font-display);
+  font-size: 20px;
+  line-height: 1.58;
+  font-weight: 400;
+  letter-spacing: 1px;
+  white-space: nowrap;
+}
+
+.space-material-card {
+  position: absolute;
+  right: 24px;
+  bottom: 24px;
+  z-index: 4;
+  width: min(277px, calc(100% - 32px));
+  aspect-ratio: 277 / 150;
+  overflow: hidden;
+  border: 1px solid rgba(20, 16, 14, 0.52);
+  background: var(--color-off-white);
+  box-shadow: 5px 6px 6.4px rgba(0, 0, 0, 0.36);
+  opacity: 0;
+  pointer-events: none;
+  transform: translate3d(0, 20px, 0) scale(0.96);
+  transform-origin: right bottom;
+  transition:
+    opacity 240ms ease,
+    transform 420ms var(--ease-glide);
+}
+
+.space-material-image {
+  position: absolute;
+  inset: 0;
+  display: block;
+  overflow: hidden;
+  transition: transform 450ms ease;
+}
+
+.space-material-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 45%, rgba(255, 255, 255, 0.84) 100%);
+}
+
+/* 544:4014 — Haas Grot Disp Trial 45 Light, NOT Halogen. The room caption above
+   it (544:3955 "Kitchen") is the Halogen one; these two sit inches apart and are
+   deliberately different faces, so setting both to the display face is an easy
+   mistake to make and a hard one to see. */
+.space-material-link {
+  position: absolute;
+  right: 13px;
+  bottom: 12px;
+  z-index: 1;
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 300;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.space-material-card:hover .space-material-image {
+  transform: scale(1.04);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .space-track:not(.is-dragging) .space-card:hover,
+  .space-track:not(.is-dragging) .space-card:focus-within {
+    width: var(--space-card-active-w);
+    height: var(--space-card-active-h);
+    box-shadow: 0 18px 34px rgba(20, 16, 14, 0.18);
+  }
+
+  .space-track:not(.is-dragging) .space-card:hover .space-image,
+  .space-track:not(.is-dragging) .space-card:focus-within .space-image {
+    transform: scale(var(--space-image-active-scale));
+  }
+
+  .space-track:not(.is-dragging) .space-card:hover::after,
+  .space-track:not(.is-dragging) .space-card:focus-within::after {
+    background-image:
+      linear-gradient(to bottom, rgba(7, 6, 5, 0.45), rgba(0, 0, 0, 0) 22%),
+      linear-gradient(
+        198.185deg,
+        rgba(0, 0, 0, 0) 50.817%,
+        rgba(7, 6, 5, 0.5) 67.361%,
+        rgb(20, 16, 14) 97.235%
+      );
+  }
+
+  .space-track:not(.is-dragging) .space-card:hover .cap,
+  .space-track:not(.is-dragging) .space-card:focus-within .cap {
+    bottom: calc(100% - 92px);
+  }
+
+  .space-track:not(.is-dragging) .space-card:hover .space-material-card,
+  .space-track:not(.is-dragging) .space-card:focus-within .space-material-card {
+    opacity: 1;
+    pointer-events: auto;
+    transform: none;
+    transition-delay: 80ms;
+  }
+}
+
+@media (max-width: 1023px) {
+  .space-track {
+    --space-card-w: min(360px, 78vw);
+    --space-card-h: calc(var(--space-card-w) * 600 / 460);
+    --space-card-active-w: var(--space-card-w);
+    --space-card-active-h: var(--space-card-h);
+
+    gap: 16px;
+    padding-bottom: 0;
+  }
+}
+
+@media (hover: none), (pointer: coarse) {
+  .space-material-card {
+    right: 16px;
+    bottom: 16px;
+    width: min(160px, calc(100% - 40px));
+    opacity: 1;
+    pointer-events: auto;
+    transform: none;
+  }
+
+  .space-material-link {
+    right: 10px;
+    bottom: 8px;
+    font-size: 12px;
+  }
+
+  .space-card .cap {
+    left: 20px;
+    bottom: calc(100% - 76px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .space-card,
+  .space-image,
+  .space-card .cap,
+  .space-material-card,
+  .space-material-image {
+    transition-duration: 0.01ms !important;
+  }
+
+  .space-track:not(.is-dragging) .space-card:hover .space-image,
+  .space-track:not(.is-dragging) .space-card:focus-within .space-image {
+    transform: scale(var(--space-image-scale));
+  }
+}

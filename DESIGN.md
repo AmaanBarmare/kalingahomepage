@@ -288,6 +288,36 @@ three colours, so it has to inherit. The footer tile repeats it on a measured
 
 ---
 
+## Two faces sit inches apart on the application cards
+
+The room caption and the material link are **different typefaces**, and they are
+close enough together that setting both to the display face looks fine and is
+wrong. Verified per node:
+
+| element | node | face | size | tracking |
+|---|---|---|---|---|
+| index "01" | 544:3954 | Halogen Regular (400) | 12 | — |
+| room "Kitchen" | 544:3955 | Halogen Regular (400) | 20 / lh 31.6 | 1 |
+| **"View material"** | 544:4014 | **Haas Grot Disp Trial 45 Light (300)** | 9 | 1, uppercase, underline |
+| sector chip | 544:3935 | Halogen **Medium** (500) | 12 | 1 |
+| audience chip | 544:4005 | Halogen **Medium** (500) | 12 | 1 |
+
+Two were wrong and both were font-family errors, not size errors:
+
+- `.space-material-link` was `--font-display` at weight 500. It is the **body**
+  face at weight 300 — the one place on a card that is not Halogen.
+- `TabBar` was `font-body font-normal` on **both** bars. Both are Halogen Medium.
+
+One trap in the Figma output: 544:3935 reports `font-['Transducer_Test:Medium']`
+on the paragraph, and `Halogen:Medium` on the spans inside it. The paragraph font
+is a leftover on an empty style — the spans are what renders. Read the spans.
+
+Still deliberately off, pending a call from the client: the link renders at 13px
+against Figma's 9 and the chips at 13 against 12. Those are sizes the build
+already carried; only the faces were corrected here.
+
+---
+
 ## The MaxGuard band is two photographic layers, not one
 
 `551:5467` is the **same couple, cut out** of the scene `542:5281` and drawn

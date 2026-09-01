@@ -44,23 +44,81 @@ export const collections = [
 ] as const;
 
 /**
- * Applications strip — 544:3950.
+ * Applications / Browse by Space strip — 544:3950.
  *
- * Figma draws three cards clipped by a 1250px frame; the strip's own rawImages
- * carry four scenes plus the material swatch that sits on the active card.
- * Sectors come from the filter bar at 544:3931.
+ * The local heading and filter labels stay aligned with this page's Figma
+ * frame. Card order, destinations, scene plates, and hover-detail materials
+ * mirror the reference site's Browse by Space section sector by sector.
  */
 export const applications = {
   headline: "Lorem IPSUM",
   body: LOREM_DUMMY,
   sectors: ["Residential", "Commercial", "Hospitality", "Healthcare"],
-  cards: [
-    { index: "01", title: "Kitchen", image: "/images/application-kitchen.webp" },
-    { index: "02", title: "Bathroom", image: "/images/application-bathroom.webp" },
-    { index: "03", title: "Living Room", image: "/images/application-living.webp" },
-    { index: "04", title: "Lounge", image: "/images/application-lounge.webp" },
-  ],
-  swatch: { image: "/images/application-swatch.webp", label: "View material" },
+  spacesBySector: {
+    Residential: [
+      { index: "01", name: "Bathroom",    href: "/spaces/bathroom",    src: "/images/residential-bathroom.webp",    alt: "A contemporary bathroom with a warm white engineered quartz shower wall and mitred vanity",
+        material: "Bianco Chianti",         materialSrc: "/images/material-v2-bianco-chianti.webp",    materialAlt: "Close detail of warm white engineered quartz with delicate grey veining" },
+      { index: "02", name: "Living Room", href: "/spaces/living-room", src: "/images/residential-living-room.webp", alt: "A living room with a floor-to-ceiling black engineered quartz fireplace wall crossed by bold white veins",
+        material: "Grand Antique",          materialSrc: "/images/material-v2-grand-antique.webp", materialAlt: "Close detail of black engineered quartz with dramatic white veining" },
+      { index: "03", name: "Kitchen",     href: "/spaces/kitchen",     src: "/images/residential-kitchen.webp",     alt: "A walnut kitchen centred on a warm Calacatta engineered quartz waterfall island and backsplash",
+        material: "Calacatta Oro",          materialSrc: "/images/material-v2-calacatta-oro.webp",     materialAlt: "Close detail of warm ivory engineered quartz with grey and muted gold veins" },
+      { index: "04", name: "Workspace",   href: "/spaces/workspace",   src: "/images/residential-workspace.webp",   alt: "A home workspace with a deep green engineered quartz desk and statement wall",
+        material: "Verde Botanic Classico", materialSrc: "/images/material-v2-verde-botanic-classico.webp",   materialAlt: "Close detail of deep botanical green engineered quartz with pale mineral veins" },
+      { index: "05", name: "Dining",      href: "/spaces/dining",      src: "/images/residential-dining.webp",      alt: "A warm dining room centred on a sculptural engineered terrazzo table",
+        material: "Murano Terrazzo",        materialSrc: "/images/material-v2-murano-terrazzo.webp",      materialAlt: "Close detail of creamy engineered terrazzo with terracotta, olive and charcoal aggregate" },
+      { index: "06", name: "Hallway",     href: "/spaces/hallway",     src: "/images/residential-hallway.webp",     alt: "A residential hallway finished with large-format warm cream engineered marble flooring and wall cladding",
+        material: "Crema Nova",             materialSrc: "/images/material-v2-crema-nova.webp",     materialAlt: "Close detail of warm cream engineered marble with soft beige and grey movement" },
+      { index: "07", name: "Bedroom",     href: "/spaces/bedroom",     src: "/images/residential-bedroom.webp",     alt: "A calm bedroom with a taupe engineered marble headboard wall and matching bedside ledge",
+        material: "Emperador Chiara",       materialSrc: "/images/material-v2-emperador-chiara.webp",     materialAlt: "Close detail of taupe engineered marble with fine cream veining" },
+    ],
+    Commercial: [
+      { index: "01", name: "Entrance & Arrivals",      href: "/spaces/entrance-arrivals",    src: "/images/commercial-entrance-arrivals.webp",    alt: "A corporate entrance framed by monumental white engineered marble wall cladding, deep jambs and flooring",
+        material: "Statuario Classic",       materialSrc: "/images/material-v2-statuario-classic.webp",    materialAlt: "Close detail of warm white engineered marble with disciplined charcoal-grey veining" },
+      { index: "02", name: "Lobby & Common Area",      href: "/spaces/lobby-common-area",    src: "/images/commercial-lobby-common-area.webp",    alt: "A large commercial lobby with engineered terrazzo flooring, curved reception desk and communal bench",
+        material: "Imperial Grey Terrazzo", materialSrc: "/images/material-v2-imperial-grey-terrazzo.webp",    materialAlt: "Close detail of warm grey engineered terrazzo with cream, charcoal, rust and green aggregate" },
+      { index: "03", name: "Office Interiors",         href: "/spaces/office-interiors",     src: "/images/commercial-office-interiors.webp",     alt: "A contemporary office with warm grey engineered quartz workstations and full-height wall cladding",
+        material: "Michelangelo Quartz",    materialSrc: "/images/material-v2-michelangelo-quartz.webp",     materialAlt: "Close detail of warm grey engineered quartz with subtle pale mineral movement" },
+      { index: "04", name: "Retail & Showroom Space",  href: "/spaces/retail-showroom",      src: "/images/commercial-retail-showroom.webp",      alt: "A luxury showroom with black engineered quartz display walls, illuminated niches and monolithic plinths",
+        material: "Grand Antique",          materialSrc: "/images/material-v2-grand-antique.webp",      materialAlt: "Close detail of jet-black engineered quartz with bold organic white veining" },
+      { index: "05", name: "Meeting & Event Area",     href: "/spaces/meeting-event-area",   src: "/images/commercial-meeting-event-area.webp",   alt: "An executive meeting and event suite centred on a blue-grey engineered quartz table and matching wall",
+        material: "Blue Crystal Agathe",    materialSrc: "/images/material-v2-blue-crystal-agathe.webp",   materialAlt: "Close detail of blue-grey engineered quartz with luminous crystalline blue, white and amber movement" },
+    ],
+    Hospitality: [
+      { index: "01", name: "Entrance Facade",          href: "/spaces/hospitality/entrance-facade",    src: "/images/hospitality-entrance-facade.webp",          alt: "A luxury hotel entrance framed by monumental bookmatched white engineered marble slabs",
+        material: "Statuario Classic",       materialSrc: "/images/material-v3-statuario-classic-entrance-facade.webp", materialAlt: "Close detail of warm ivory engineered marble with dense branching charcoal-grey veining matching the entrance facade" },
+      { index: "02", name: "Lobby",                  href: "/spaces/hospitality/lobby",              src: "/images/hospitality-lobby.webp",                    alt: "A double-height hotel lobby with warm grey terrazzo flooring and curved sculptural plinths",
+        material: "Bianco Terrazzo",         materialSrc: "/images/material-v2-bianco-terrazzo.webp",                    materialAlt: "Close detail of warm grey engineered terrazzo with cream, charcoal and muted earth aggregate" },
+      { index: "03", name: "Reception",              href: "/spaces/hospitality/reception",          src: "/images/hospitality-reception.webp",                alt: "A hotel reception desk and full-height feature wall clad in deep forest-green engineered quartz",
+        material: "Verde Botanic Classico", materialSrc: "/images/material-v2-verde-botanic-classico.webp",                materialAlt: "Close detail of deep green engineered quartz with fine ivory mineral veining" },
+      { index: "04", name: "Guest Rooms",            href: "/spaces/hospitality/guest-rooms",        src: "/images/hospitality-guest-rooms.webp",              alt: "A hotel guest room with a taupe engineered marble headboard wall and floating bedside ledge",
+        material: "Emperador Chiara",       materialSrc: "/images/material-v2-emperador-chiara.webp",              materialAlt: "Close detail of honed taupe engineered marble with fine cream veining" },
+      { index: "05", name: "Bathroom",               href: "/spaces/hospitality/bathroom",           src: "/images/hospitality-bathroom.webp",                 alt: "A luxury hotel bathroom with bookmatched Calacatta-style engineered marble shower walls and vanity",
+        material: "Calacatta Oro",          materialSrc: "/images/material-v2-calacatta-oro.webp",                 materialAlt: "Close detail of ivory engineered marble with disciplined grey and muted gold veins" },
+      { index: "06", name: "Restaurant",             href: "/spaces/hospitality/restaurant",         src: "/images/hospitality-restaurant.webp",               alt: "A hotel restaurant centred on a curved burgundy engineered terrazzo bar and matching dining tables",
+        material: "Rosso Levanto Terrazzo", materialSrc: "/images/material-v2-rosso-levanto-terrazzo.webp",               materialAlt: "Close detail of burgundy engineered terrazzo with cream, rose and charcoal aggregate" },
+      { index: "07", name: "Wellness & Recreation",  href: "/spaces/hospitality/wellness-recreation", src: "/images/hospitality-wellness-recreation.webp",       alt: "A resort spa with a curved sage engineered-stone relaxation bench, wall cladding and pool coping",
+        material: "Verde Aurora",            materialSrc: "/images/material-v2-verde-aurora.webp",       materialAlt: "Close detail of pale sage engineered stone with soft white crystalline movement" },
+      { index: "08", name: "Outdoor & Landscape",    href: "/spaces/hospitality/outdoor-landscape",  src: "/images/hospitality-outdoor-landscape.webp",        alt: "A landscaped resort courtyard finished with large-format sand-coloured porcelain pavers and stepped planters",
+        material: "Sandstone Porcelain",     materialSrc: "/images/material-v2-sandstone-porcelain.webp",        materialAlt: "Close detail of matte sand-coloured exterior porcelain with subtle limestone texture" },
+      { index: "09", name: "Banquet & Events Space", href: "/spaces/hospitality/banquet-events-space", src: "/images/hospitality-banquet-events-space.webp",     alt: "A hotel banquet hall with black-veined engineered marble columns, buffet console and warm grey stone flooring",
+        material: "Nero Marquina",           materialSrc: "/images/material-v2-nero-marquina.webp",     materialAlt: "Close detail of black engineered marble crossed by crisp organic white veins" },
+    ],
+    Healthcare: [
+      { index: "01", name: "Entrance & Arrivals",            href: "/spaces/healthcare/entrance-arrivals",          src: "/images/healthcare-entrance-arrivals.webp",          alt: "An accessible healthcare entrance finished with large-format warm ivory porcelain facade panels and slip-resistant paving",
+        material: "Ivory Limestone Porcelain", materialSrc: "/images/material-v2-ivory-limestone-porcelain.webp",          materialAlt: "Close detail of warm ivory porcelain with subtle blue-grey limestone movement" },
+      { index: "02", name: "Reception & Waiting",            href: "/spaces/healthcare/reception-waiting",          src: "/images/healthcare-reception-waiting.webp",          alt: "A healthcare reception and waiting area centred on a curved pale mineral-blue engineered quartz desk and wall",
+        material: "Aqua Mineral Quartz",       materialSrc: "/images/material-v2-aqua-mineral-quartz.webp",          materialAlt: "Close detail of pale mineral-blue engineered quartz with fine white and grey aggregate" },
+      { index: "03", name: "Lobby & Corridors",              href: "/spaces/healthcare/lobby-corridors",            src: "/images/healthcare-lobby-corridors.webp",            alt: "A naturally lit healthcare corridor with warm-white engineered terrazzo flooring, coved skirting and wall protection",
+        material: "Bianco Terrazzo",           materialSrc: "/images/material-v2-bianco-terrazzo.webp",            materialAlt: "Close detail of warm-white engineered terrazzo with small sage, charcoal and grey aggregate" },
+      { index: "04", name: "Consultation & Admin Area",      href: "/spaces/healthcare/consultation-admin-area",     src: "/images/healthcare-consultation-admin-area.webp",     alt: "A healthcare consultation and administration area with dove-grey engineered quartz worktops, counter faces and backsplash",
+        material: "Michelangelo Quartz",       materialSrc: "/images/material-v2-michelangelo-quartz.webp",     materialAlt: "Close detail of warm dove-grey engineered quartz with restrained cream mineral veining" },
+      { index: "05", name: "Patient Rooms & Suites",         href: "/spaces/healthcare/patient-rooms-suites",        src: "/images/healthcare-patient-rooms-suites.webp",        alt: "A private patient suite with a warm ivory engineered marble headwall and matching bedside surfaces",
+        material: "Crema Nova",                materialSrc: "/images/material-v3-crema-nova-patient-rooms.webp", materialAlt: "Close detail of smooth warm ivory engineered marble with sparse hairline beige veining matching the patient-room headwall" },
+      { index: "06", name: "Wellness & Rehabilitation",      href: "/spaces/healthcare/wellness-rehabilitation",     src: "/images/healthcare-wellness-rehabilitation.webp",     alt: "A rehabilitation studio with pale sage porcelain wall cladding, non-slip terrazzo flooring and a sculpted therapy bench",
+        material: "Verde Aurora Porcelain",    materialSrc: "/images/material-v2-verde-aurora-porcelain.webp",     materialAlt: "Close detail of pale sage healthcare porcelain with soft cloudy mineral texture" },
+    ],
+  },
+  materialCta: "View Material",
 } as const;
 
 /** MaxGuard band — 542:5281 and siblings. */

@@ -41,8 +41,11 @@ export function TabBar({
             aria-selected={isActive}
             onClick={() => onSelect(i)}
             className={[
-              "h-[34px] min-w-[101px] px-[8px] text-[13px] tracking-[0.4px]",
-              "font-body font-normal transition-colors duration-300 ease-[var(--ease-out-expo)]",
+              // Halogen Medium — 544:3935 (sectors) and 544:4005 (audiences)
+              // both report font-['Halogen:Medium'] with tracking 1px. The body
+              // face here was wrong on both bars.
+              "h-[34px] min-w-[101px] px-[8px] text-[13px] tracking-[1px]",
+              "font-display font-medium transition-colors duration-300 ease-[var(--ease-out-expo)]",
               isActive
                 ? `${activeFill} text-white`
                 : "border border-line-soft bg-white text-ink hover:border-ink/40",
