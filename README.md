@@ -107,6 +107,13 @@ against its known y in the Figma frame. **The bar is 4px** — currently 15/15.
    source holds 101 frozen transitions out of 299. The real figure was 17x.
    `npm run video` folds the tail back over the head to close both.
 
+## Favicon
+
+`src/app/favicon.ico`, `icon.svg` and `apple-icon.png` — the Kalinga mark in
+white on ruby, generated from the mark's own path data. Next picks them up by
+filename; there is nothing to wire in `layout.tsx`. Regenerate them only if the
+mark changes.
+
 ## Outstanding
 
 - Testimonial videos — the four cards currently render poster frames with the

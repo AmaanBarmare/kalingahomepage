@@ -750,6 +750,35 @@ flips while it is still fully below the fold, so the switch is never seen.
 Everything derives from page scroll and nothing is stored, so the sequence
 reverses exactly: measured 7/7 sampled stages byte-identical on the way back up.
 
+## Favicon
+
+Generated from the Kalinga mark's own path data (`kalinga-mark.tsx`, the same 12
+paths the page uses), white on brand ruby `#70000E` with 14% padding — the mark
+is 12 separate shapes, so it needs air to keep its counters open once scaled to
+a tab.
+
+Three files in `src/app/`, which is all Next's metadata file convention needs —
+no `<link>` tags, no config:
+
+| file | what it serves |
+| --- | --- |
+| `favicon.ico` | 16 / 32 / 48, PNG-in-ICO |
+| `icon.svg` | the scalable one modern browsers prefer |
+| `apple-icon.png` | 180 x 180 for iOS home screens |
+
+Next emits all three with hashed query strings, so a deploy busts the browser
+cache rather than leaving the old icon in the tab.
+
+**A ruby tile, not the mark on transparency.** Transparent-background ruby
+disappears against dark browser chrome — the mark and the chrome are both near
+black. The tile also gives the icon a colour to be recognised by at 16px, where
+the 2 x 2 geometry itself is below the resolution to read.
+
+**At 16px it is a textured ruby chip, not a legible mark.** If that matters,
+the top half of the mark alone (paths 1-6, a 28 x 13.27 box) fills the tile at
+twice the scale and reads clearly at 32px — but it is a crop of the client's
+logo, so it is not something to adopt without asking them.
+
 ## Known Figma-side issues — do not "fix" these
 
 - **`MAXGAURD`** is misspelled in the footer (`544:4401`). Reproduced as-is so
