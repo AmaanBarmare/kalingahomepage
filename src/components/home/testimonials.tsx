@@ -26,9 +26,9 @@ import { testimonials } from "@/lib/content";
  * momentum — driving scrollLeft from pointermove on top of that would double
  * every swipe. Drag is wired for MOUSE ONLY.
  *
- * THE PLAY MARK IS BAKED INTO THE POSTERS at inconsistent sizes. A uniform,
- * opaque-backed control is drawn over every baked mark so all four cards expose
- * the same 120px desktop / 100px mobile target without editing the portraits.
+ * The original posters carried baked-in play marks at inconsistent sizes. The
+ * cleaned poster set removes those marks, so this component owns the one and
+ * only ring-and-triangle control at a uniform size on every card.
  *
  * There is a "Scrim" vector (544:3976) at x865 y7214 covering only the top
  * third of the cards. It does not appear in the rendered frame and no plausible
@@ -96,12 +96,12 @@ export function Testimonials() {
                   type="button"
                   disabled={!card.videoHref}
                   aria-label={`Play testimonial — ${card.role}, ${card.place}`}
-                  className="absolute top-1/2 left-1/2 z-10 flex size-[100px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-2 border-white bg-ink/85 text-white shadow-[0_4px_20px_rgba(20,16,14,0.24)] backdrop-blur-[3px] transition-colors duration-300 hover:bg-ink/75 disabled:cursor-default lg:size-[120px]"
+                  className="absolute top-1/2 left-1/2 z-10 flex size-[84px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-2 border-white bg-black/10 text-white shadow-[0_3px_16px_rgba(20,16,14,0.2)] transition-colors duration-300 hover:bg-black/20 disabled:cursor-default lg:size-[96px]"
                 >
                   <svg
                     aria-hidden
                     viewBox="0 0 40 48"
-                    className="ml-1 h-[42px] w-[36px] lg:h-[48px] lg:w-[40px]"
+                    className="ml-1 h-[34px] w-[29px] lg:h-[38px] lg:w-[32px]"
                   >
                     <path d="M4 3.5L37 24 4 44.5V3.5Z" fill="currentColor" />
                   </svg>

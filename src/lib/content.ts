@@ -227,10 +227,10 @@ export const testimonials = {
   body: LOREM_DUMMY,
   audiences: ["Architects", "Partners", "Consumers"],
   cards: [
-    { image: "/images/testimonial-1.webp", role: "Homeowner", place: "Mumbai", videoHref: null },
-    { image: "/images/testimonial-2.webp", role: "Architect", place: "Dubai", videoHref: null },
-    { image: "/images/testimonial-3.webp", role: "Designer", place: "Singapore", videoHref: null },
-    { image: "/images/testimonial-4.webp", role: "Homeowner", place: "Mumbai", videoHref: null },
+    { image: "/images/testimonial-clean-1.webp", role: "Homeowner", place: "Mumbai", videoHref: null },
+    { image: "/images/testimonial-clean-2.webp", role: "Architect", place: "Dubai", videoHref: null },
+    { image: "/images/testimonial-clean-3.webp", role: "Designer", place: "Singapore", videoHref: null },
+    { image: "/images/testimonial-clean-4.webp", role: "Homeowner", place: "Mumbai", videoHref: null },
   ],
 } as const;
 
@@ -252,7 +252,19 @@ export const testimonials = {
 export const contact = {
   headline: "Lorem ipsum",
   body: LOREM_SHORT,
-  cta: { label: "Download brochure", href: "/brochure" },
+  cta: { label: "Download brochure" },
+  /**
+   * The CTA is a menu, not a link — see brochure-menu.tsx. These are the four
+   * studio brochures, downsampled from their 300ppi CMYK print masters by
+   * tools/optimize-brochures.py; they open in a new tab rather than download.
+   * Order is the client's: Elixir first, then the three stone families.
+   */
+  brochures: [
+    { label: "Elixir Collection Brochure", href: "/brochures/kalinga-elixir-collection.pdf" },
+    { label: "Marble Collection Brochure", href: "/brochures/kalinga-marble-collection.pdf" },
+    { label: "Quartz Collection Brochure", href: "/brochures/kalinga-quartz-collection.pdf" },
+    { label: "Terrazzo Collection Brochure", href: "/brochures/kalinga-terrazzo-collection.pdf" },
+  ],
 } as const;
 
 export type FooterGroup = { title: string | null; links: string[]; headingStyle?: boolean };

@@ -14,7 +14,7 @@
  *     a request to make of the client, not a pipeline bug. `npm run assets:audit`
  *     reports the difference.
  *
- * Usage:  node tools/optimize-assets.mjs [--audit] [--collections]
+ * Usage:  node tools/optimize-assets.mjs [--audit] [--collections|--testimonials]
  */
 import sharp from "sharp";
 import { mkdir, stat } from "node:fs/promises";
@@ -89,10 +89,10 @@ const PLATES = [
   { src: "appbadge-1.png", out: "app-badges.webp", display: [248, 42], node: "542:5285", alpha: true },
 
   // --- testimonials (video poster frames) -----------------------------------
-  { src: "testi-b1.png", out: "testimonial-1.webp", display: [321, 646], node: "544:3983" },
-  { src: "testi-a3.png", out: "testimonial-2.webp", display: [321, 646], node: "544:3978" },
-  { src: "testi-a1.png", out: "testimonial-3.webp", display: [321, 646], node: "544:3978" },
-  { src: "testi-c1.png", out: "testimonial-4.webp", display: [321, 646], node: "544:3989" },
+  { src: "testimonial-clean-1.png", out: "testimonial-clean-1.webp", display: [321, 646], group: "testimonials" },
+  { src: "testimonial-clean-2.png", out: "testimonial-clean-2.webp", display: [321, 646], group: "testimonials" },
+  { src: "testimonial-clean-3.png", out: "testimonial-clean-3.webp", display: [321, 646], group: "testimonials" },
+  { src: "testimonial-clean-4.png", out: "testimonial-clean-4.webp", display: [321, 646], group: "testimonials" },
 
   // --- contact band ----------------------------------------------------------
   // 544:4018 replaced the old 1672-wide bleed plate with a 1440 x 640 image
@@ -165,6 +165,10 @@ function report(rows) {
 }
 
 const audit = process.argv.includes("--audit");
-const collectionsOnly = process.argv.includes("--collections");
-const plates = collectionsOnly ? PLATES.filter((plate) => plate.group === "collections") : PLATES;
+const requestedGroup = process.argv.includes("--collections")
+  ? "collections"
+  : process.argv.includes("--testimonials")
+    ? "testimonials"
+    : null;
+const plates = requestedGroup ? PLATES.filter((plate) => plate.group === requestedGroup) : PLATES;
 report(await build({ audit, plates }));

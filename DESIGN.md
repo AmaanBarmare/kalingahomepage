@@ -537,6 +537,21 @@ Watch the denominator here. The visualiser's seam first measured as *341×*
 because the "typical" delta was sampled from frames 0→1 — which sit inside
 that head freeze. Sampling a frozen pair makes any seam look catastrophic.
 
+### The visualiser clip was replaced with the surface-swap demo
+
+The client supplied `kalinga-marble-20-surface-visualizer.mp4` to stand in for
+the old dolly push-in. It is a different clip — PSNR against the previous raw is
+**13.3 dB**, i.e. unrelated footage — and a far better fit under "Visualise Your
+Space": it shows a cursor picking swatches and the surface actually changing,
+rather than a static room.
+
+**The pipeline config did not need to move.** Measuring the new clip's per-frame
+delta gives a 23-frame head freeze and a 50-frame dead tail with motion in
+frames 23–250 — the same structure as the clip it replaces, so the existing
+`keep: [23, 251]` trim and 24-frame loop fold were already correct. The four
+internal holds are 3 frames each, which are the deliberate pauses on each
+surface and are kept.
+
 ### The hero clip is 16:9 and its box is not
 
 1.778 against a box of 1.345, so `object-cover` **hides 24.4% of the width** —
@@ -587,8 +602,31 @@ to within a level; guessing a two-stop fade is not.
 the button, not inside the component — and Figma pays for it out of the right
 padding. The label ends at x254.3, the chevron runs 267.3 → 279, the box closes
 at 297. So `KsButton` grew a `trailing` slot that swaps its symmetric 24px
-padding for **13px of gap and 18px on the right**. It is a link with an icon,
-not a dropdown: the board draws no menu.
+padding for **13px of gap and 18px on the right**.
+
+**It is now a dropdown** (`brochure-menu.tsx`), on the client's instruction —
+the chevron became a real disclosure opening the four collection brochures.
+The board still draws no panel, so none of the panel is copied from Figma; it
+is assembled entirely out of parts that already ship, which is the only way to
+add UI to this page without inventing a second visual language:
+
+| part | borrowed from |
+| --- | --- |
+| trigger box | `ksButtonClass` — the KS/Button recipe itself, so it is pixel-identical to the link it replaced |
+| item type | the same 11.272px / +1.0247 / Haas 55 Roman |
+| item hover | the `outline` variant's own hover — white fill, ink text |
+| open/close | the nav drawer's disclosure: chevron `rotate-180`, `grid-template-rows` 0fr → 1fr, `--ease-out-expo` |
+
+**It opens UPWARD, and that is forced, not chosen.** The CTA's base sits 70.3px
+above the band's bottom edge and the footer starts immediately below, so a
+downward panel would be born inside the footer. `bottom-full` puts it over the
+band's own scrim, which is at or near black by that height, so white-on-dark
+holds. The panel is `w-max min-w-full` because the items are longer than the
+trigger's label.
+
+Each item opens in a new tab (`target="_blank"` + `rel="noopener noreferrer"`).
+`download` is deliberately NOT set — the ask was to open the PDF, and `download`
+would push a file to disk instead.
 
 ### The body copy went back to lorem
 

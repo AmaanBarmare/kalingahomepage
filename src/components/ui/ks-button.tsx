@@ -50,12 +50,22 @@ type Props = {
   className?: string;
 } & Omit<ComponentProps<typeof Link>, "className" | "children">;
 
+/**
+ * The same box as `KsButton`, for the cases that cannot be a `<Link>` — the
+ * contact band's brochure menu needs a real `<button>` so it can carry
+ * `aria-expanded`. Kept here so the two can never drift apart.
+ */
+export function ksButtonClass({
+  variant = "outline",
+  trailing = false,
+  className = "",
+}: { variant?: Variant; trailing?: boolean; className?: string } = {}) {
+  return `${BASE} ${trailing ? TRAILING : "pr-6"} ${VARIANTS[variant]} ${className}`;
+}
+
 export function KsButton({ variant = "outline", trailing, children, className = "", ...rest }: Props) {
   return (
-    <Link
-      className={`${BASE} ${trailing ? TRAILING : "pr-6"} ${VARIANTS[variant]} ${className}`}
-      {...rest}
-    >
+    <Link className={ksButtonClass({ variant, trailing: Boolean(trailing), className })} {...rest}>
       {children}
       {trailing}
     </Link>

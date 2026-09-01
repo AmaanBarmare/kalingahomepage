@@ -1,6 +1,5 @@
 import Image from "next/image";
-import { ChevronDownIcon } from "@/components/ui/nav-icons";
-import { KsButton } from "@/components/ui/ks-button";
+import { BrochureMenu } from "@/components/home/brochure-menu";
 import { Reveal } from "@/components/ui/reveal";
 import { contact } from "@/lib/content";
 
@@ -31,6 +30,10 @@ import { contact } from "@/lib/content";
  * i.e. 56.9% / 64.1% / 99.2% of 640. Neutral black, not ink — a tinted scrim
  * over photography casts a visible colour wash.
  *
+ * The CTA is a MENU now, not a link — the chevron Figma draws over it
+ * (695:2576) is a disclosure, and it opens the four collection brochures.
+ * See brochure-menu.tsx for why the panel opens upward.
+ *
  * Content bottom-aligns on the button's base at y9088.7, which is 70.3px up
  * from 9159 = 10.98%. Headline x84 y8903, body x87 y8975 (698 wide), button
  * x87 y9046 (210 x 42.7). The 84/87 split is Figma being loose; one gutter.
@@ -60,15 +63,8 @@ export function ContactBand() {
             <p className="body-copy mt-2.25 max-w-174.5 text-white">{contact.body}</p>
           </Reveal>
 
-          <Reveal delay={200}>
-            <KsButton
-              href={contact.cta.href}
-              variant="outline"
-              className="mt-5.75"
-              trailing={<ChevronDownIcon className="h-[6.06px] w-[11.67px] shrink-0" />}
-            >
-              {contact.cta.label}
-            </KsButton>
+          <Reveal delay={200} className="mt-5.75 block">
+            <BrochureMenu />
           </Reveal>
         </div>
       </div>
