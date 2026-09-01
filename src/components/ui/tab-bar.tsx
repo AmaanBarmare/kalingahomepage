@@ -30,7 +30,7 @@ export function TabBar({
   const activeFill = tone === "ruby" ? "bg-ruby border-ruby" : "bg-ink border-ink";
 
   return (
-    <div role="tablist" aria-label={label} className={`flex flex-wrap justify-center gap-[10px] ${className}`}>
+    <div role="tablist" aria-label={label} className={`flex flex-wrap justify-center gap-2.5 ${className}`}>
       {items.map((item, i) => {
         const isActive = i === active;
         return (
@@ -44,8 +44,8 @@ export function TabBar({
               // Halogen Medium — 544:3935 (sectors) and 544:4005 (audiences)
               // both report font-['Halogen:Medium'] with tracking 1px. The body
               // face here was wrong on both bars.
-              "h-[34px] min-w-[101px] px-[8px] text-[13px] tracking-[1px]",
-              "font-display font-medium transition-colors duration-300 ease-[var(--ease-out-expo)]",
+              "h-8.5 min-w-25.25 px-2 text-[13px] tracking-[1px]",
+              "font-display font-medium transition-colors duration-300 ease-out-expo",
               isActive
                 ? `${activeFill} text-white`
                 : "border border-line-soft bg-white text-ink hover:border-ink/40",
