@@ -94,7 +94,10 @@ const PLATES = [
   { src: "testi-c1.png", out: "testimonial-4.webp", display: [321, 646], node: "544:3989" },
 
   // --- contact band ----------------------------------------------------------
-  { src: "contact-raw1.png", out: "contact.webp", display: [1672, 640], node: "544:4017" },
+  // 544:4018 replaced the old 1672-wide bleed plate with a 1440 x 640 image
+  // sitting flush in the frame, so the display box is the frame width now. The
+  // source is exactly 1440 wide, i.e. 1x — see README, Outstanding.
+  { src: "contact-scene.png", out: "contact.webp", display: [1440, 640], node: "544:4018" },
 ];
 
 async function build({ audit, plates = PLATES }) {

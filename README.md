@@ -84,7 +84,19 @@ against its known y in the Figma frame. **The bar is 4px** — currently 15/15.
    the scene node claims `x-16 width 1472` while Figma actually crops it to
    1440 at 1:1 — believing the box zooms the kitchen 2%. See DESIGN.md.
 
-6. **Neither video looped, and measuring that needs a denominator.** A seam is
+6. **The contact band is drawn OVER the footer's first 84px.** The band is 640
+   tall and runs to 9159; the footer frame starts at 9075. The footer pays that
+   overlap out of its own top padding, which is why its padding and its
+   watermark percentages do not match the raw Figma numbers. Change one and you
+   must change the other, or the page stops being 9849 tall.
+
+7. **The footer's background tile is a raster on purpose.** The board draws it
+   as 1487 loose vectors whose coordinates do not match the render's own 97 x 49
+   period, so the tile was folded out of the render (r = 0.98) rather than
+   rebuilt. Do not "restore" it to the vector mark — that tile repeats at half
+   the pitch and is the wrong motif.
+
+8. **Neither video looped, and measuring that needs a denominator.** A seam is
    only meaningful against a *typical* frame delta. The visualiser's first read
    was "341x" because the baseline was sampled from two frozen frames — its
    source holds 101 frozen transitions out of 299. The real figure was 17x.
@@ -103,3 +115,5 @@ against its known y in the Figma frame. **The bar is 4px** — currently 15/15.
   16:9 in a 1.345 box, so `object-cover` throws away 24.4% of its width — it
   wants a re-render at the section's aspect, not a harder crop.
 - Only `/` exists, so footer and CTA links prefetch to 404s in the console.
+  `/brochure`, behind the band's new Download brochure CTA, is one of them.
+- The contact plate is 1x (1440px source against a 1440px box).

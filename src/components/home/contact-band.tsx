@@ -65,7 +65,7 @@ export function ContactBand() {
               href={contact.cta.href}
               variant="outline"
               className="mt-5.75"
-              trailing={<ChevronDownIcon className="w-[11.67px] shrink-0" />}
+              trailing={<ChevronDownIcon className="h-[6.06px] w-[11.67px] shrink-0" />}
             >
               {contact.cta.label}
             </KsButton>

@@ -2,8 +2,7 @@
  * The Kalinga mark — four quadrants of arrow/chevron forms.
  *
  * Inlined as JSX rather than shipped through next/image on purpose: it is used
- * as a ruby divider, as a white footer watermark, and tiled as the footer's
- * background pattern, so it has to inherit its colour. An SVG rendered through
+ * as a ruby divider, so it has to inherit its colour. An SVG rendered through
  * next/image is an isolated document and never picks up `currentColor` — that
  * exact bug made a previous project's footer icons invisible.
  *
@@ -46,14 +45,4 @@ export function KalingaMark({
       ))}
     </svg>
   );
-}
-
-/**
- * The same mark as a tiling background, for the footer.
- * Figma's footer plate repeats it on a measured 48px period at roughly 8%
- * luminance over black (sampled: pattern runs 0..21 on a 0..255 scale).
- */
-export function markTileDataUri(color = "%23222020") {
-  const body = PATHS.map((d) => `<path d='${d}' fill='${color}'/>`).join("");
-  return `url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28.5774' width='48' height='49'>${body}</svg>")`;
 }

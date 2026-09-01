@@ -553,10 +553,133 @@ has no such problem: 1.778 against 1.767 loses 0.6%.
 
 ---
 
+## The contact band and footer were rebuilt — 544:4017 / 555:2863
+
+The band changed in four ways at once, and the footer moved with it.
+
+### The plate stopped bleeding, and the band is 640 not 556
+
+`544:4018` is **1440 x 640 at x0**, the frame's own width. The old plate was
+1672 wide at x-114 and hung 114px off both edges; nothing hangs off the sides
+now, so the band is a plain 9:4 box.
+
+It still hangs off the BOTTOM. The band runs to 9159 while the footer frame
+starts at 9075, and it is drawn OVER the footer. An earlier pass read this the
+other way — footer on top, band clipped to 556 — which is wrong: sampling the
+board down a clean column shows the photograph still present at 9075 and only
+reaching pure black at 9159. The band is the full 640 and the footer gives back
+the 84px overlap out of its own top padding. Page total is unchanged: 640 + 690
+= 1330 from 8519.
+
+### The scrim was solved, not eyeballed
+
+Figma stacks two rects over the plate (1430 x 495 at y8594, 1443 x 411 at
+y8751). Because the source image is now supplied untouched, the alpha per row
+comes straight out of `1 - rendered/source`, and the quartiles land within 0.02
+of the median — that tightness is the check that the solve is real:
+
+| band y | alpha |
+| --- | --- |
+| 0 → 364 | 0 |
+| 364 → 410 | 0 → 0.68, steep |
+| 410 → 635 | 0.68 → 1, slope 0.00143/px, dead straight |
+
+i.e. stops at 56.9% / 64.1% / 99.2%. Reproducing this as one gradient is exact
+to within a level; guessing a two-stop fade is not.
+
+### The CTA is "Download brochure" and carries a chevron
+
+`695:2576` is an 11.67 x 6.06 stroked chevron drawn as a loose vector ON TOP of
+the button, not inside the component — and Figma pays for it out of the right
+padding. The label ends at x254.3, the chevron runs 267.3 → 279, the box closes
+at 297. So `KsButton` grew a `trailing` slot that swaps its symmetric 24px
+padding for **13px of gap and 18px on the right**. It is a link with an icon,
+not a dropdown: the board draws no menu.
+
+### The body copy went back to lorem
+
+`544:4022` is now named after the lorem string and renders it. The real Client
+Care paragraph it replaced is kept verbatim in the comment above `contact` in
+content.ts, so restoring it is one edit rather than git archaeology. Flagging it
+because it looks more like an accidental board edit than a decision.
+
+## The footer's background is two mirrored marks, and it fades
+
+Three things were wrong here, and none of them were visible without measuring.
+
+**The period is 97 x 49, not 48 x 49.** Autocorrelating a clean column band of
+the board's render puts the horizontal period at 97 — exactly twice what was
+built. One period holds **two mirrored marks**, so a single-mark tile repeats at
+half the pitch and reads as a different motif entirely. That is why the shipped
+footer looked like diamonds where the board has arrowheads.
+
+**It could not be rebuilt from the vectors.** The board draws the pattern as
+**1487 loose vector nodes**. Their three distinct shapes come back with exact
+path data, but their reported coordinates imply a 65.81 x 48.67 period that the
+render does not have, and the best arrangement fitted from them correlates at
+only 0.68. So the tile is a raster: folded out of 12 clean periods of the
+board's own render, thresholded, and shipped as a 776 x 396 PNG (3.5 KB) used at
+97 x 49. It correlates back against the board at **r = 0.98**. Its origin sits
+at Figma footer x45 y40, which is `background-position: 45px 5px` once the 84px
+overlap is taken off.
+
+**It fades in.** Sampling the pattern's peak per row: nothing until y200, then a
+*decelerating* ramp to 21/255 by the base. A flat tile — what was there — is
+visibly wrong across the top third of the frame. The mask in the component is
+those measurements as stops, not an eased guess.
+
+**There is no centre watermark.** An earlier pass put the mark at x678 y341 in
+full white. The board has only background there.
+
+## The footer's two type families
+
+The split is real and both halves were wrong.
+
+| run | family | size | tracking | fill |
+| --- | --- | --- | --- | --- |
+| Find a store / FOLLOW US | Halogen Regular | 12 | 2 / 1.0247 | white |
+| left body, placeholder | Haas Grot Disp **Trial** 45 Light | 14 / 13 | 1 | white |
+| COLLECTIONS, KARIGARE, ABOUT | Haas Grot Disp **R** 55 Roman | 16 | 1.5 | `#f3f3f3` |
+| Quartz, Residential, … | Haas Grot Disp **R** 45 Light | 16 | 2 | white/70 |
+| legal row | Haas Grot Disp **R** 45 Light | 13 | 1 | white |
+
+The build had all of it at 14px `font-body` with no tracking on the links, so
+the right column was ~12% too small and the newsletter line failed to wrap where
+the board wraps it. The **R** is the Round cut — the same one the nav drawer
+wants, still on the Display fallback.
+
+**"55 Roman" is Haas's REGULAR.** The numbering is 45 Light / 55 Roman / 65
+Medium / 75 Bold, so 55 is 400. Setting those headings to 500 put 30% more ink
+on the glyphs than the board has; the ink-pixel count is what caught it (569
+against 709), because the peak brightness matched either way.
+
+Fills were confirmed by sampling peaks off the board rather than trusting the
+export: headings land on 243, which is `#f3f3f3` exactly.
+
+### Rhythm: Figma's auto-layout gaps are between boxes, this is between ink
+
+Frame 497 declares gaps of 52 / 27 / 9 / 13 / 15. Using them literally puts
+every row 1-6px low, because a text node's box is not where its ink starts. The
+values in the component are those gaps carried short by the measured difference,
+and the result is every ink row in the left column landing on the board's, with
+the right column exact at all nine. Measured by row-profiling both renders, not
+by eye.
+
+## Verification below the collections carousel
+
+The carousel is a scroll story: the board draws its 1271px sticky view, the page
+gives it a runway several times that, so **every anchor below it is displaced by
+a real and intended amount**. `verify.mjs` now reads that overshoot off the
+applications section's own top (Figma y2839) and rebases the anchors below 1715
+by it. Anchors above stay absolute, and each rebased anchor still checks its own
+spacing — the overshoot is one number, not fifteen fudge factors.
+
 ## Known Figma-side issues — do not "fix" these
 
 - **`MAXGAURD`** is misspelled in the footer (`544:4401`). Reproduced as-is so
   the discrepancy stays visible. Worth raising with the designer.
+- **The contact paragraph is lorem again** (`544:4022`). It used to be the real
+  Client Care copy. Kept verbatim in a comment in content.ts — see above.
 - **`544:3976` "Scrim"** — a vector at x865 y7214 covering only the top third of
   the testimonial cards. It does not appear in the rendered frame and no
   plausible edge-fade has that geometry. Treated as a stray layer and omitted.
@@ -583,7 +706,8 @@ The build now solves to the same [1.00, 1.00, 1.00] against Figma.
 ## Deviations, stated
 
 - **Copy is Figma's lorem ipsum, verbatim**, including `"Lorem ipsum hakdinaik
-  ahdk"`. Only the contact paragraph and footer nav are real. All of it lives in
+  ahdk"`. Only the footer nav is real now — the contact paragraph went back to
+  lorem on the board. All of it lives in
   [content.ts](src/lib/content.ts) so real copy drops in without touching layout.
 - **No copyright line in the footer.** An earlier pass added one; Figma has
   none, so it was removed rather than kept as unrequested scope.
@@ -595,6 +719,7 @@ The build now solves to the same [1.00, 1.00, 1.00] against Figma.
    control on each. `videoHref` is `null` in `content.ts`, so the card renders
    as a poster with a disabled control rather than a dead link.
 2. **Higher-resolution imagery**, or approval to super-resolve — see Assets.
+   The new contact plate is 1440px against a 1440px box, i.e. exactly 1x.
    The two clips have the same problem: the hero is 0.89× and the visualiser
    1.33× against their boxes. The hero also wants a re-render at the section's
    1.345 aspect rather than 16:9 — see Video.

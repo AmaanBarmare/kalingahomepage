@@ -16,6 +16,17 @@ const URL_ = process.env.URL ?? "http://localhost:3000/";
 const SHOT_DIR = process.env.SHOT_DIR ?? "/tmp/ks-shots";
 const TOL = 4;
 
+/**
+ * The collections carousel is a scroll story: Figma draws the 1271px sticky
+ * view, the page gives it a runway several times that. Everything below it is
+ * therefore displaced by a real, intended amount, so those anchors are compared
+ * against figmaY + that overshoot rather than against figmaY. `rebase: false`
+ * marks the ones above it, which are absolute. The overshoot is read off the
+ * applications section's own top (Figma y2839, i.e. 147 above its heading), so
+ * every anchor below still checks its own spacing rather than being assumed.
+ */
+const APPLICATIONS_FIGMA_Y = 2839;
+
 /** [label, selector, figmaY] — y is the element's top in the 1440x9849 frame. */
 const ANCHORS = [
   ["hero section", "main > section:nth-of-type(1)", 0],
@@ -32,7 +43,11 @@ const ANCHORS = [
   ["testimonials heading", "main > section:nth-of-type(8) h2", 7273],
   ["testimonial cards", "#testimonial-rail figure", 7555],
   ["contact band", "main > section:nth-of-type(9)", 8519],
-  ["footer", "footer", 9075],
+  // The footer FRAME starts at 9075 in Figma, but the contact band is drawn
+  // over its first 84px and only reaches pure black at 9159 — so 9159 is where
+  // the footer element can actually begin. Its first content still lands on
+  // Figma's y9243.
+  ["footer", "footer", 9159],
 ];
 
 const run = async () => {
@@ -56,11 +71,19 @@ const run = async () => {
 
   const pageH = await page.evaluate(() => document.body.scrollHeight);
 
-  console.log(`\nFigma 544:3926 is 1440 x 9849. Page renders 1440 x ${pageH} (${pageH - 9849 >= 0 ? "+" : ""}${pageH - 9849}).\n`);
+  const applicationsY = await page
+    .locator("main > section:nth-of-type(4)")
+    .first()
+    .evaluate((el) => el.getBoundingClientRect().top + window.scrollY);
+  const overshoot = Math.round(applicationsY - APPLICATIONS_FIGMA_Y);
+
+  console.log(`\nFigma 544:3926 is 1440 x 9849. Page renders 1440 x ${pageH} (${pageH - 9849 >= 0 ? "+" : ""}${pageH - 9849}).`);
+  console.log(`Carousel runway adds ${overshoot}px; anchors below it are rebased by that.\n`);
   console.log(`${"anchor".padEnd(24)}${"figma y".padStart(9)}${"actual".padStart(9)}${"delta".padStart(8)}   `);
 
   let fails = 0;
-  for (const [label, sel, figmaY] of ANCHORS) {
+  for (const [label, sel, rawY] of ANCHORS) {
+    const figmaY = rawY > 1715 ? rawY + overshoot : rawY;
     const y = await page
       .locator(sel)
       .first()
