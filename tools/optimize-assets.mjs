@@ -52,7 +52,14 @@ const PLATES = [
   { src: "strip-15.png", out: "application-swatch.webp", display: [140, 92], node: "544:3950" },
 
   // --- maxguard band ------------------------------------------------------
-  { src: "mg-raw1.png", out: "maxguard-scene.webp", display: [1472, 655], node: "542:5281" },
+  // 542:5281 sits at x-16 and is 1472 wide — it bleeds 16px past BOTH frame
+  // edges. mg-scene.png is the node's own source (Figma names the layer after
+  // the file); the 1536x1024 mg-raw1.png that was here is a different, more
+  // zoomed render whose framing does not match the board.
+  { src: "mg-scene.png", out: "maxguard-scene.webp", display: [1472, 655], node: "542:5281" },
+  // 551:5467 — the SAME couple, cut out, drawn back over the ghost type at 1:1
+  // (723x418 at x215 y106). This is what puts the "I" of IPSUM behind the man.
+  { src: "mg-foreground.png", out: "maxguard-foreground.webp", display: [723, 418], node: "551:5467", alpha: true },
   // alpha-bearing originals: the Figma `export` of each of these has WHITE
   // flattened behind it, which is invisible in Figma and wrong on the page.
   { src: "badge-warranty.png", out: "badge-warranty.webp", display: [197, 132], node: "542:5282", alpha: true },

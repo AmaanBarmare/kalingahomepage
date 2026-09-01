@@ -288,6 +288,73 @@ three colours, so it has to inherit. The footer tile repeats it on a measured
 
 ---
 
+## The MaxGuard band is two photographic layers, not one
+
+`551:5467` is the **same couple, cut out** of the scene `542:5281` and drawn
+back on top. The ghost type sits between them, which is what puts the "I" of
+IPSUM behind the man's head. Composited over a single flat plate the type runs
+across their faces, and it reads as wrong instantly.
+
+Layer order, bottom to top: scene -> ghost type -> cutout -> badge, button,
+lockup, app row. (Figma stacks the cutout above the UI too, but the overlap is
+transparent there, and a photo layer over a link would eat the click.)
+
+| node | element | x | y | size |
+|---|---|---|---|---|
+| 542:5281 | scene | 0 | 0 | 1440 x 655 |
+| 551:5465 | ghost "lorem" | 434 | 78 | 343.9 x 95.53 |
+| 551:5466 | ghost "ipsum" | 684 | 192 | 333 x 92 |
+| 551:5468 | ghost "cal" | 684 | 284 | 210 x 95 |
+| 551:5467 | **cutout** | 215 | 106 | 723 x 418 |
+| 542:5282 | warranty badge | 1176 | 21 | 197 x 132 |
+| 542:5290 | KS/Button | 649 | 500 | 184.19 x 42.69 |
+| 542:5283 | MaxGuard lockup | 60 | 520.8 | 273.25 x 59.17 |
+| 542:5289 | store badges | 339.99 | 570.41 | 248.01 x 41.61 |
+| 542:5284 | "Download the App" | 80.89 | 580.85 | 253 x 21 |
+
+### The scene node's box lies about its own size
+
+`542:5281` reports **x -16, width 1472** — which reads as a 16px bleed past both
+frame edges, and that is how the previous pass built it. It is wrong. Figma
+**crops** the fill to the frame rather than scaling into that box. Matching a
+clean background patch (the left cabinets — clear of the badge, the type and the
+cutout) against Figma's own render of the frame returns **scale 1.000 at offset
+(0, 0), r = 0.998**. Scaling the plate to 1472 zooms the whole kitchen ~2% and
+drags every landmark right.
+
+Worse, the previous pass divided the ghost x by 1472 while those x values are
+frame coordinates, so the type sat ~10px left of where it belongs. If a divisor
+is ever in doubt, render the frame from Figma and match a patch — do not reason
+about it from the node box.
+
+### The cutout does not sit on the couple already in the scene
+
+Template-matching the cutout against Figma's frame render gives (215, 106) at
+scale 1.000, r = **0.9996** — the node's coordinates taken literally. But the
+placement that best fits the *background* couple is (224, 109) at 702 x 406.
+The cutout is deliberately a touch larger and higher so it fully covers the pair
+underneath. Do not "correct" it onto them: that reintroduces a visible edge.
+
+### "Download the App" is the display face
+
+`542:5284` is **Halogen Medium 13.053 / +4.3511**, not the body font at 13 / +3.
+The tracking is nearly half again what it looks like, and it is the difference
+between a 253px run and a 170px one.
+
+### Ghost widths do not match their frames, and that is fine
+
+Rendered vs Figma box: lorem 340.8 / 343.9, ipsum 300.3 / 333, cal 188 / 210.
+Only lorem is close — and lorem is the one that settles it, because the three
+boxes are hand-drawn (heights 95.53 / 92 / 95 for identical one-line text at one
+size). One font at one size and tracking: if one word matches, they all do, and
+the boxes are the loose thing.
+
+Verified against Figma's own render of the band: median per-pixel difference
+**3.67**, with the scene and the couple both at mean 5.6 — WebP and resampling
+noise. The amplified difference map is thin edge outlines only.
+
+---
+
 ## Video
 
 `npm run video` rebuilds `public/videos` from `assets-src/video`;

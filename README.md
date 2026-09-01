@@ -74,7 +74,12 @@ against its known y in the Figma frame. **The bar is 4px** — currently 15/15.
    parks the other slides off-canvas or below the clip boundary — see DESIGN.md
    before "simplifying" any of them into a grid.
 
-4. **Neither video looped, and measuring that needs a denominator.** A seam is
+4. **The MaxGuard band is two photographic layers.** The couple is cut out of
+   the scene and drawn back on top so the ghost type passes *behind* them. And
+   the scene node claims `x-16 width 1472` while Figma actually crops it to
+   1440 at 1:1 — believing the box zooms the kitchen 2%. See DESIGN.md.
+
+5. **Neither video looped, and measuring that needs a denominator.** A seam is
    only meaningful against a *typical* frame delta. The visualiser's first read
    was "341x" because the baseline was sampled from two frozen frames — its
    source holds 101 frozen transitions out of 299. The real figure was 17x.
