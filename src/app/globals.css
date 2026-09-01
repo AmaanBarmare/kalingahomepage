@@ -1,0 +1,160 @@
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------------------
+   Design tokens — read straight off the Figma variable set for
+   5SkKc300bE566PF5ltUzqi ("Kalinga Design 2.0"), via get_variable_defs.
+   Do not invent colours here; every value below is a named Figma variable.
+--------------------------------------------------------------------------- */
+@theme {
+  --color-ink: #14100e; /* ink/primary — warm near-black, the page's text colour */
+  --color-ruby: #70000e; /* brand/ruby — the only accent on the page */
+  --color-ruby-pressed: #4a000e; /* brand/ruby-pressed */
+  --color-off-white: #f8f6f3; /* bg/off-white */
+  --color-line-soft: #e4dfd8; /* line/soft */
+  --color-gray-1: #333333; /* Gray 1 */
+  --color-gray-6: #f2f2f2; /* Gray 6 — hero headline sits on this, not pure white */
+  --color-placeholder: #cfc8c0; /* surface/placeholder */
+  --color-stone-deep: #5e544e; /* surface/stone-deep */
+
+  --font-display: var(--font-halogen), "Futura", "Century Gothic", sans-serif;
+  --font-body: var(--font-neue-haas), "Helvetica Neue", Arial, sans-serif;
+
+  /* The design frame is 1440 wide with an 80px gutter — derived once, from the
+     first-section x of every band (hero text 80, strip 82, progress rule 80,
+     footer column 79). Amaha playbook Part 1 §4: measure the gutter, never
+     assume it. */
+  --page-gutter: 80px;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-glide: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ---------------------------------------------------------------------------
+   Type utilities. Figma carries exactly two named text styles for this page:
+     Heading   — Halogen Medium 40 / 1.58 / +5   uppercase
+     Body Copy — Haas Grot Disp 45 Light 16 / 1.5 / +1
+   Everything else on the page is a scaled instance of one of those two. If you
+   find yourself writing `text-[16px] leading-[1.5] tracking-[1px]`, you meant
+   `.body-copy`.
+--------------------------------------------------------------------------- */
+@utility heading {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 40px;
+  line-height: 1.58;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+}
+
+/* The collection slides use Halogen *Regular* at 45.6/+6.84 — same style, one
+   weight down and one step up in size. Kept separate so the carousel can scale
+   it without disturbing the section headings. */
+@utility heading-slide {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 45.6px;
+  line-height: 1.58;
+  letter-spacing: 6.84px;
+  text-transform: uppercase;
+}
+
+@utility body-copy {
+  font-family: var(--font-body);
+  font-weight: 300;
+  font-size: 16px;
+  line-height: 1.5;
+  letter-spacing: 1px;
+}
+
+@utility label-caps {
+  font-family: var(--font-body);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.88px;
+}
+
+/* MaxGuard's ghost headline. Figma specifies Haas Grot Disp *Round* 25 XThin
+   at 90/+13.5 — the only place on the page that uses the Round cut or a weight
+   below 300. Falls back to the lightest available Disp weight until
+   NeueHaasGrotDispRound-25XThin-Trial.woff2 is supplied. */
+@utility ghost-display {
+  font-family: var(--font-neue-haas-round, var(--font-body));
+  font-weight: 200;
+  font-size: 90px;
+  line-height: normal;
+  letter-spacing: 13.5px;
+  text-transform: uppercase;
+}
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    background: #ffffff;
+    color: var(--color-ink);
+    font-family: var(--font-body);
+  }
+
+  ::selection {
+    background: var(--color-ruby);
+    color: #ffffff;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-ruby);
+    outline-offset: 3px;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Motion. Figma carries no keyframe data for this file (get_motion_context
+   returns an empty node list), so every animation here is authored — derived
+   from what the layout implies, not from a spec. See DESIGN.md § Motion.
+
+   One rule, enforced globally: nothing moves for a reader who asked it not to.
+--------------------------------------------------------------------------- */
+@keyframes ks-rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 24px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes ks-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Slow, continuous drift on the hero plate. 1.06 is deliberately small: the
+   source is 1280px on a 1440px box (see tools/optimize-assets.mjs), so a
+   larger scale would make the softness obvious. */
+@keyframes ks-drift {
+  from {
+    transform: scale(1.06);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
