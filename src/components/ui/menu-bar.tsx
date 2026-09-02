@@ -22,15 +22,15 @@ import { KalingaLogo } from "@/components/ui/kalinga-logo";
  * centre of 720. On the page it is centred.
  *
  * NOT BUILT: the variant also carries four mega-menu panels (Engineered
- * Surfaces, Karigear, Projects, World of Kalinga) as rows of 226 x 186 image
+ * Surfaces, Karigear, Spaces, World of Kalinga) as rows of 226 x 186 image
  * cards 25px below the bar. Variant6's bar has no labels to open them from —
  * see DESIGN.md.
  */
 export function MenuBar({ className = "", href = "/" }: { className?: string; href?: string | null }) {
   return (
-    <div className={`flex h-[95px] w-full justify-center pt-[13px] ${className}`}>
-      <div className="flex h-[70px] w-[330px] origin-top scale-[0.72] items-center justify-center border border-[rgba(255,255,255,0.67)] bg-[rgba(248,246,243,0.14)] sm:scale-[0.86] lg:scale-100">
-        <span className="block h-[32.09px] w-[285px]">
+    <div className={`flex h-23.75 w-full justify-center pt-3.25 ${className}`}>
+      <div className="flex h-17.5 w-82.5 origin-top scale-[0.72] items-center justify-center border border-[rgba(255,255,255,0.67)] bg-[rgba(248,246,243,0.14)] sm:scale-[0.86] lg:scale-100">
+        <span className="block h-[32.09px] w-71.25">
           <span className="block origin-top-left scale-[0.8663]">
             <KalingaLogo href={href} />
           </span>

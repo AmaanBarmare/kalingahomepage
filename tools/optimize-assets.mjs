@@ -18,6 +18,7 @@
  */
 import sharp from "sharp";
 import { mkdir, stat } from "node:fs/promises";
+import { flushImageCache } from "./flush-image-cache.mjs";
 import { existsSync } from "node:fs";
 import path from "node:path";
 
@@ -37,14 +38,30 @@ const PLATES = [
   // These are the four user-supplied production plates. Keep their own native
   // crop and never upscale; the two larger sources are capped at a 2880px 2x
   // master and the two smaller sources remain at their full native width.
-  // Quartz is Figma 759:9016, a loose plate parked off-canvas at x-1227 y39002
-  // rather than placed in the home frame — it is the kitchen scene reshot, and
-  // it replaces the Michelangelo slab that stood here. Its native 1672 x 941 is
-  // BELOW the 2880 master (1.16x), which the audit flags; see README.
-  { src: "quartz-kitchen.png", out: "collection-scroll-quartz.webp", display: [1440, 1000], group: "collections" },
+  //
+  // QUARTZ is Figma 903:30034 "Quartz_Bianco cinnati 1", a loose 1451 x 1017
+  // plate parked off-canvas at x5044 y19809. It is the SAME photograph as the
+  // quartz-kitchen.png it replaces — diffed at 1.17/255 mean channel error —
+  // cropped by the designer to the middle 80.28% of the width (the fill sits at
+  // w 124.57%, left -12.29%). That crop is the whole point of the swap: the old
+  // 1672 x 941 source is 16:9, the slide is full-bleed, so on any window wider
+  // than 16:9 `object-cover` had to crop vertically and showed the full width —
+  // window, curtain and all — which is scenery the board deliberately cuts.
+  //
+  // It costs resolution and that is not recoverable: 1451 native is 1.01x, down
+  // from the old plate's 1.16x, so the audit flags it harder than before. There
+  // is no better source — cropping the 1672 master ourselves to the same 80.28%
+  // yields 1342px, LESS than the client's 1451 export — and rule 1 forbids
+  // making the difference up by upscaling.
+  { src: "quartz-bianco-cinnati.png", out: "collection-scroll-quartz.webp", display: [1440, 1000], group: "collections" },
   { src: "collections-scroll-marble.png", out: "collection-scroll-marble.webp", display: [1440, 1000], group: "collections" },
   { src: "collections-scroll-terrazzo.png", out: "collection-scroll-terrazzo.webp", display: [1440, 1000], group: "collections" },
-  { src: "collections-scroll-porcelain.png", out: "collection-scroll-porcelain.webp", display: [1440, 1000], group: "collections" },
+  // PORCELAIN is Figma 1177:87800, a loose 1672 x 941 plate at x7442 y20938,
+  // drawn `object-cover` at size-full — the frame IS the image's own 16:9 box,
+  // so unlike quartz there is no crop to honour, just the file. It replaces the
+  // porcelain-lined lobby (2157 x 1437) with the clifftop pool terrace, which
+  // drops the plate from 1.50x to 1.16x. Client's asset, client's call.
+  { src: "porcelain-pool-terrace.png", out: "collection-scroll-porcelain.webp", display: [1440, 1000], group: "collections" },
 
   // --- applications strip (544:3950) -------------------------------------
   // Figma draws 3 cards; the strip's rawImages carry 4 scenes + 1 material swatch.
@@ -147,17 +164,27 @@ const PLATES = [
   { src: "contact-lounge.png", out: "contact-lounge.webp", display: [1440, 640], node: "544:4018" },
 
   // --- nav menu overlay, Engineered Surfaces thumbnails (1076:49128) ---------
-  // The board draws these 167.88 x 87.34 (Elixir 169 x 90; the 1px was never
-  // worth a second display box). They render 180 x 94 now — the card grew so a
-  // long label and the hover arrow could stop fighting over one line, see the
-  // note in site-nav.tsx — so the 2x target is 360 rather than 336. Every source
-  // still clears it and the cap in build() does the rest; `npm run assets:audit`
-  // is what says so, and it is the thing to re-read if this box moves again.
-  { src: "menu-elixir.png", out: "menu-elixir.webp", display: [180, 94], group: "menu", node: "1096:53019" },
-  { src: "menu-quartz.png", out: "menu-quartz.webp", display: [180, 94], group: "menu", node: "1076:49129" },
-  { src: "menu-marble.png", out: "menu-marble.webp", display: [180, 94], group: "menu", node: "1076:49135" },
-  { src: "menu-terazzo.png", out: "menu-terazzo.webp", display: [180, 94], group: "menu", node: "1076:49141" },
-  { src: "menu-porcelain.png", out: "menu-porcelain.webp", display: [180, 94], group: "menu", node: "1076:49147" },
+  // Five 167.88 x 87.34 cards in the expanded accordion row. The display box is
+  // the card, so the 2x target is 336 — every source clears it comfortably and
+  // the cap in build() does the rest. Elixir's card is drawn 169 x 90 rather
+  // than 167.88 x 87.34; the 1px is not worth a second display box.
+  { src: "menu-elixir.png", out: "menu-elixir.webp", display: [169, 90], group: "menu", node: "1096:53019" },
+  // Quartz, Terazzo and Porcelain take THE SAME PICTURE the collections carousel
+  // shows on the page — the strip used to draw a different shot of each, so the
+  // menu and the carousel disagreed about what a collection looks like. Marble
+  // already matched and keeps its own plate. Elixir has no carousel slide, so it
+  // takes the client's Silvermist file.
+  //
+  // The sources are the DELIVERED webp in public/images, not the PNG masters in
+  // here, and that is deliberate: collection-scroll-quartz and -porcelain have
+  // both been re-cut since their PNGs were last exported, so the PNGs no longer
+  // agree with what the page actually serves. Reading the delivered file is the
+  // only way "matches the homepage" stays true rather than true-at-the-time.
+  // Re-cut a carousel plate and re-run this group to bring the strip along.
+  { src: "navsrc-quartz.webp", out: "menu-quartz.webp", display: [168, 88], group: "menu", node: "1076:49129" },
+  { src: "menu-marble.png", out: "menu-marble.webp", display: [168, 88], group: "menu", node: "1076:49135" },
+  { src: "navsrc-terrazzo.webp", out: "menu-terazzo.webp", display: [168, 88], group: "menu", node: "1076:49141" },
+  { src: "navsrc-porcelain.webp", out: "menu-porcelain.webp", display: [168, 88], group: "menu", node: "1076:49147" },
 ];
 
 async function build({ audit, plates = PLATES }) {
@@ -236,3 +263,8 @@ const requestedGroup = groupFlag
       : null;
 const plates = requestedGroup ? PLATES.filter((plate) => plate.group === requestedGroup) : PLATES;
 report(await build({ audit, plates }));
+// Writing a plate is exactly the moment its cached encode goes stale, and the
+// optimizer cannot work that out for itself — it keys on the URL, which has not
+// changed. Flushing here is what stops "I rebuilt the asset and the old picture
+// is still on screen". Skipped on --audit, which writes nothing.
+if (!audit) await flushImageCache();

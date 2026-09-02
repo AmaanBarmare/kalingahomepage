@@ -24,6 +24,20 @@ const SHRINK_END = 0.45;
  */
 const ACTIVE_LEAD = 0.31;
 
+/**
+ * The white breath between one plate's bottom edge and the next plate's top
+ * edge, as a percentage of the viewport height. The board draws 27.5px in a
+ * 1440x1024 frame — 2.69svh — and it is what tells the eye the incoming
+ * material is a SEPARATE picture arriving rather than the same picture growing
+ * a new bottom half. Without it the two edges meet on one line and the seam
+ * disappears.
+ *
+ * It is a percentage rather than a pixel value because everything else in this
+ * sequence is: the plate sizes, the rest pose, the travel. A fixed px gap would
+ * read as 2% on a laptop and 1% on a tall monitor.
+ */
+const PLATE_GAP = 2.69;
+
 type SlidePose = {
   opacity: number;
   scale: number;
@@ -39,8 +53,13 @@ function smoothstep(value: number) {
   return t * t * (3 - 2 * t);
 }
 
-/** Where a plate's bottom edge sits, as a percentage of the viewport. */
-const bottomEdgeOf = (scale: number) => 50 + scale * 50;
+/**
+ * Where the NEXT plate's top edge sits while it waits below: the current
+ * plate's bottom edge (the plate is centred, so 50% + half its scaled height)
+ * plus the gap. Both callers below are the incoming plate, so the gap lives
+ * here rather than being added at each site and forgotten at one of them.
+ */
+const topEdgeAfter = (scale: number) => 50 + scale * 50 + PLATE_GAP;
 
 /**
  * One viewport of scroll belongs to each material: its plate contracts from
@@ -50,12 +69,13 @@ const bottomEdgeOf = (scale: number) => 50 + scale * 50;
  *
  * THE INCOMING PLATE IS WHAT THE SHRINK REVEALS. While the current plate is
  * contracting, the next one's top edge is pinned to the current one's BOTTOM
- * edge — so the white gap the shrink opens is never white, it is always filled
- * by the material coming next. That is the whole point: you can see it arriving
- * as the picture gets smaller, rather than having it appear afterwards.
+ * edge, held off it by PLATE_GAP — so the space the shrink opens is filled by
+ * the material coming next, less one thin white band. That is the whole point:
+ * you can see it arriving as the picture gets smaller, rather than having it
+ * appear afterwards, and the band keeps the two pictures reading as two.
  *
- *   prev 0 -> 0.45   current 1 -> 0.7569, incoming y 100% -> 87.845%
- *   prev 0.45 -> 1   incoming y 87.845% -> 0, covering as it goes
+ *   prev 0 -> 0.45   current 1 -> 0.7569, incoming y 102.69% -> 90.535%
+ *   prev 0.45 -> 1   incoming y 90.535% -> 0, closing the gap as it covers
  *
  * The first pass cross-faded the incoming plate in at full size, so nothing
  * moved at all; the second ran the rise strictly AFTER the shrink, so the gap
@@ -82,11 +102,11 @@ function getSlidePose(stage: number, index: number, restScale: number): SlidePos
 
     if (prev <= SHRINK_END) {
       const shrink = smoothstep(prev / SHRINK_END);
-      return { opacity: 1, scale: 1, y: bottomEdgeOf(1 - (1 - restScale) * shrink) };
+      return { opacity: 1, scale: 1, y: topEdgeAfter(1 - (1 - restScale) * shrink) };
     }
 
     const rise = smoothstep((prev - SHRINK_END) / (1 - SHRINK_END));
-    return { opacity: 1, scale: 1, y: bottomEdgeOf(restScale) * (1 - rise) };
+    return { opacity: 1, scale: 1, y: topEdgeAfter(restScale) * (1 - rise) };
   }
 
   if (local <= SHRINK_END) {

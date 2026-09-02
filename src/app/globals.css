@@ -392,9 +392,19 @@
       );
   }
 
+  /* The active card's label sits at y30 on the board (DESIGN.md, Applications:
+     "moves its label from the bottom (512/534) to the top (30/52)"). This was
+     92, which put the visible glyph top at 63.4px measured — more than twice
+     the gap Figma draws, and the one thing that reads as wrong when the board
+     and the page are held side by side.
+
+     59 rather than 30 because `bottom` positions the LINE BOX, not the letters.
+     The box is 31.6 tall (20px x 1.58) and the glyphs start 3px into it, both
+     measured: 59 - 31.6 = 27.4 line-box top, + 3 = 30.4 glyph top. Change the
+     font size or line-height and this number has to be re-derived, not nudged. */
   .space-track:not(.is-dragging) .space-card:hover .cap,
   .space-track:not(.is-dragging) .space-card:focus-within .cap {
-    bottom: calc(100% - 92px);
+    bottom: calc(100% - 59px);
   }
 
   .space-track:not(.is-dragging) .space-card:hover .space-material-card,
@@ -434,9 +444,13 @@
     font-size: 12px;
   }
 
+  /* Same correction on touch, where the label is always at the top. Scaled to
+     the smaller card rather than copied: the card is 470 tall against 650, and
+     the inset already steps 28 -> 20 across the same break, so the 30px glyph
+     top becomes ~21. 50 - 31.6 = 18.4 line-box top, + 3 = 21.4. */
   .space-card .cap {
     left: 20px;
-    bottom: calc(100% - 76px);
+    bottom: calc(100% - 50px);
   }
 }
 

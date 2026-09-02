@@ -42,7 +42,7 @@ export type NavSection = { label: string; href: string; children: NavChild[] };
  * (1076:49128, exported to public/images/menu-*.webp). The other three sections
  * have no open state on the board and no plates with it; they reuse the page's
  * own art for the same destinations — karigear.columns for Base/Form, the
- * applications strip's sector scenes for Projects — so the pattern is
+ * applications strip's sector scenes for Spaces — so the pattern is
  * consistent. World of Kalinga has no page art for About/Blogs/Media at all and
  * is standing on borrowed plates; those three are the ones to replace when the
  * board grows an open state for it.
@@ -67,15 +67,15 @@ export const nav: {
       href: "/collections",
       children: [
         { label: "Elixir", href: "/collections/elixir", image: "/images/menu-elixir.webp",
-          alt: "A polished malachite slice with concentric green banding, mirrored on black" },
+          alt: "A sunlit Silvermist stone wall under dappled tree shadow on a modern house" },
         { label: "Quartz", href: "/collections/quartz", image: "/images/menu-quartz.webp",
-          alt: "A figure reading on a lounger beside a dark-tiled pool, seen from above" },
+          alt: "A kitchen with a pale stone island and warm timber cabinetry" },
         { label: "Marble", href: "/collections/marble", image: "/images/menu-marble.webp",
           alt: "A curved stone staircase rising through a sunlit plaster hall" },
         { label: "Terazzo", href: "/collections/terrazzo", image: "/images/menu-terazzo.webp", position: "50% 100%",
-          alt: "Stacked terrazzo-clad terraces of a coastal building above the sea" },
+          alt: "A stone pavilion mirrored in a still reflecting pool under a wide sky" },
         { label: "Porcelain", href: "/collections/porcelain", image: "/images/menu-porcelain.webp", position: "50% 100%",
-          alt: "A porcelain-lined lobby with a figure crossing the floor" },
+          alt: "A hillside villa terrace with loungers along a long pool" },
       ],
     },
     {
@@ -89,7 +89,11 @@ export const nav: {
       ],
     },
     {
-      label: "Projects",
+      // "Spaces", not "Projects", on the client's instruction. The label is the
+      // only thing that moved: the routes under it stay /projects/* so no URL
+      // breaks and nothing needs redirecting. Rename them too and this comment
+      // goes away with the mismatch.
+      label: "Spaces",
       href: "/projects",
       children: [
         { label: "Residential", href: "/projects/residential", image: "/images/residential-living-room-canva.webp",
@@ -177,12 +181,12 @@ export const applications = {
         material: "Grand Antique",           materialSrc: "/images/material-scene-commercial-entrance.webp", materialAlt: "Grand Antique black stone with organic white crystalline clusters and branching veins" },
       { index: "02", name: "Lobby & Common Area",      href: "/spaces/lobby-common-area",    src: "/images/commercial-lobby-common-area-canva.webp",    alt: "A refined commercial lobby with a terrazzo reception desk and dark aggregate floor",
         material: "Navona",                 materialSrc: "/images/material-surface-navona.webp",    materialAlt: "Navona terrazzo surface in charcoal black with fine pale aggregate" },
-      { index: "03", name: "Office Interiors",         href: "/spaces/office-interiors",     src: "/images/commercial-office-interiors-canva.webp",     alt: "A commercial interior finished with large-format terrazzo flooring and mirrored partitions",
-        material: "Savvanna",               materialSrc: "/images/material-surface-savvanna.webp",     materialAlt: "Savvanna terrazzo surface with bold charcoal and beige aggregate on white" },
-      { index: "04", name: "Retail & Showroom Space",  href: "/spaces/retail-showroom",      src: "/images/commercial-retail-showroom-canva.webp",      alt: "A softly lit retail showroom with pale terrazzo floors and a timber service counter",
+      { index: "03", name: "Retail & Showroom Space",  href: "/spaces/retail-showroom",      src: "/images/commercial-retail-showroom-canva.webp",      alt: "A softly lit retail showroom with pale terrazzo floors and a timber service counter",
         material: "Plazzo White",           materialSrc: "/images/material-surface-plazzo-white.webp",      materialAlt: "Plazzo White terrazzo surface with a fine soft-grey aggregate" },
-      { index: "05", name: "Meeting & Event Area",     href: "/spaces/meeting-event-area",   src: "/images/commercial-meeting-event-area-canva.webp",   alt: "A boardroom with a monolithic stone conference table overlooking a city skyline",
+      { index: "04", name: "Meeting & Event Area",     href: "/spaces/meeting-event-area",   src: "/images/commercial-meeting-event-area-canva.webp",   alt: "A boardroom with a monolithic stone conference table overlooking a city skyline",
         material: "Bianco Oro",              materialSrc: "/images/material-surface-bianco-oro.webp",       materialAlt: "Bianco Oro quartz surface in a clean soft-white finish" },
+      { index: "05", name: "Office Interiors",         href: "/spaces/office-interiors",     src: "/images/commercial-office-interiors-canva.webp",     alt: "A commercial interior finished with large-format terrazzo flooring and mirrored partitions",
+        material: "Savvanna",               materialSrc: "/images/material-surface-savvanna.webp",     materialAlt: "Savvanna terrazzo surface with bold charcoal and beige aggregate on white" },
     ],
     Hospitality: [
       { index: "01", name: "Entrance Facade",         href: "/spaces/hospitality/entrance-facade",     src: "/images/hospitality-entrance-facade-canva.webp",      alt: "A warmly lit hotel entrance framed by deep brown terrazzo and landscaped planting",
