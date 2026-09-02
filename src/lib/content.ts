@@ -237,7 +237,7 @@ export const karigear = {
         { src: "/images/karigear-base-2.webp", position: "50% 50%",
           alt: "Textured stone feature wall above a linear fireplace in a living room" },
         { src: "/images/karigear-base-3.webp", position: "50% 50%",
-          alt: "Book-matched marble dining table on a solid slab base" },
+          alt: "Circular stone inlay floor medallion seen from above, ringed by a curved sofa" },
       ],
     },
     {
@@ -249,7 +249,7 @@ export const karigear = {
         { src: "/images/karigear-form-2.webp", position: "50% 50%",
           alt: "Travertine bench with a solid slab seat" },
         { src: "/images/karigear-form-3.webp", position: "50% 50%",
-          alt: "Circular stone inlay floor medallion seen from above, ringed by a curved sofa" },
+          alt: "Book-matched marble dining table on a solid slab base" },
       ],
     },
   ],

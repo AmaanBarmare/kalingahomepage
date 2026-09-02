@@ -74,19 +74,29 @@ const PLATES = [
 
   // --- karigear BASE / FORM columns ----------------------------------------
   // THREE per column now, not four. The board's window is 722 x 666, so the
-  // pipeline wants 1444px of source; these six arrive at ~620-626 wide, i.e.
-  // 0.86x — under even 1:1. Nothing here can invent that detail, so they are
-  // written at native width and the audit flags them source-limited.
+  // pipeline wants 1444px of source.
+  //
+  // THESE SIX ARE UPSCALED, and that is deliberate rather than accidental. The
+  // supplied files are ~620-626 wide — 0.86x, under even 1:1 — so they were
+  // resampled to 1444 (Lanczos3, then a gentle unsharp to recover the acuity a
+  // 2.3x interpolation costs) before being listed here. The untouched originals
+  // sit in assets-src/karigear/originals/ so the real provenance is never lost.
+  //
+  // Be honest about what that buys: interpolation cannot add detail that was
+  // never captured. What it does buy is control of the resample — a browser
+  // scaling a 620px asset into a 722px box at 2x DPR does it with a cheap
+  // filter and no sharpening, and that looks worse than doing it here once.
+  // Replace these with true 1444px exports and the upscale step goes away.
   //
   // They arrive with an alpha channel, but it is fully opaque and libwebp drops
   // such a channel on its own — flattening first is measurably a no-op (100.0KB
   // either way), so there is nothing to do about it here.
   { src: "karigear/base-1-wave-panel.png",       out: "karigear-base-1.webp", display: [722, 666], group: "karigear" },
   { src: "karigear/base-2-textured-wall.png",    out: "karigear-base-2.webp", display: [722, 666], group: "karigear" },
-  { src: "karigear/base-3-marble-table.png",     out: "karigear-base-3.webp", display: [722, 666], group: "karigear" },
+  { src: "karigear/base-3-inlay-medallion.png",  out: "karigear-base-3.webp", display: [722, 666], group: "karigear" },
   { src: "karigear/form-1-terrazzo-table.png",   out: "karigear-form-1.webp", display: [722, 666], group: "karigear" },
   { src: "karigear/form-2-travertine-bench.png", out: "karigear-form-2.webp", display: [722, 666], group: "karigear" },
-  { src: "karigear/form-3-inlay-medallion.png",  out: "karigear-form-3.webp", display: [722, 666], group: "karigear" },
+  { src: "karigear/form-3-marble-table.png",     out: "karigear-form-3.webp", display: [722, 666], group: "karigear" },
 
   // --- karigare collage (Component 101) ------------------------------------
   // Named layers in Figma's own child order, which is the z-order: 1 sits at the
