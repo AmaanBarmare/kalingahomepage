@@ -311,21 +311,25 @@ export function SiteNav({ className = "" }: { className?: string }) {
                                 aria-hidden
                                 className="absolute inset-x-0 bottom-0 h-[41%] bg-linear-to-t from-ink to-transparent"
                               />
-                              {/* The section row's own arrow (1096:57603),
-                                  repeated per card and revealed on hover. It is
-                                  RIGHT-aligned rather than centred because the
-                                  label owns the bottom-left and a centred 40px
-                                  plate would span y24-64 of an 88px card,
-                                  straight through the label's line. Right of it
-                                  also echoes the section row, where the same
-                                  plate sits at the column's right edge.
-                                  Decoration, not a control — the whole card is
-                                  already the link. */}
+                              {/* The arrow plate again, revealed on hover. It
+                                  is NOT the section row's 40px one: measured off
+                                  the client's hover reference against the 950px
+                                  rule, the card's plate is 30 and the row's is
+                                  40 in the same picture, so the difference is
+                                  deliberate.
+                                    30 x 30      (26 below sm, on a 74px card)
+                                    right 9      the label's own inset, mirrored
+                                    centred on the LABEL's line, not the card's
+                                  That last one is why the offset is 5.75 and not
+                                  a round number: the label sits 12 up with a
+                                  17.5 line, so its middle is 20.75 from the base
+                                  and half the plate is 15. Decoration, not a
+                                  control — the whole card is already the link. */}
                               <span
                                 aria-hidden
-                                className="text-ruby pointer-events-none absolute top-1/2 right-2.25 grid h-10 w-10 -translate-y-1/2 place-items-center bg-white opacity-0 transition-opacity duration-300 ease-out-expo group-hover:opacity-100 group-focus-visible:opacity-100"
+                                className="text-ruby pointer-events-none absolute right-2.25 bottom-[4.5px] grid h-6.5 w-6.5 place-items-center bg-white opacity-0 transition-opacity duration-300 ease-out-expo group-hover:opacity-100 group-focus-visible:opacity-100 sm:bottom-[5.75px] sm:h-7.5 sm:w-7.5"
                               >
-                                <ArrowRightIcon className="h-10 w-10" />
+                                <ArrowRightIcon className="h-6.5 w-6.5 sm:h-7.5 sm:w-7.5" />
                               </span>
                               <span
                                 className="font-display absolute right-2.25 bottom-2.5 left-2.25 text-[12px] font-bold tracking-[1.4634px] text-white uppercase sm:bottom-3 sm:text-[14px]"

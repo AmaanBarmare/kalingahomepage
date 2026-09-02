@@ -124,7 +124,14 @@ const PLATES = [
   // hours while the surrounding code updates immediately — which reads exactly
   // like "the image didn't change". A new name is a new URL, and both caches
   // miss on it the first time.
-  { src: "testimonial-work-sample-wall.png", out: "testimonial-work-sample-wall.webp", display: [321, 646], group: "testimonials" },
+  // -2 on the out name, and it is the cache rule above again. The Figma export
+  // of this one carried a 1px PURE BLACK column at its right edge (x=321 of
+  // 322); the 2x upsample smeared it and the unsharp threw a bright halo off
+  // it, which rendered as a hairline down the right side of the card. The
+  // source in assets-src is now rebuilt from originals/ with that column cropped
+  // BEFORE the resample — cropping after would have kept the halo. Same picture,
+  // different bytes, so it needs a URL both caches miss on.
+  { src: "testimonial-work-sample-wall.png", out: "testimonial-work-sample-wall-2.webp", display: [321, 646], group: "testimonials" },
   { src: "testimonial-clean-3.png", out: "testimonial-clean-3.webp", display: [321, 646], group: "testimonials" },
   { src: "testimonial-work-drawing-desk.png", out: "testimonial-work-drawing-desk.webp", display: [321, 646], group: "testimonials" },
 
