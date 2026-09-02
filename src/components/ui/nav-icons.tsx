@@ -54,6 +54,22 @@ export function ChevronIcon(props: SVGProps<SVGSVGElement>) {
 }
 
 /**
+ * The menu overlay's "go to this section" arrow — 1096:57603, a 40 x 40 white
+ * plate with a ruby arrow on it. Only the arrow is drawn here; the plate is the
+ * button's own background, so the arrow can take its colour from `currentColor`
+ * the way every other icon in this file does. Path data is Figma's own, at
+ * Figma's own 40 x 40 viewBox, so the arrow sits where the board puts it inside
+ * the plate rather than being re-centred by hand.
+ */
+export function ArrowRightIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 40 40" fill="none" aria-hidden focusable="false" {...props}>
+      <path d="M31.6446 20.7071C32.0351 20.3166 32.0351 19.6834 31.6446 19.2929L25.2806 12.9289C24.8901 12.5384 24.257 12.5384 23.8664 12.9289C23.4759 13.3195 23.4759 13.9526 23.8664 14.3431L29.5233 20L23.8664 25.6569C23.4759 26.0474 23.4759 26.6805 23.8664 27.0711C24.257 27.4616 24.8901 27.4616 25.2806 27.0711L31.6446 20.7071ZM9 20L9 21L30.9375 21L30.9375 20L30.9375 19L9 19L9 20Z" fill="currentColor" />
+    </svg>
+  );
+}
+
+/**
  * The 11.67 x 6.06 chevron drawn over the contact band's CTA (695:2576). It is
  * a stroked open chevron, not the filled ChevronIcon above — Figma keeps it as
  * a loose vector on top of the button rather than inside the component.

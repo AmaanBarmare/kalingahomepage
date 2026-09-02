@@ -1,15 +1,18 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { KalingaLogo } from "@/components/ui/kalinga-logo";
-import { ChevronIcon, CloseIcon, MenuIcon } from "@/components/ui/nav-icons";
+import { KalingaMark } from "@/components/ui/kalinga-mark";
+import { ArrowRightIcon, CloseIcon, MenuIcon } from "@/components/ui/nav-icons";
 import { nav } from "@/lib/content";
 
 /**
- * Site navigation — 709:6387 "Frame 552", six variants of one 1440 x 90 bar.
+ * Site navigation — 1040:49584 "Component 107", two states of one 1440 x 911
+ * overlay: Frame 675 collapsed, Frame 674 with ENGINEERED SURFACES open.
  *
- * BAR (709:6388)
+ * BAR (686:3786) — UNCHANGED by this redesign.
  *   1440 x 90, solid white. Inner row x80 y27, 1280 wide, space-between.
  *   lockup    308 x 35.93 at x80  y27
  *   hamburger  36 x 32    at x1324 y29   (1324 + 36 = 1360 = 1440 - 80)
@@ -19,31 +22,46 @@ import { nav } from "@/lib/content";
  * icon takes it via `currentColor`, which the lockup cannot do: it is served
  * through next/image, and an SVG rendered as its own document inherits nothing.
  *
- * DRAWER (709:6661 "Frame 443") — 521 x 937 at x919, i.e. flush right, and it
- * starts at the TOP of the page, so it covers the bar's right end including the
- * hamburger. Fill #70020f, which is NOT the brand ruby #70000e; the extra green
- * is real and only shows against the ruby CTA, so it is kept literal.
- *   close      46 x 41 at x460 y15, white plate, X 32 at x7 y4.5
- *   sections  404 wide at x58  y113, one every 136px while collapsed
- *   inquiry   x45 y794 · rule x45 y839 w425 · legal x45 y858
+ * OVERLAY — this is what changed. The 521-wide drawer at #70020f is gone; the
+ * panel now takes 1153 of the 1440 (80.07%) at the real brand ruby #70000E,
+ * with the page showing through a 287-wide ink scrim at 89% on its left.
+ *   close      46 x 41 at x1364 y30, white plate, X 32 centred
+ *   column    950 wide at x357 — 70 in from the panel edge, 133 from the right
+ *   labels    30/1.58/+5 Halogen Medium uppercase, one every 113px collapsed
+ *   rules     1px #9F9F9F, 950 wide, 80px below each label's top
+ *   inquiry   y789 · rule y834 · legal y853, i.e. 122 up from the panel base
  *
- * Each section is a 40px header (label + 19x9 chevron) with its children
- * clipped away; expanding reveals a list that starts 48px below the header top
- * on a 36px pitch. Collapsed pitch 136 = 40 header + 96 gap, so the gap is what
- * stays fixed and the list simply pushes the sections below it down.
+ * A ROW OPENS INTO A STRIP OF CARDS, not a text list. Open, the row also grows
+ * a 33px Kalinga mark to the left of its label (which is why the label shifts
+ * from x357 to x418) and a 40 x 40 white plate carrying a ruby arrow at the
+ * column's right edge — that arrow is a LINK to the section index, while the
+ * label itself only toggles. Cards are 168 x 88 on a 11.5px gap, inset 61 to
+ * line up under the label rather than under the mark.
  *
- * Type is Haas Grot Disp **Round** — see --font-nav in globals.css for why it
- * currently resolves to the Display cut.
+ * Label colour is state, and the board is explicit about all three values:
+ * nothing open, every label is #f2f2f2 (Frame 675); one open, that one goes to
+ * pure white and the rest drop to rgba(242,242,242,0.52) (1040:42104). Karigear
+ * is drawn at 0.56 rather than 0.52 — a board inconsistency, not a third state,
+ * so one value is used for every inactive row.
+ *
+ * READING THE CLASSES AGAINST THE NUMBERS ABOVE. Spacing here is on Tailwind's
+ * scale rather than in arbitrary px, so the utilities are QUARTERS of the
+ * board's pixels: `lg:pt-33.75` is Figma's 135, `w-11.5` its 46, `lg:pl-15.25`
+ * its 61. Multiply by 4 to get back to the frame. Anything off that grid stays
+ * arbitrary and still reads in px — the mark's 26.54/30.62/33.68 heights, the
+ * 11.5px card gap, every `text-` and `tracking-` value. One consequence worth
+ * knowing: the scale is 0.25REM a step, so the spacing now follows the root
+ * font size while the type, still literal px, does not. At the default 16px
+ * root the two agree exactly, which is what the measurements were taken at.
  */
 
 /**
- * MOBILE. The drawer is a 521-wide desktop panel in Figma and there is no phone
- * artboard for it, so everything below `sm` is authored. It went out at Figma's
- * literal values — 58px gutters, a 25/+5 label set `whitespace-nowrap`, a 96px
- * gap — and on a 320 screen that leaves 204px for labels that measure past 250:
- * "World of Kalinga" ran 53px off the panel and took its chevron 82px off with
- * it. The gutter, the type and the gap all step down below `sm`, and the labels
- * are allowed to wrap rather than being pinned to one line they cannot fit.
+ * MOBILE. The overlay is authored below `lg`: Figma has no phone artboard for
+ * it, and the desktop geometry does not survive the trip — a 950px column at
+ * 70/133 gutters, 30/+5 labels and a 5-wide card strip all assume 1440. Below
+ * `lg` the panel takes the full width (the scrim has nowhere to go), the
+ * gutters step down to the page's own 24/40, the labels scale to 20/+3, and the
+ * strip wraps instead of overflowing.
  */
 
 export function SiteNav({ className = "" }: { className?: string }) {
@@ -52,7 +70,7 @@ export function SiteNav({ className = "" }: { className?: string }) {
   const panelRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
 
-  // Close on Escape, and hold focus inside the drawer while it is open.
+  // Close on Escape, and hold focus inside the overlay while it is open.
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
@@ -69,16 +87,19 @@ export function SiteNav({ className = "" }: { className?: string }) {
   }, [open]);
 
   // Returning focus to the hamburger belongs to the close action, not to a
-  // render, so it lives here rather than in the effect above.
+  // render, so it lives here rather than in the effect above. Collapsing the
+  // accordion belongs here too: the overlay reopens in Frame 675, never
+  // half-open on whatever was last looked at.
   const close = () => {
     setOpen(false);
+    setExpanded(null);
     triggerRef.current?.focus();
   };
 
   return (
     <>
-      <header className={`h-[90px] w-full bg-white ${className}`}>
-        <div className="mx-auto flex h-full max-w-[1440px] items-center justify-between px-4 sm:px-6 lg:px-20">
+      <header className={`h-22.5 w-full bg-white ${className}`}>
+        <div className="mx-auto flex h-full max-w-360 items-center justify-between px-4 sm:px-6 lg:px-20">
           {/* The bar lockup is 308 wide against the component's natural 329.
               `scale` is a TRANSFORM, so it changes what the lockup looks like
               and not one pixel of what it reserves: the row went on booking the
@@ -87,7 +108,7 @@ export function SiteNav({ className = "" }: { className?: string }) {
               the only way into the menu was simply gone on a small phone. The
               explicit width is the scaled width, so the box now measures what
               the eye sees. */}
-          <span className="block w-[218px] origin-left scale-[0.66] min-[360px]:w-[257px] min-[360px]:scale-[0.78] sm:w-[297px] sm:scale-90 lg:w-[308px] lg:scale-[0.936]">
+          <span className="block w-54.5 origin-left scale-[0.66] min-[360px]:w-64.25 min-[360px]:scale-[0.78] sm:w-74.25 sm:scale-90 lg:w-77 lg:scale-[0.936]">
             <KalingaLogo />
           </span>
 
@@ -98,19 +119,22 @@ export function SiteNav({ className = "" }: { className?: string }) {
             aria-expanded={open}
             aria-controls="site-menu"
             aria-label="Open menu"
-            className="grid h-[32px] w-[36px] shrink-0 place-items-center text-ruby transition-opacity hover:opacity-70"
+            className="grid h-8 w-9 shrink-0 place-items-center text-ruby transition-opacity hover:opacity-70"
           >
-            <MenuIcon className="h-[20px] w-[28px]" />
+            <MenuIcon className="h-5 w-7" />
           </button>
         </div>
       </header>
 
-      {/* Scrim. Figma draws none — the drawer is only 521 of 1440 — but without
-          it a click on the page behind reads as "nothing happened". */}
+      {/* Scrim — 1040:42106, ink at 89% over the 287 the panel leaves showing.
+          It is a real part of the design here, unlike the old drawer's, and it
+          doubles as the click target that dismisses the overlay. It stays a
+          `div`: Escape and the close plate already give keyboard users a way
+          out, and a second focusable "Close menu" would only be noise. */}
       <div
         onClick={close}
         aria-hidden
-        className={`fixed inset-0 z-40 bg-ink/40 transition-opacity duration-500 ${
+        className={`bg-ink/89 fixed inset-0 z-40 transition-opacity duration-500 ${
           open ? "opacity-100" : "pointer-events-none opacity-0"
         }`}
       />
@@ -122,105 +146,192 @@ export function SiteNav({ className = "" }: { className?: string }) {
         role="dialog"
         aria-modal="true"
         aria-label="Site menu"
-        className={`fixed top-0 right-0 z-50 flex h-dvh w-full max-w-[521px] flex-col overflow-y-auto bg-[#70020f] transition-transform duration-[600ms] ease-[var(--ease-out-expo)] ${
+        className={`bg-ruby fixed top-0 right-0 z-50 h-dvh w-full transition-transform duration-600 ease-out-expo lg:w-[80.07%] ${
           open ? "translate-x-0" : "translate-x-full"
         }`}
       >
-        {/* close — x460 y15 within the 521 drawer, so 15px from the right */}
-        <div className="flex justify-end px-[15px] pt-[15px]">
-          <button
-            type="button"
-            onClick={close}
-            aria-label="Close menu"
-            className="grid h-[41px] w-[46px] place-items-center bg-white text-ink transition-opacity hover:opacity-80"
-          >
-            <CloseIcon className="h-[32px] w-[32px]" />
-          </button>
-        </div>
-
-        <nav
-          className="flex flex-col gap-14 px-6 pt-10 sm:gap-24 sm:px-[58px] sm:pt-[57px]"
-          aria-label="Main"
+        {/* close — 46 x 41 at x1364 y30 (1040:42096). The panel is flush right,
+            so 1440 - 1364 - 46 puts it 30 in from the panel's own edge. */}
+        <button
+          type="button"
+          onClick={close}
+          tabIndex={open ? 0 : -1}
+          aria-label="Close menu"
+          className="absolute top-5 right-5 z-10 grid h-10.25 w-11.5 place-items-center bg-white text-ink transition-opacity hover:opacity-80 lg:top-7.5 lg:right-7.5"
         >
-          {nav.sections.map((section, i) => {
-            const isOpen = expanded === i;
-            return (
-              <div key={section.label}>
-                <button
-                  type="button"
-                  onClick={() => setExpanded(isOpen ? null : i)}
-                  aria-expanded={isOpen}
-                  className="flex h-[40px] w-full items-center gap-[10px] text-left text-white transition-opacity hover:opacity-80"
+          <CloseIcon className="h-8 w-8" />
+        </button>
+
+        <div className="flex h-full flex-col overflow-y-auto px-6 pt-27.5 pb-7.5 sm:px-10 lg:pt-33.75 lg:pr-33.25 lg:pl-17.5">
+          <nav aria-label="Main">
+            {nav.sections.map((section, i) => {
+              const isOpen = expanded === i;
+              return (
+                <div
+                  key={section.label}
+                  className={`border-b border-[#9F9F9F] ${i > 0 ? "pt-6.5 lg:pt-8" : ""}`}
                 >
-                  <span
-                    className="font-nav text-[20px] font-medium tracking-[3px] uppercase sm:text-[25px] sm:tracking-[5px] sm:whitespace-nowrap"
+                  <div
+                    className={`flex items-center gap-4 transition-[padding] duration-500 ease-out-expo sm:gap-5.5 lg:gap-7 ${
+                      isOpen
+                        ? "pb-5.5 lg:pb-6.75"
+                        : "pb-6.5 lg:pb-8.25"
+                    }`}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => setExpanded(isOpen ? null : i)}
+                      aria-expanded={isOpen}
+                      aria-controls={`site-menu-panel-${i}`}
+                      tabIndex={open ? 0 : -1}
+                      className="flex min-w-0 flex-1 items-center text-left"
+                    >
+                      {/* The mark only exists on the open row (1096:57676), and
+                          it is what pushes the label from x357 to x418. Its
+                          width is animated with the same 0fr -> 1fr grid the
+                          card strip uses, so nothing has to be measured; the
+                          gap rides INSIDE the clipped track as a margin, or a
+                          flex `gap` would keep reserving 28px of nothing while
+                          the mark is collapsed. */}
+                      <span
+                        aria-hidden
+                        className="grid shrink-0 transition-[grid-template-columns] duration-500 ease-out-expo"
+                        style={{ gridTemplateColumns: isOpen ? "1fr" : "0fr" }}
+                      >
+                        <span className="overflow-hidden">
+                          <KalingaMark className="mr-4 block h-[26.54px] w-6.5 text-white sm:mr-5.5 sm:h-[30.62px] sm:w-7.5 lg:mr-7 lg:h-[33.68px] lg:w-8.25" />
+                        </span>
+                      </span>
+                      <span
+                        className={`font-display text-[20px] font-medium tracking-[3px] uppercase transition-colors duration-500 sm:text-[24px] sm:tracking-[4px] lg:text-[30px] lg:tracking-[5px] ${
+                          expanded === null
+                            ? "text-gray-6"
+                            : isOpen
+                              ? "text-white"
+                              : "text-[rgba(242,242,242,0.52)]"
+                        }`}
+                        style={{ lineHeight: 1.58 }}
+                      >
+                        {section.label}
+                      </span>
+                    </button>
+
+                    {/* 1096:57603 — a LINK, not part of the toggle: it goes to
+                        the section index while the label opens the strip. */}
+                    <Link
+                      href={section.href}
+                      onClick={close}
+                      tabIndex={open && isOpen ? 0 : -1}
+                      aria-hidden={!isOpen}
+                      aria-label={`Go to ${section.label}`}
+                      className={`text-ruby grid h-10 w-10 shrink-0 place-items-center bg-white transition-opacity duration-500 hover:opacity-80 ${
+                        isOpen ? "opacity-100" : "pointer-events-none opacity-0"
+                      }`}
+                    >
+                      <ArrowRightIcon className="h-10 w-10" />
+                    </Link>
+                  </div>
+
+                  {/* grid-rows 0fr -> 1fr animates height without measuring it */}
+                  <div
+                    id={`site-menu-panel-${i}`}
+                    className="grid transition-[grid-template-rows] duration-500 ease-out-expo"
+                    style={{ gridTemplateRows: isOpen ? "1fr" : "0fr" }}
+                  >
+                    {/* The clipped box carries NO padding of its own. `0fr`
+                        sizes the grid TRACK to zero, but the item is
+                        border-box, so a padding-bottom on it survives the
+                        collapse as 43px of empty row — which is exactly what it
+                        did, pushing every rule 44px down the panel. The
+                        padding belongs one level in, where the clip eats it. */}
+                    <div className="overflow-hidden">
+                      {/* Indented by exactly the mark + its gap, so the strip
+                          starts under the label (x418), not under the mark. */}
+                      <ul className="flex flex-wrap gap-[11.5px] pb-9 pl-10.5 sm:pl-13 lg:pb-10.75 lg:pl-15.25">
+                        {section.children.map((child) => (
+                          <li key={child.label}>
+                            <Link
+                              href={child.href}
+                              onClick={close}
+                              tabIndex={isOpen && open ? undefined : -1}
+                              className="group relative block h-18.5 w-35.5 overflow-hidden bg-[#040707] sm:h-22 sm:w-42"
+                            >
+                              {child.image ? (
+                                <Image
+                                  src={child.image}
+                                  alt={child.alt ?? ""}
+                                  fill
+                                  sizes="168px"
+                                  style={{
+                                    objectPosition: child.position ?? "50% 50%",
+                                  }}
+                                  className="object-cover transition-transform duration-600 ease-out-expo group-hover:scale-[1.06]"
+                                />
+                              ) : null}
+                              {/* 1076:49133 — #14100e up to 9.459%, out by the
+                                card's 41%. Invisible over the Elixir plate,
+                                which is already black, so it stays uniform. */}
+                              <span
+                                aria-hidden
+                                className="absolute inset-x-0 bottom-0 h-[41%] bg-linear-to-t from-ink to-transparent"
+                              />
+                              <span
+                                className="font-display absolute right-2.25 bottom-2.5 left-2.25 text-[12px] font-bold tracking-[1.4634px] text-white uppercase sm:bottom-3 sm:text-[14px]"
+                                style={{
+                                  lineHeight: 1.25,
+                                  textShadow:
+                                    "-2.195px 2.927px 4.024px rgba(0,0,0,0.35)",
+                                }}
+                              >
+                                {child.label}
+                              </span>
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </nav>
+
+          {/* inquiry / rule / legal sit 122, 77 and 58 up from the panel's base */}
+          <div className="mt-auto pt-15">
+            {/* Sentence case, lowercase email — 1040:42111 renders "Any inquiry
+                info@kalingastone.com". Figma's export shows a `capitalize` class
+                on the paragraph with `lowercase` on the spans inside; the spans
+                win, and title-casing this gives "Info@Kalingastone.Com". */}
+            <p
+              className="font-nav text-[15px] font-light tracking-[1px] text-white"
+              style={{ lineHeight: 1.58 }}
+            >
+              {nav.inquiry.lead}{" "}
+              <a
+                href={`mailto:${nav.inquiry.email}`}
+                tabIndex={open ? 0 : -1}
+                className="font-bold underline"
+              >
+                {nav.inquiry.email}
+              </a>
+            </p>
+            <hr className="mt-5.25 h-px w-full border-0 bg-[#9F9F9F]" />
+            <ul className="mt-4.75 flex flex-wrap items-center gap-x-5.25 gap-y-2">
+              {nav.legal.map((item) => (
+                <li key={item.label}>
+                  <Link
+                    href={item.href}
+                    onClick={close}
+                    tabIndex={open ? undefined : -1}
+                    className="font-nav -my-1.5 block py-1.5 text-[15px] font-light tracking-[1px] text-white uppercase transition-opacity hover:opacity-70"
                     style={{ lineHeight: 1.58 }}
                   >
-                    {section.label}
-                  </span>
-                  <ChevronIcon
-                    className={`h-[9px] w-[19px] shrink-0 transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`}
-                  />
-                </button>
-
-                {/* grid-rows 0fr -> 1fr animates height without measuring it */}
-                <div
-                  className="grid transition-[grid-template-rows] duration-500 ease-[var(--ease-out-expo)]"
-                  style={{ gridTemplateRows: isOpen ? "1fr" : "0fr" }}
-                >
-                  <ul className="overflow-hidden">
-                    <li className="h-[8px]" aria-hidden />
-                    {section.children.map((child) => (
-                      <li key={child.label} className="pb-[12px] last:pb-0">
-                        <Link
-                          href={child.href}
-                          onClick={close}
-                          tabIndex={isOpen ? undefined : -1}
-                          className="font-nav flex min-h-11 items-center text-[15px] font-light tracking-[3px] text-white uppercase transition-opacity hover:opacity-70 sm:block sm:h-[24px] sm:min-h-0 sm:tracking-[5px]"
-                          style={{ lineHeight: 1.58 }}
-                        >
-                          {child.label}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            );
-          })}
-        </nav>
-
-        {/* inquiry / rule / legal sit 143, 98 and 79 up from the drawer's base */}
-        <div className="mt-auto px-6 pb-10 sm:px-[45px] sm:pb-[51px]">
-          {/* Sentence case, lowercase email — 709:6662 renders "Any inquiry
-              info@kalingastone.com". Figma's export shows a `capitalize` class
-              on the paragraph with `lowercase` on the spans inside; the spans
-              win, and title-casing this gives "Info@Kalingastone.Com". */}
-          <p
-            className="font-nav text-[15px] font-light tracking-[1px] text-white"
-            style={{ lineHeight: 1.58 }}
-          >
-            {nav.inquiry.lead}{" "}
-            <a href={`mailto:${nav.inquiry.email}`} className="font-bold underline">
-              {nav.inquiry.email}
-            </a>
-          </p>
-          <hr className="mt-[21px] h-px w-full max-w-[425px] border-0 bg-white/40" />
-          <ul className="mt-[19px] flex flex-wrap items-center gap-x-[21px] gap-y-[8px]">
-            {nav.legal.map((item) => (
-              <li key={item.label}>
-                <Link
-                  href={item.href}
-                  onClick={close}
-                  tabIndex={open ? undefined : -1}
-                  className="font-nav -my-1.5 block py-1.5 text-[15px] font-light tracking-[1px] text-white uppercase transition-opacity hover:opacity-70"
-                  style={{ lineHeight: 1.58 }}
-                >
-                  {item.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       </div>
     </>

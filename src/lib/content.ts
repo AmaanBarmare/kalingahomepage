@@ -22,19 +22,34 @@ const LOREM_BRIEF =
 const LOREM_DUMMY =
   "is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since.";
 
-/** One entry under a drawer section. */
-export type NavChild = { label: string; href: string };
-/** A drawer section: a heading with a chevron and a collapsible child list. */
+/** One entry under a menu section. Legal links carry no card, hence optional. */
+export type NavChild = { label: string; href: string; image?: string; alt?: string; position?: string };
+/** A menu section: a heading that opens into a strip of its children's cards. */
 export type NavSection = { label: string; href: string; children: NavChild[] };
 
 /**
- * Site navigation — 709:6387 "Frame 552", six variants of one 1440 x 90 bar.
- * Variant1 is the closed bar; Variant2 is the open drawer with everything
- * collapsed; Variants 3-6 each expand one section.
+ * Site navigation — 1040:49584 "Component 107", two states of one 1440 x 911
+ * overlay. Frame 675 is everything collapsed; Frame 674 has ENGINEERED SURFACES
+ * open.
+ *
+ * This REPLACED the 521-wide ruby drawer (709:6387) that shipped first. The
+ * white 90px bar above it is untouched — the same 686:3786 component, same
+ * lockup, same hamburger — so only the overlay is new: it now takes 1153 of the
+ * 1440 and each section opens into a strip of image cards rather than a text
+ * list. `children` therefore carries a plate per entry.
+ *
+ * ONLY ENGINEERED SURFACES IS DRAWN OPEN, so its five plates are the board's
+ * (1076:49128, exported to public/images/menu-*.webp). The other three sections
+ * have no open state on the board and no plates with it; they reuse the page's
+ * own art for the same destinations — karigear.columns for Base/Form, the
+ * applications strip's sector scenes for Projects — so the pattern is
+ * consistent. World of Kalinga has no page art for About/Blogs/Media at all and
+ * is standing on borrowed plates; those three are the ones to replace when the
+ * board grows an open state for it.
  *
  * Two Figma spellings are preserved deliberately, same rule as the footer's
- * MAXGAURD: "TERAZZO" (709:6683) and "TERAM AND CONDITIONS" (709:6666). Both
- * are wrong and both stay until the client corrects the board, so the
+ * MAXGAURD: "TERAZZO" (1076:49146) and "TERAM AND CONDITIONS" (1040:42115).
+ * Both are wrong and both stay until the client corrects the board, so the
  * discrepancy is visible rather than silently patched.
  */
 export const nav: {
@@ -47,38 +62,52 @@ export const nav: {
       label: "Engineered Surfaces",
       href: "/collections",
       children: [
-        { label: "Elixir - Premium Edition", href: "/collections/elixir" },
-        { label: "Quartz", href: "/collections/quartz" },
-        { label: "Marble", href: "/collections/marble" },
-        { label: "Terazzo", href: "/collections/terrazzo" },
-        { label: "Porcelain", href: "/collections/porcelain" },
+        { label: "Elixir", href: "/collections/elixir", image: "/images/menu-elixir.webp",
+          alt: "A polished malachite slice with concentric green banding, mirrored on black" },
+        { label: "Quartz", href: "/collections/quartz", image: "/images/menu-quartz.webp",
+          alt: "A figure reading on a lounger beside a dark-tiled pool, seen from above" },
+        { label: "Marble", href: "/collections/marble", image: "/images/menu-marble.webp",
+          alt: "A curved stone staircase rising through a sunlit plaster hall" },
+        { label: "Terazzo", href: "/collections/terrazzo", image: "/images/menu-terazzo.webp", position: "50% 100%",
+          alt: "Stacked terrazzo-clad terraces of a coastal building above the sea" },
+        { label: "Porcelain Tiles", href: "/collections/porcelain", image: "/images/menu-porcelain.webp", position: "50% 100%",
+          alt: "A porcelain-lined lobby with a figure crossing the floor" },
       ],
     },
     {
       label: "Karigear",
       href: "/karigear",
       children: [
-        { label: "Base", href: "/karigear/base" },
-        { label: "Form", href: "/karigear/form" },
+        { label: "Base", href: "/karigear/base", image: "/images/karigear-base-1.webp",
+          alt: "Carved stone wall panel with a flowing wave relief, lit within a bronze frame" },
+        { label: "Form", href: "/karigear/form", image: "/images/karigear-form-1.webp",
+          alt: "Oval terrazzo table on a cylindrical base" },
       ],
     },
     {
       label: "Projects",
       href: "/projects",
       children: [
-        { label: "Residential", href: "/projects/residential" },
-        { label: "Commercial", href: "/projects/commercial" },
-        { label: "Hospitality", href: "/projects/hospitality" },
-        { label: "Healthcare", href: "/projects/healthcare" },
+        { label: "Residential", href: "/projects/residential", image: "/images/residential-living-room-canva.webp",
+          alt: "A double-height living room with city views and polished pale stone flooring" },
+        { label: "Commercial", href: "/projects/commercial", image: "/images/commercial-lobby-common-area-canva.webp",
+          alt: "A commercial lobby with stone-clad columns and a long seating run" },
+        { label: "Hospitality", href: "/projects/hospitality", image: "/images/hospitality-lobby-canva.webp",
+          alt: "A hotel lobby with a book-matched stone feature wall" },
+        { label: "Healthcare", href: "/projects/healthcare", image: "/images/healthcare-reception-waiting-canva.webp",
+          alt: "A healthcare reception with a pale stone counter and a waiting area beyond" },
       ],
     },
     {
       label: "World of Kalinga",
       href: "/about",
       children: [
-        { label: "About", href: "/about" },
-        { label: "Blogs", href: "/blogs" },
-        { label: "Media", href: "/media" },
+        { label: "About", href: "/about", image: "/images/contact-lounge.webp",
+          alt: "A stone-lined lounge with low seating and warm daylight" },
+        { label: "Blogs", href: "/blogs", image: "/images/testimonial-work-drawing-desk.webp",
+          alt: "A drawing desk with plans and material samples laid out" },
+        { label: "Media", href: "/media", image: "/images/testimonial-work-sample-wall.webp",
+          alt: "A wall of stone samples arranged in a studio" },
       ],
     },
   ],
@@ -207,7 +236,7 @@ export const maxguard = {
 export const visualiser = {
   headline: "Lorem IPSUM",
   body: LOREM_DUMMY,
-  cta: { label: "Visualise Your Space", href: "/visualiser" },
+  cta: { label: "Visualize Your Space", href: "/visualiser" },
 } as const;
 
 /** Karigear collage — Component 101 (544:4013). */
@@ -316,10 +345,14 @@ export const contact = {
    * here. The second is the visualiser's own CTA, repeated — same label, same
    * destination, so the two are kept identical deliberately.
    *
-   * NOTE the spelling: the visualiser section already ships "Visualise", and a
-   * page must not offer the same button under two spellings, so this follows it.
+   * SPELLING: "Visualize", with a z, in both places. The board spells it that
+   * way on this button (1000:56840) and the client has confirmed it as the
+   * house spelling, so the visualiser section's own CTA was moved to match
+   * rather than leaving one page offering the same button two ways. The
+   * `/visualiser` route and the component and asset names are untouched — they
+   * are the section's identifier, not the label.
    */
-  secondaryCta: { label: "Visualise Your Space", href: "/visualiser" },
+  secondaryCta: { label: "Visualize Your Space", href: "/visualiser" },
   /**
    * The CTA is a menu, not a link — see brochure-menu.tsx. These are the four
    * studio brochures, downsampled from their 300ppi CMYK print masters by
@@ -334,52 +367,89 @@ export const contact = {
   ],
 } as const;
 
-export type FooterGroup = { title: string; links: string[] };
-
-/** Footer — 555:2863. */
+/**
+ * Footer — 880:27210, rebuilt.
+ *
+ * WHAT WENT: the FOLLOW US block (heading, newsletter line, and the 159 x 25
+ * three-mark socials strip) and the centred legal row. Both are gone from the
+ * board entirely, and the two-column-of-two-groups arrangement went with them.
+ *
+ * WHAT ARRIVED: four flat link columns instead of two stacked pairs, and two
+ * new rows under a rule apiece — offices and contact details, then named social
+ * links with a copyright line. The socials are now text with an icon rather
+ * than bare marks, which is why each one needs its own file in public/icons
+ * instead of the single flattened strip.
+ *
+ * Column headings are Haas Grot Disp R 55 Roman 16 / +1.5 on #f3f3f3; links are
+ * 45 Light 16 / +2 on white/70, stacked on a 14px gap — the same 33px pitch the
+ * old columns ran on, reached a different way.
+ */
 export const footer: {
   findAStore: { title: string; body: string; placeholder: string };
-  follow: {
-    title: string;
-    body: string;
-    linkText: string;
-    socials: { name: string; href: string }[];
-  };
-  columns: { groups: FooterGroup[] }[];
-  legal: string[];
+  columns: { title: string; links: { label: string; href: string }[] }[];
+  offices: string[];
+  contacts: { icon: string; label: string }[];
+  socials: { name: string; icon: string; href: string }[];
+  copyright: string[];
 } = {
   findAStore: {
     title: "Find a store",
     body: "Enter a location to find the closest Kalinga Stone stores",
     placeholder: "City or zip code",
   },
-  follow: {
-    title: "Follow us",
-    body: "Subscribe to our newsletter to receive latest updates from Kalinga Stone.",
-    linkText: "Subscribe to our newsletter",
-    socials: [
-      { name: "Instagram", href: "https://instagram.com" },
-      { name: "LinkedIn", href: "https://linkedin.com" },
-      { name: "YouTube", href: "https://youtube.com" },
-    ],
-  },
   columns: [
     {
-      groups: [
-        { title: "Collections", links: ["Quartz", "Marble", "Terrazzo", "Porcelain"] },
-        { title: "Karigear", links: ["Base", "Form"] },
+      title: "Engineered Surfaces",
+      links: [
+        { label: "Elixir - Premium Edition", href: "/collections/elixir" },
+        { label: "Quartz", href: "/collections/quartz" },
+        { label: "Marble", href: "/collections/marble" },
+        { label: "Terrazzo", href: "/collections/terrazzo" },
+        { label: "Porcelain", href: "/collections/porcelain" },
       ],
     },
     {
-      groups: [
-        { title: "Projects", links: ["Residential", "Hospitality", "Commercial", "Healthcare"] },
-        // Was 544:4401, one text node of four uppercase lines with no heading
-        // and no child links. The board replaced it with a normal group — a
-        // DISCOVER heading over three links on the same 33px pitch as the rest
-        // (I880:27210;665:7419), which also retired the MAXGAURD misspelling.
-        { title: "Discover", links: ["About", "Blogs", "Media"] },
+      title: "Karigear",
+      links: [
+        { label: "Base", href: "/karigear/base" },
+        { label: "Form", href: "/karigear/form" },
+      ],
+    },
+    {
+      title: "Spaces",
+      links: [
+        { label: "Residential", href: "/spaces/residential" },
+        { label: "Commercial", href: "/spaces/commercial" },
+        { label: "Hospitality", href: "/spaces/hospitality" },
+        { label: "Healthcare", href: "/spaces/healthcare" },
+      ],
+    },
+    {
+      title: "World of Kalinga",
+      links: [
+        { label: "About", href: "/about" },
+        { label: "Blogs", href: "/blogs" },
+        { label: "Media", href: "/media" },
       ],
     },
   ],
-  legal: ["Conditions of service", "Terms of use", "Privacy policy"],
+  offices: [
+    "Head Office : Lorem ipsum dolor sit amet consectetur.",
+    "Manufacturing Factory : Lorem ipsum dolor sit amet consectetur.",
+  ],
+  // Plain text, not links: the board gives placeholder copy, and there is no
+  // number or address to put behind a tel: or mailto: yet.
+  contacts: [
+    { icon: "/icons/phone.svg", label: "Adipiscing" },
+    { icon: "/icons/mail.svg", label: "Lorem ipsum curabitur" },
+  ],
+  socials: [
+    { name: "Instagram", icon: "/icons/instagram.svg", href: "https://instagram.com" },
+    { name: "Facebook", icon: "/icons/facebook.svg", href: "https://facebook.com" },
+    // The board spells this "Linkdin". Corrected here — a misspelt brand name in
+    // a live footer is a defect, not a design decision.
+    { name: "LinkedIn", icon: "/icons/linkedin.svg", href: "https://linkedin.com" },
+    { name: "YouTube", icon: "/icons/youtube.svg", href: "https://youtube.com" },
+  ],
+  copyright: ["2026 Kalinga Stone.", "All rights reserved."],
 };

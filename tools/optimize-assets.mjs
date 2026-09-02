@@ -138,6 +138,17 @@ const PLATES = [
   // full-width band, so it is upscaled to the 2880 the box wants; the untouched
   // original is in assets-src/originals/.
   { src: "contact-lounge.png", out: "contact-lounge.webp", display: [1440, 640], node: "544:4018" },
+
+  // --- nav menu overlay, Engineered Surfaces thumbnails (1076:49128) ---------
+  // Five 167.88 x 87.34 cards in the expanded accordion row. The display box is
+  // the card, so the 2x target is 336 — every source clears it comfortably and
+  // the cap in build() does the rest. Elixir's card is drawn 169 x 90 rather
+  // than 167.88 x 87.34; the 1px is not worth a second display box.
+  { src: "menu-elixir.png", out: "menu-elixir.webp", display: [169, 90], group: "menu", node: "1096:53019" },
+  { src: "menu-quartz.png", out: "menu-quartz.webp", display: [168, 88], group: "menu", node: "1076:49129" },
+  { src: "menu-marble.png", out: "menu-marble.webp", display: [168, 88], group: "menu", node: "1076:49135" },
+  { src: "menu-terazzo.png", out: "menu-terazzo.webp", display: [168, 88], group: "menu", node: "1076:49141" },
+  { src: "menu-porcelain.png", out: "menu-porcelain.webp", display: [168, 88], group: "menu", node: "1076:49147" },
 ];
 
 async function build({ audit, plates = PLATES }) {

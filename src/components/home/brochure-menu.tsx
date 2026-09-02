@@ -83,7 +83,7 @@ export function BrochureMenu() {
         aria-controls={panelId}
         onClick={() => setOpen((v) => !v)}
         // Ruby now, not the outline it was — the board fills this one and leaves
-        // the new "Visualise Your Space" beside it as the outline.
+        // the new "Visualize Your Space" beside it as the outline.
         className={ksButtonClass({ variant: "ruby", trailing: true })}
       >
         {contact.cta.label}

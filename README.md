@@ -118,9 +118,16 @@ mark changes.
 
 - Testimonial videos — the four cards currently render poster frames with the
   play control disabled.
-- **Three nav fonts.** The drawer needs Haas Grot Disp **Round** 45 Light,
-  65 Medium and 75 Bold; only Round 25 XThin is licensed here. `--font-nav` in
-  globals.css falls back to the Display cut until they land — see DESIGN.md.
+- **Three nav fonts.** Narrowed by the 1040:49584 menu redesign: its section
+  labels are Halogen Medium now, so only the inquiry line and the legal links
+  are still on Haas Grot Disp **Round** 45 Light / 75 Bold, and only Round
+  25 XThin is licensed here. `--font-nav` in globals.css falls back to the
+  Display cut until they land — see DESIGN.md.
+- **Menu cards for World of Kalinga.** 1040:49584 only draws ENGINEERED
+  SURFACES open, so About / Blogs / Media have no plates of their own and are
+  standing on borrowed page art (`nav.sections` in content.ts says which).
+  Karigear and Projects reuse their own sections' plates, which is right;
+  these three want art from the client.
 - Eleven image plates are below 2× DPR because the supplied sources are
   1280–1920px. Not a pipeline limit; see DESIGN.md § Assets.
 - Both clips are under 2× too (hero 0.89×, visualiser 1.33×). The hero is also
