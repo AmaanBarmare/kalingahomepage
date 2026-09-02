@@ -36,9 +36,15 @@ import { contact } from "@/lib/content";
  * page content is what a dropdown is supposed to do; looking half-transparent
  * while doing it is not.
  *
- * The panel is `w-max min-w-full`: the trigger reads "Download brochure" but
- * the items are longer, and letting the panel match the longest item keeps the
- * type from wrapping. It is left-aligned to the trigger.
+ * THE PANEL IS EXACTLY THE TRIGGER'S WIDTH, and that is load-bearing. It used
+ * to be `w-max min-w-full` — as wide as its longest item — which ran it 61px
+ * out past the button it hangs from. Since the panel opens BELOW the row, that
+ * overhang never overlapped "Visualize Your Space"; it stopped 45px inside it,
+ * which is the worst of both readings: too close to look deliberate, not close
+ * enough to look like a layer. `w-full` is the structural fix — the panel can
+ * only ever be as wide as the thing it belongs to, so no neighbour can be
+ * crowded no matter what goes in it. The items were shortened to suit (see
+ * contact.brochures); the longest now measures ~150px inside a 210px box.
  *
  * Each brochure opens in a new tab — `target="_blank"` with `rel="noopener
  * noreferrer"`, the same pairing the footer's social links use. `download` is
@@ -88,7 +94,7 @@ export function BrochureMenu() {
       >
         {contact.cta.label}
         <ChevronDownIcon
-          className={`h-[6.06px] w-[11.67px] shrink-0 transition-transform duration-300 ease-[var(--ease-out-expo)] ${
+          className={`h-[6.06px] w-[11.67px] shrink-0 transition-transform duration-300 ease-out-expo ${
             open ? "rotate-180" : ""
           }`}
         />
@@ -97,7 +103,7 @@ export function BrochureMenu() {
       {/* 0fr -> 1fr animates the height without anyone having to measure it. */}
       <div
         id={panelId}
-        className="absolute top-full left-0 z-20 grid w-max min-w-full transition-[grid-template-rows] duration-500 ease-[var(--ease-out-expo)]"
+        className="absolute top-full left-0 z-20 grid w-full transition-[grid-template-rows] duration-500 ease-out-expo"
         style={{ gridTemplateRows: open ? "1fr" : "0fr" }}
       >
         <ul
@@ -116,7 +122,7 @@ export function BrochureMenu() {
                 rel="noopener noreferrer"
                 tabIndex={open ? undefined : -1}
                 onClick={() => setOpen(false)}
-                className="flex h-[42.7px] items-center px-6 font-body text-[11.272px] font-normal tracking-[1.0247px] text-white uppercase transition-colors duration-300 ease-[var(--ease-out-expo)] hover:bg-white hover:text-ink focus-visible:bg-white focus-visible:text-ink focus-visible:outline-none"
+                className="flex h-[42.7px] items-center px-6 font-body text-[11.272px] font-normal tracking-[1.0247px] text-white uppercase transition-colors duration-300 ease-out-expo hover:bg-white hover:text-ink focus-visible:bg-white focus-visible:text-ink focus-visible:outline-none"
               >
                 {b.label}
               </a>

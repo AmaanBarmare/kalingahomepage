@@ -360,10 +360,15 @@ export const contact = {
    * Order is the client's: Elixir first, then the three stone families.
    */
   brochures: [
-    { label: "Elixir Collection Brochure", href: "/brochures/kalinga-elixir-collection.pdf" },
-    { label: "Marble Collection Brochure", href: "/brochures/kalinga-marble-collection.pdf" },
-    { label: "Quartz Collection Brochure", href: "/brochures/kalinga-quartz-collection.pdf" },
-    { label: "Terrazzo Collection Brochure", href: "/brochures/kalinga-terrazzo-collection.pdf" },
+    // "Brochure" is NOT repeated on the items. The trigger above them already
+    // says Download brochure, and carrying the word four more times made the
+    // longest label 221px against a 210px trigger — which is what pushed the
+    // open panel out from under its own button and up against Visualize Your
+    // Space beside it. Naming the collection is the item's whole job.
+    { label: "Elixir Collection", href: "/brochures/kalinga-elixir-collection.pdf" },
+    { label: "Marble Collection", href: "/brochures/kalinga-marble-collection.pdf" },
+    { label: "Quartz Collection", href: "/brochures/kalinga-quartz-collection.pdf" },
+    { label: "Terrazzo Collection", href: "/brochures/kalinga-terrazzo-collection.pdf" },
   ],
 } as const;
 
