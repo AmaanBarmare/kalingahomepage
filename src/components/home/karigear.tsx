@@ -43,10 +43,18 @@ import { karigear } from "@/lib/content";
  *   left     translateY(-progress * distance)          0    -> -distance
  *   right    translateY((-1 + progress) * distance)    -distance ->  0
  *
- * Because the right track starts at -distance and ends at 0, the columns are
- * counter-indexed: at rest BASE shows frame 1 against FORM's frame 4. The two
- * sets are ordered so every pair that meets is deliberate — lobby/table,
- * carved wall/carved table, flat carving/fluted basin, relief/curved bath.
+ * THE UP-RUNNING COLUMN REVEALS ITS FRAMES BOTTOM-UP, and that has to be undone
+ * or the content array lies about what you see. A track stacks frame 0 at the
+ * top, so a column sitting at translateY(0) shows frame 0 and a column sitting
+ * at -distance shows the LAST one. Column 0 runs 0 -> -distance and therefore
+ * plays 0, 1, 2 as you scroll; column 1 runs -distance -> 0 and plays 2, 1, 0.
+ * Left alone, that means the first frame authored for FORM is the last one seen
+ * — which is exactly how "form 2" ended up arriving at the bottom of the scroll
+ * rather than the top.
+ *
+ * So the DOM order is reversed for the up-running columns. The array in
+ * content.ts is then the ON-SCREEN order for both columns, which is the only
+ * reading that does not require knowing which way a given column travels.
  *
  * The frame is fixed px rather than the reference's 100vh because Figma's is
  * 660 and near-square; `--frame-h` also takes a viewport ceiling so the whole
@@ -116,7 +124,11 @@ export function Karigear() {
         <div className="karigear-sticky">
           <div className="karigear-stage">
             <div id="karigear-columns" className="karigear-columns">
-              {karigear.columns.map((column, ci) => (
+              {karigear.columns.map((column, ci) => {
+                // Odd columns travel upward, so their DOM order is flipped to
+                // keep the authored order the seen order — see the note above.
+                const frames = ci % 2 === 0 ? column.frames : [...column.frames].reverse();
+                return (
                 <div key={column.label} className="karigear-column">
                   <div
                     ref={ci === 0 ? windowRef : undefined}
@@ -138,7 +150,7 @@ export function Karigear() {
                             : `translate3d(0, calc(${-(COUNT - 1)} * var(--frame-h)), 0)`,
                       }}
                     >
-                      {column.frames.map((frame) => (
+                      {frames.map((frame) => (
                         <div key={frame.src} className="karigear-frame">
                           <Image
                             src={frame.src}
@@ -157,7 +169,8 @@ export function Karigear() {
                     {column.label}
                   </Link>
                 </div>
-              ))}
+                );
+              })}
             </div>
 
             <div className="karigear-cta">
