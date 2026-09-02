@@ -15,6 +15,32 @@
  *     The visualiser is a far more detailed render and needs its own numbers:
  *     at the hero's crf its MP4 came out LARGER than the source file.
  *
+ *     Swept against the 3754 KB master, PSNR frame-aligned (see the warning
+ *     below), the visualiser's curve is:
+ *
+ *       vp9  crf 24  2324 KB  47.26 dB      h264 crf 21  3048 KB  48.98 dB
+ *            crf 26  1972 KB  46.53 dB           crf 22  2728 KB  48.06 dB
+ *            crf 28  1718 KB  45.93 dB           crf 23  2413 KB  47.17 dB
+ *            crf 30  1510 KB  45.37 dB           crf 25  1876 KB  45.63 dB
+ *            crf 34  1114 KB  44.07 dB
+ *
+ *     There is no knee — it is close to linear — so this is a budget call, and
+ *     the budget is set by what the picture does. At crf 34, which is what used
+ *     to ship, the rug weave in the middle of frame 150 goes visibly soft; by
+ *     crf 24 that crop is 44.2 dB and matches the master by eye. So vp9 24, and
+ *     h264 23 to MATCH IT rather than to match its size: 47.17 against 47.26,
+ *     so Safari and Chrome get the same picture. Both land under the master.
+ *
+ *     Tuning the VP9 args instead of the crf buys nothing: cpu-used 1 with
+ *     auto-alt-ref 6, lag-in-frames 25 and tile-columns 2 gave 47.87 dB for
+ *     2790 KB, which is where plain crf 22 already sits. Same curve, more
+ *     wall-clock. The args below stay as they are.
+ *
+ *     MEASURE PSNR/SSIM WITH THE TIMEBASE NORMALISED — `[0:v]settb=AVTB,
+ *     setpts=N` on both inputs. Without it ffmpeg silently pairs frames by
+ *     timestamp, and the WebM's timing made VP9 read 8.7dB worse than it is
+ *     (38.5 vs 47.3), which is enough to pick the wrong codec entirely.
+ *
  * Three things this fixes that are invisible until you measure them.
  *
  * WATERMARK (hero). A Gemini sparkle sits at x1137..1182 y576..622 (46x47,
@@ -30,42 +56,29 @@
  * marble there carries only 2.24 levels RMS of high-frequency detail, so there
  * is nothing to lose.
  *
- * DEAD FRAMES (visualiser), AND WHY 10s OF SOURCE SHIPS AS 6.8s. The delivered
- * clip is 300 frames at 30fps, but 130 of its 299 transitions are frozen — the
- * file does not move for a quarter of its length. Re-measured on the clip that
- * currently ships (kalinga-marble-20-surface-visualizer.mp4), at full
- * resolution rather than off a thumbnail:
+ * THE VISUALISER SHIPS AS DELIVERED — no trim, no retime, no fold. That is a
+ * deliberate reversal and both halves of it were tried first, so the reasons
+ * are worth keeping.
  *
- *   frames   0..22    0.77s   frame 0 vs 22 is 59.8dB, max channel delta 9
- *   frames  23..250   7.60s   motion — frame 23 breaks from 0 at 45.4dB / 210
- *   frames 251..299   1.63s   frame 250 vs 299 is 71.3dB, max delta 3
+ * The master is 300 frames at 30fps, but only 228 of them move. Measured at
+ * full resolution: frames 0..22 are frozen (frame 0 vs 22 is 59.8dB, max
+ * channel delta 9), frames 251..299 are frozen (250 vs 299 is 71.3dB, delta 3),
+ * and motion runs 23..250 — frame 23 breaks from frame 0 at 45.4dB / 210. So
+ * 2.40s of the 10 is a still frame, at both ends, where a loop can least afford
+ * it, and 58 frozen transitions survive inside the cut including a 0.6s stall
+ * at frame 165.
  *
- * So 2.40s of the 10 is a still frame, at both ends, where a loop can least
- * afford it. `keep` drops exactly those and nothing else.
+ * Trimming those and folding the tail gave 6.80s, which read as rushed.
+ * Retiming that back up to 8.00s through minterpolate's motion-compensated mode
+ * fixed the pace and cost picture quality — synthesised frames are only as good
+ * as the motion estimate, and on this render they were not good enough.
  *
- * The remaining 0.80s is the loop fold, and it is NOT lost footage: the fade
- * dissolves the last 24 frames over the first 24 rather than deleting them, so
- * every one of the 228 moving frames still plays. 228 - 24 = 204 = 6.80s.
- *
- * 6.80s READ AS RUSHED, so the clip is now RETIMED to 8.00s rather than cut
- * differently — there is no more motion to find, only the holds, and putting
- * those back would trade a rushed loop for a stalled one. `retime: 264` takes
- * the kept 228 frames to 264 (1.158x) so the fold still leaves 240 = 8.00s at
- * 30fps.
- *
- * The stretch goes through minterpolate's motion-compensated mode, which
- * SYNTHESISES the in-between frames; plain `setpts` would repeat 36 of them and
- * a slow dolly shows every duplicate as a stutter. Validated on this clip
- * rather than assumed: dropping it to 15fps and rebuilding 30 puts the
- * synthesised frames at 36.5dB against the real ones (blend mode manages
- * 34.1dB). That is the hard case — a 2-frame gap — where the retime only has
- * to invent one frame in seven, so the real error is well under it.
- *
- * This source is worse inside the cut than the one it replaced: 58 frozen
- * transitions survive the trim against the previous clip's 25, including two
- * 18-frame (0.6s) stalls at source frames 165 and 231. The second falls inside
- * the fold and does no harm; the first is a visible stall mid-clip and is a
- * note for whoever renders the master, not something to fix here.
+ * Between a clip that is paced wrong and one that is soft, the client's call
+ * was the master's own timing. So `keep`, `retime` and `fade` are all off here
+ * and every bit goes to the encode instead. What that accepts, on the record:
+ * a ~1.6s stall before each loop, and a restart that jumps ~17x a normal frame
+ * delta because nothing smooths the seam. Both are properties of the delivered
+ * file. The fix for either is a better master, not a better pipeline.
  *
  * LOOP SEAM (both). Neither clip loops as delivered: the hero's last->first
  * jump is 21x a typical frame delta, the visualiser's 17x. Both are fixed by
@@ -117,10 +130,10 @@ const CLIPS = [
     poster: "visualiser-poster.webp",
     display: [1440, 815], // 544:4015 — aspect 1.767 vs the clip's 1.778, near-exact
     pre: [],
-    keep: [23, 251], // drop the 22-frame head freeze and 49-frame dead tail
-    retime: 264, // 228 -> 264 so the fold leaves 240 = 8.00s; see the note above
-    fade: 24, // 0.8s at 30fps
-    crf: { h264: 25, vp9: 34 },
+    keep: null, // ship the master's own timeline — see the note above
+    retime: null,
+    fade: 0, // no fold: the loop seam is the master's, untouched
+    crf: { h264: 23, vp9: 24 }, // quality-matched at ~47.2dB; see the sweep above
     note: "slow dolly push-in — loops",
   },
 ];
@@ -189,6 +202,10 @@ const buildFilter = (clip, srcFrames, rate) => {
   const [ks, ke] = clip.keep ?? [0, srcFrames];
   const trim = clip.keep ? `trim=start_frame=${ks}:end_frame=${ke},setpts=PTS-STARTPTS,` : "";
   const kept = ke - ks;
+  // `fade: 0` ships the timeline untouched — no fold, no split, nothing to
+  // blend. Kept as a real branch because a zero-length crossfade would divide
+  // by zero in the blend expression below.
+  if (!clip.fade) return `[0:v]${pre}${trim}null[v]`;
   // Stretch time, then rebuild the timeline at the native rate. minterpolate
   // SYNTHESISES the in-between frames rather than repeating neighbours, which
   // is what keeps a 1.16x stretch from reading as judder.
@@ -253,7 +270,7 @@ for (const clip of CLIPS) {
   console.log(
     `  loop   ${clip.keep ? `keep ${ks}..${ke} then ` : ""}${
       clip.retime ? `retime ${ke - ks}->${clip.retime}f (${(clip.retime / (ke - ks)).toFixed(3)}x) then ` : ""
-    }fold ${clip.fade}f tail over head  ->  ${outFrames} frames (${(outFrames / rate).toFixed(2)}s)`,
+    }${clip.fade ? `fold ${clip.fade}f tail over head` : "master timeline untouched"}  ->  ${outFrames} frames (${(outFrames / rate).toFixed(2)}s)`,
   );
 
   if (AUDIT) {
