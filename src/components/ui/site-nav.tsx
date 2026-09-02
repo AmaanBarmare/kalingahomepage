@@ -38,6 +38,16 @@ import { nav } from "@/lib/content";
  * label itself only toggles. Cards are 168 x 88 on a 11.5px gap, inset 61 to
  * line up under the label rather than under the mark.
  *
+ * OPENING IS ON HOVER, and only one row is ever open. Crossing from Engineered
+ * Surfaces to Karigear swaps the strip; leaving the list closes it. Three
+ * inputs drive the same one piece of state so no one is locked out:
+ *   pointerenter  mouse only — see the guard on the row
+ *   focus         the keyboard's hover, so tabbing walks the strips
+ *   click         the toggle, which is all a touch device has
+ * Hovering a CARD then reveals that card's own copy of the arrow plate. It is
+ * `aria-hidden` and `pointer-events-none` in there: the card is already a
+ * link, so the arrow is the affordance for it, not a second target.
+ *
  * Label colour is state, and the board is explicit about all three values:
  * nothing open, every label is #f2f2f2 (Frame 675); one open, that one goes to
  * pure white and the rest drop to rgba(242,242,242,0.52) (1040:42104). Karigear
@@ -163,12 +173,24 @@ export function SiteNav({ className = "" }: { className?: string }) {
         </button>
 
         <div className="flex h-full flex-col overflow-y-auto px-6 pt-27.5 pb-7.5 sm:px-10 lg:pt-33.75 lg:pr-33.25 lg:pl-17.5">
-          <nav aria-label="Main">
+          {/* Leaving the whole list closes it — "open on hover" has to mean
+              closed again when the pointer is elsewhere, or the panel keeps
+              whichever row was touched last. Moving BETWEEN rows never passes
+              through here, so the strip swaps rather than blinking shut. */}
+          <nav aria-label="Main" onMouseLeave={() => setExpanded(null)}>
             {nav.sections.map((section, i) => {
               const isOpen = expanded === i;
               return (
                 <div
                   key={section.label}
+                  // The whole row opens it, cards included, so travelling down
+                  // from the label into the strip cannot close what you are
+                  // reaching for. Mouse only: a tap fires pointerenter and THEN
+                  // click, so an unguarded handler would open the row and the
+                  // toggle would immediately shut it again on touch.
+                  onPointerEnter={(e) => {
+                    if (e.pointerType === "mouse") setExpanded(i);
+                  }}
                   className={`border-b border-[#9F9F9F] ${i > 0 ? "pt-6.5 lg:pt-8" : ""}`}
                 >
                   <div
@@ -181,6 +203,10 @@ export function SiteNav({ className = "" }: { className?: string }) {
                     <button
                       type="button"
                       onClick={() => setExpanded(isOpen ? null : i)}
+                      // Focus is the keyboard's hover: tabbing the four rows
+                      // opens each in turn, so a strip is never unreachable
+                      // without a pointer. The click toggle stays for touch.
+                      onFocus={() => setExpanded(i)}
                       aria-expanded={isOpen}
                       aria-controls={`site-menu-panel-${i}`}
                       tabIndex={open ? 0 : -1}
@@ -268,6 +294,16 @@ export function SiteNav({ className = "" }: { className?: string }) {
                                   className="object-cover transition-transform duration-600 ease-out-expo group-hover:scale-[1.06]"
                                 />
                               ) : null}
+                              {/* Hover scrim. It exists FOR the arrow: the
+                                  plate is white, and Marble and Porcelain are
+                                  pale enough that its edges would dissolve
+                                  into the photo. Dimming the plate's ground is
+                                  what makes it read as a card sitting on the
+                                  image. */}
+                              <span
+                                aria-hidden
+                                className="absolute inset-0 bg-ink/0 transition-colors duration-300 ease-out-expo group-hover:bg-ink/35 group-focus-visible:bg-ink/35"
+                              />
                               {/* 1076:49133 — #14100e up to 9.459%, out by the
                                 card's 41%. Invisible over the Elixir plate,
                                 which is already black, so it stays uniform. */}
@@ -275,6 +311,22 @@ export function SiteNav({ className = "" }: { className?: string }) {
                                 aria-hidden
                                 className="absolute inset-x-0 bottom-0 h-[41%] bg-linear-to-t from-ink to-transparent"
                               />
+                              {/* The section row's own arrow (1096:57603),
+                                  repeated per card and revealed on hover. It is
+                                  RIGHT-aligned rather than centred because the
+                                  label owns the bottom-left and a centred 40px
+                                  plate would span y24-64 of an 88px card,
+                                  straight through the label's line. Right of it
+                                  also echoes the section row, where the same
+                                  plate sits at the column's right edge.
+                                  Decoration, not a control — the whole card is
+                                  already the link. */}
+                              <span
+                                aria-hidden
+                                className="text-ruby pointer-events-none absolute top-1/2 right-2.25 grid h-10 w-10 -translate-y-1/2 place-items-center bg-white opacity-0 transition-opacity duration-300 ease-out-expo group-hover:opacity-100 group-focus-visible:opacity-100"
+                              >
+                                <ArrowRightIcon className="h-10 w-10" />
+                              </span>
                               <span
                                 className="font-display absolute right-2.25 bottom-2.5 left-2.25 text-[12px] font-bold tracking-[1.4634px] text-white uppercase sm:bottom-3 sm:text-[14px]"
                                 style={{

@@ -516,10 +516,13 @@
   color: #ffffff;
 }
 
-/* The four titles set on ONE line each. "PORCELAIN TILES" is the long one and
-   the only one at risk: at the design width it wants 654px inside a 588px
-   column, so it wrapped at 1440 as well as on every phone — the mid widths
-   around 1200 happen to fit, which is what made it look fine in review.
+/* The four titles set on ONE line each. The rule was written when the longest
+   was "PORCELAIN TILES" — 654px inside a 588px column, so it wrapped at 1440 as
+   well as on every phone, and only the mid widths around 1200 happened to fit,
+   which is what made it look fine in review. That title is plain "Porcelain"
+   now (see collections in content.ts) and none of the four are near the
+   measure, but the guard stays: it costs nothing and the next long name is a
+   content edit away.
 
    `nowrap` alone would only trade the wrap for an overflow, so it is paired
    with a size rule below 640 (see the small-screen block). Above that the title

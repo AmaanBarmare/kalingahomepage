@@ -51,6 +51,10 @@ export type NavSection = { label: string; href: string; children: NavChild[] };
  * MAXGAURD: "TERAZZO" (1076:49146) and "TERAM AND CONDITIONS" (1040:42115).
  * Both are wrong and both stay until the client corrects the board, so the
  * discrepancy is visible rather than silently patched.
+ *
+ * One label does NOT follow the board: 1076:49152 draws "PORCELAIN TILES" and
+ * this reads "Porcelain", on the client's instruction. It is the only card
+ * whose label ran to two lines, so the strip is now single-line throughout.
  */
 export const nav: {
   sections: NavSection[];
@@ -70,7 +74,7 @@ export const nav: {
           alt: "A curved stone staircase rising through a sunlit plaster hall" },
         { label: "Terazzo", href: "/collections/terrazzo", image: "/images/menu-terazzo.webp", position: "50% 100%",
           alt: "Stacked terrazzo-clad terraces of a coastal building above the sea" },
-        { label: "Porcelain Tiles", href: "/collections/porcelain", image: "/images/menu-porcelain.webp", position: "50% 100%",
+        { label: "Porcelain", href: "/collections/porcelain", image: "/images/menu-porcelain.webp", position: "50% 100%",
           alt: "A porcelain-lined lobby with a figure crossing the floor" },
       ],
     },
