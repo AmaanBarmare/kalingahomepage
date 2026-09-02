@@ -147,15 +147,17 @@ const PLATES = [
   { src: "contact-lounge.png", out: "contact-lounge.webp", display: [1440, 640], node: "544:4018" },
 
   // --- nav menu overlay, Engineered Surfaces thumbnails (1076:49128) ---------
-  // Five 167.88 x 87.34 cards in the expanded accordion row. The display box is
-  // the card, so the 2x target is 336 — every source clears it comfortably and
-  // the cap in build() does the rest. Elixir's card is drawn 169 x 90 rather
-  // than 167.88 x 87.34; the 1px is not worth a second display box.
-  { src: "menu-elixir.png", out: "menu-elixir.webp", display: [169, 90], group: "menu", node: "1096:53019" },
-  { src: "menu-quartz.png", out: "menu-quartz.webp", display: [168, 88], group: "menu", node: "1076:49129" },
-  { src: "menu-marble.png", out: "menu-marble.webp", display: [168, 88], group: "menu", node: "1076:49135" },
-  { src: "menu-terazzo.png", out: "menu-terazzo.webp", display: [168, 88], group: "menu", node: "1076:49141" },
-  { src: "menu-porcelain.png", out: "menu-porcelain.webp", display: [168, 88], group: "menu", node: "1076:49147" },
+  // The board draws these 167.88 x 87.34 (Elixir 169 x 90; the 1px was never
+  // worth a second display box). They render 180 x 94 now — the card grew so a
+  // long label and the hover arrow could stop fighting over one line, see the
+  // note in site-nav.tsx — so the 2x target is 360 rather than 336. Every source
+  // still clears it and the cap in build() does the rest; `npm run assets:audit`
+  // is what says so, and it is the thing to re-read if this box moves again.
+  { src: "menu-elixir.png", out: "menu-elixir.webp", display: [180, 94], group: "menu", node: "1096:53019" },
+  { src: "menu-quartz.png", out: "menu-quartz.webp", display: [180, 94], group: "menu", node: "1076:49129" },
+  { src: "menu-marble.png", out: "menu-marble.webp", display: [180, 94], group: "menu", node: "1076:49135" },
+  { src: "menu-terazzo.png", out: "menu-terazzo.webp", display: [180, 94], group: "menu", node: "1076:49141" },
+  { src: "menu-porcelain.png", out: "menu-porcelain.webp", display: [180, 94], group: "menu", node: "1076:49147" },
 ];
 
 async function build({ audit, plates = PLATES }) {

@@ -273,21 +273,30 @@ export function SiteNav({ className = "" }: { className?: string }) {
                     <div className="overflow-hidden">
                       {/* Indented by exactly the mark + its gap, so the strip
                           starts under the label (x418), not under the mark. */}
-                      <ul className="flex flex-wrap gap-[11.5px] pb-9 pl-10.5 sm:pl-13 lg:pb-10.75 lg:pl-15.25">
+                      {/* -mr-33.25 exactly cancels the panel's lg:pr-33.25. That 133px is
+                          dead space — the close plate is up at the panel's top corner and
+                          nothing else reaches into it — and the strip is the one row that
+                          needs it. Collections is FIVE cards: at the old 168 they spanned
+                          886 of the 889 the indent leaves, i.e. 3px of slack, so the card
+                          could not gain a single pixel without that row breaking to a
+                          4 + 1 orphan. Reclaiming the padding for the strip alone buys
+                          1022, which holds five 180s (996) and leaves 26 to spare. Only
+                          the ul is widened; the panel's own column is untouched. */}
+                      <ul className="flex flex-wrap gap-[11.5px] pb-9 pl-10.5 sm:pl-13 lg:pb-10.75 lg:-mr-33.25 lg:pl-15.25">
                         {section.children.map((child) => (
                           <li key={child.label}>
                             <Link
                               href={child.href}
                               onClick={close}
                               tabIndex={isOpen && open ? undefined : -1}
-                              className="group relative block h-18.5 w-35.5 overflow-hidden bg-[#040707] sm:h-22 sm:w-42"
+                              className="group relative block h-20.5 w-39.5 overflow-hidden bg-[#040707] sm:h-23.5 sm:w-45"
                             >
                               {child.image ? (
                                 <Image
                                   src={child.image}
                                   alt={child.alt ?? ""}
                                   fill
-                                  sizes="168px"
+                                  sizes="180px"
                                   style={{
                                     objectPosition: child.position ?? "50% 50%",
                                   }}
@@ -311,23 +320,34 @@ export function SiteNav({ className = "" }: { className?: string }) {
                                 aria-hidden
                                 className="absolute inset-x-0 bottom-0 h-[41%] bg-linear-to-t from-ink to-transparent"
                               />
-                              {/* The arrow plate again, revealed on hover. It
-                                  is NOT the section row's 40px one: measured off
-                                  the client's hover reference against the 950px
-                                  rule, the card's plate is 30 and the row's is
-                                  40 in the same picture, so the difference is
-                                  deliberate.
-                                    30 x 30      (26 below sm, on a 74px card)
-                                    right 9      the label's own inset, mirrored
-                                    centred on the LABEL's line, not the card's
-                                  That last one is why the offset is 5.75 and not
-                                  a round number: the label sits 12 up with a
-                                  17.5 line, so its middle is 20.75 from the base
-                                  and half the plate is 15. Decoration, not a
-                                  control — the whole card is already the link. */}
+                              {/* The arrow plate again, revealed on hover. It is
+                                  NOT the section row's 40px one: measured off the
+                                  client's hover reference against the 950px rule,
+                                  the card's plate is 30 and the row's is 40 in the
+                                  same picture, so the difference is deliberate.
+                                  Inset 9 on both axes — the label's own inset,
+                                  mirrored. Decoration, not a control: the whole
+                                  card is already the link.
+
+                                  IT SITS TOP-RIGHT, not bottom-right on the
+                                  label's line where the reference puts it, and
+                                  that is a deliberate departure. The reference
+                                  only ever shows it against Collections, whose
+                                  labels are short — ELIXIR inks 66px, MARBLE 89.
+                                  Projects is the case it does not cover:
+                                  RESIDENTIAL 138, HOSPITALITY 138, COMMERCIAL 142.
+                                  The label box is 162 wide, so a 30px plate at
+                                  right 9 landed ON the last two letters — 18 to
+                                  22px of overlap on all four Projects cards, and
+                                  1.5 on PORCELAIN. Reserving the plate's width in
+                                  the label instead would leave 124 for a 142px
+                                  word and wrap it. Moving it off the label's line
+                                  is what makes the collision impossible rather
+                                  than merely unlikely, at any card width and for
+                                  any label the content file grows later. */}
                               <span
                                 aria-hidden
-                                className="text-ruby pointer-events-none absolute right-2.25 bottom-[4.5px] grid h-6.5 w-6.5 place-items-center bg-white opacity-0 transition-opacity duration-300 ease-out-expo group-hover:opacity-100 group-focus-visible:opacity-100 sm:bottom-[5.75px] sm:h-7.5 sm:w-7.5"
+                                className="text-ruby pointer-events-none absolute top-2.25 right-2.25 grid h-6.5 w-6.5 place-items-center bg-white opacity-0 transition-opacity duration-300 ease-out-expo group-hover:opacity-100 group-focus-visible:opacity-100 sm:h-7.5 sm:w-7.5"
                               >
                                 <ArrowRightIcon className="h-6.5 w-6.5 sm:h-7.5 sm:w-7.5" />
                               </span>
