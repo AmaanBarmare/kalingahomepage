@@ -86,7 +86,7 @@ y values are the element's top in the 1440 × 9849 frame.
 | 2839 | **Applications** | heading 2986 → tabs 3141 → progress rule 3230 → active card 3259. Card rail, see below |
 | 4092 | **MaxGuard** | plate 1472×655 at x-16. Ghost text x434/684/684 at y78/192/284. Badge x1176 y21 197×132. CTA x649 y500. Lockup x60 y521. Store badges x340 y570 |
 | 4747 | **Visualiser** | heading 4894 → plate 5065 (1449×815 at x-9) → CTA 5927. **The page's only filled button** — Figma's Style=Primary, "Ruby CTA" |
-| 6050 | **Karigare** | heading 6136 → collage 6286. Component 101, 1420×860 **at x60** |
+| 6050 | **Karigear** | heading 6136 → collage 6286. Component 101, 1420×860 **at x60** |
 | 7146 | **Testimonials** | heading 7273 → tabs 7434 → cards 7555 → mark 8328 |
 | 8519 | **Contact** | plate 1672×640 at x-114 runs to 9159, i.e. 84px *under* the opaque footer. Visible band is **556**, not 640 |
 | 9075 | **Footer** | 1440×774, see below |
@@ -191,7 +191,7 @@ from what the layout implies. Nothing here is transcribed from a spec.
 | Hero | a looping video plate. The 18s drift the still used is **dropped** — the clip carries its own camera moves and the two fought each other |
 | Collections | 6s auto-advance, 1100ms glide; pauses on hover/focus |
 | Applications | 5s auto-advance, 780ms glide; pauses on hover/focus |
-| Karigare | scroll-linked parallax, per-plate depth 10–34px, via `animation-timeline: view()` — zero JS, and browsers without it render the plates at rest, which *is* the Figma frame |
+| Karigear | scroll-linked parallax, per-plate depth 10–34px, via `animation-timeline: view()` — zero JS, and browsers without it render the plates at rest, which *is* the Figma frame |
 | Testimonials | mouse drag on a native scroll rail |
 | Video | clips play only while on-screen and never start under `prefers-reduced-motion`; the poster stands in |
 
@@ -466,7 +466,7 @@ Best guess is an effect on the scene layer that the API does not expose —
 Figma's progressive blur, a background blur, or a masked overlay. Everything
 else in the band matches; ask the designer what that layer is.
 
-## Karigare was rebuilt as two counter-scrolling columns
+## Karigear was rebuilt as two counter-scrolling columns
 
 Component 101's six-plate collage is **gone from the board** — 544:4013 and the
 whole 544:3926 home frame now 404 against the Figma API; the file was renumbered
@@ -573,7 +573,7 @@ their call, not one to make silently.
 
 `tools/verify.mjs` now carries a second rebase for it, read off the testimonials
 heading, exactly as the collections carousel's is read off the applications
-section. Without it every anchor below Karigare reads +1341px and looks broken
+section. Without it every anchor below Karigear reads +1341px and looks broken
 when it is simply displaced by an intended runway.
 
 ---
@@ -845,7 +845,7 @@ The split is real and both halves were wrong.
 | --- | --- | --- | --- | --- |
 | Find a store / FOLLOW US | Halogen Regular | 12 | 2 / 1.0247 | white |
 | left body, placeholder | Haas Grot Disp **Trial** 45 Light | 14 / 13 | 1 | white |
-| COLLECTIONS, KARIGARE, ABOUT | Haas Grot Disp **R** 55 Roman | 16 | 1.5 | `#f3f3f3` |
+| COLLECTIONS, KARIGEAR, ABOUT | Haas Grot Disp **R** 55 Roman | 16 | 1.5 | `#f3f3f3` |
 | Quartz, Residential, … | Haas Grot Disp **R** 45 Light | 16 | 2 | white/70 |
 | legal row | Haas Grot Disp **R** 45 Light | 13 | 1 | white |
 
@@ -898,7 +898,7 @@ not a design decision — on the page it is centred.
 
 **Not built: the mega-menu.** The variant also carries four panels — Engineered
 Surfaces (Quartz, Marble, Terazzo, Porcelian Tiles, **Elixir · Premium
-Edition**), Karigare (Base, Form), Projects (Residential, Commercial,
+Edition**), Karigear (Base, Form), Projects (Residential, Commercial,
 Healthcare, Hospitality), World of Kalinga (About, Media, **Blogs**) — as rows
 of 226 x 186 image cards 25px below the bar, 47px apart, each a cover image
 under a 0.2 black wash with a Halogen Bold 20/+2 white label at y147 carrying a

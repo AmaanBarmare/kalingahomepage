@@ -22,7 +22,7 @@ import { KalingaLogo } from "@/components/ui/kalinga-logo";
  * centre of 720. On the page it is centred.
  *
  * NOT BUILT: the variant also carries four mega-menu panels (Engineered
- * Surfaces, Karigare, Projects, World of Kalinga) as rows of 226 x 186 image
+ * Surfaces, Karigear, Projects, World of Kalinga) as rows of 226 x 186 image
  * cards 25px below the bar. Variant6's bar has no labels to open them from —
  * see DESIGN.md.
  */

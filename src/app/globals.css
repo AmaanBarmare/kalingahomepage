@@ -148,7 +148,7 @@
   }
 }
 
-/* Scroll-linked drift for the Karigare collage. Zero JS: browsers without
+/* Scroll-linked drift for the Karigear collage. Zero JS: browsers without
    scroll-driven animations simply render the plates at rest, which is the
    Figma frame. Guarded on reduced-motion as well as support. */
 @keyframes ks-parallax {
@@ -613,9 +613,9 @@
   }
 }
 
-/* ------------------------------------------------------------------ karigare
+/* ------------------------------------------------------------------ karigear
    Two columns travelling in opposite directions while the section is pinned —
-   the client's split-scroll, ported from kalinga-two's hero. See karigare.tsx
+   the client's split-scroll, ported from kalinga-two's hero. See karigear.tsx
    for the geometry and the progress maths.
 
    FULL-BLEED as of the board's rework: Frame 507 runs x0..722 and Frame 621
@@ -631,14 +631,14 @@
 
    The section is (COUNT) x 100vh: one viewport of pinning plus one per
    transition, which is the reference's own ratio (it used 300vh for 3 frames). */
-.karigare-scroll {
+.karigear-scroll {
   height: 400vh;
   position: relative;
   /* 6250 - (6023 + 121.5): the gap Figma leaves under the heading block. */
   padding-top: 105px;
 }
 
-.karigare-sticky {
+.karigear-sticky {
   position: sticky;
   top: 0;
   display: grid;
@@ -647,29 +647,29 @@
   overflow: hidden;
 }
 
-.karigare-stage {
+.karigear-stage {
   --frame-h: min(46.12vw, calc(100svh - 190px));
   width: 100%;
 }
 
-.karigare-columns {
+.karigear-columns {
   display: grid;
   grid-template-columns: 1fr 1fr;
 }
 
-.karigare-window {
+.karigear-window {
   position: relative;
   height: var(--frame-h);
   overflow: hidden;
   background: var(--color-placeholder, #e8e4de);
 }
 
-.karigare-track {
+.karigear-track {
   height: calc(var(--frame-h) * 4);
   will-change: transform;
 }
 
-.karigare-frame {
+.karigear-frame {
   position: relative;
   height: var(--frame-h);
   overflow: hidden;
@@ -679,7 +679,7 @@
    boxes are centred on their own column (361 and 1085 against column centres of
    361 and 1085), so these centre rather than sitting at the column's left edge
    as they did before the rework. Images close at 6916, labels open at 6965. */
-.karigare-label {
+.karigear-label {
   display: block;
   margin-top: 49px;
   font-family: var(--font-display);
@@ -693,29 +693,29 @@
   transition: color 0.3s var(--ease-out-expo);
 }
 
-.karigare-label:hover {
+.karigear-label:hover {
   color: var(--color-ruby);
 }
 
 /* 721:29347 — labels close at 7004, the button opens at 7053. */
-.karigare-cta {
+.karigear-cta {
   display: flex;
   justify-content: center;
   margin-top: 49px;
 }
 
 @media (max-width: 1023px) {
-  .karigare-stage {
+  .karigear-stage {
     --frame-h: min(56vw, calc(100svh - 165px));
   }
 
-  .karigare-label {
+  .karigear-label {
     margin-top: 24px;
     font-size: 18px;
     letter-spacing: 3px;
   }
 
-  .karigare-cta {
+  .karigear-cta {
     margin-top: 28px;
   }
 }
@@ -723,27 +723,27 @@
 /* A reader who asked for stillness gets the eight frames as a plain grid, with
    no pinning and no travel — the same bargain the collections carousel makes. */
 @media (prefers-reduced-motion: reduce) {
-  .karigare-scroll {
+  .karigear-scroll {
     height: auto !important;
   }
 
-  .karigare-sticky {
+  .karigear-sticky {
     position: relative;
     top: auto;
     height: auto;
     overflow: visible;
   }
 
-  .karigare-stage {
+  .karigear-stage {
     --frame-h: min(46.12vw, 70svh);
   }
 
-  .karigare-window {
+  .karigear-window {
     height: auto;
     overflow: visible;
   }
 
-  .karigare-track {
+  .karigear-track {
     height: auto;
     transform: none !important;
     display: grid;

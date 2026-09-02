@@ -55,11 +55,11 @@ export const nav: {
       ],
     },
     {
-      label: "Karigare",
-      href: "/karigare",
+      label: "Karigear",
+      href: "/karigear",
       children: [
-        { label: "Base", href: "/karigare/base" },
-        { label: "Form", href: "/karigare/form" },
+        { label: "Base", href: "/karigear/base" },
+        { label: "Form", href: "/karigear/form" },
       ],
     },
     {
@@ -210,9 +210,9 @@ export const visualiser = {
   cta: { label: "Visualise Your Space", href: "/visualiser" },
 } as const;
 
-/** Karigare collage — Component 101 (544:4013). */
+/** Karigear collage — Component 101 (544:4013). */
 /**
- * Karigare — Figma 721:29303 (heading), 764:9494 (BASE), 721:29349 (FORM),
+ * Karigear — Figma 721:29303 (heading), 764:9494 (BASE), 721:29349 (FORM),
  * 721:29347 (CTA).
  *
  * The eight frames are curated out of the client's CMC Value Added Services
@@ -220,14 +220,14 @@ export const visualiser = {
  * object-position each one needs in the near-square 640 x 660 frame — the deck
  * is shot for full-bleed slides, so several of them do not want centring.
  */
-export const karigare = {
-  headline: "Karigare",
+export const karigear = {
+  headline: "Karigear",
   body: LOREM_SHORT,
-  cta: { label: "Explore our expertise", href: "/karigare" },
+  cta: { label: "Explore our expertise", href: "/karigear" },
   columns: [
     {
       label: "Base",
-      href: "/karigare/base",
+      href: "/karigear/base",
       frames: [
         { src: "/images/karigare-base-1.webp", position: "50% 50%",
           alt: "Hotel lobby with a swirling stone inlay floor" },
@@ -241,7 +241,7 @@ export const karigare = {
     },
     {
       label: "Form",
-      href: "/karigare/form",
+      href: "/karigear/form",
       frames: [
         { src: "/images/karigare-form-1.webp", position: "50% 50%",
           alt: "Freestanding stone bath against book-matched marble" },
@@ -341,7 +341,7 @@ export const footer: {
     {
       groups: [
         { title: "Collections", links: ["Quartz", "Marble", "Terrazzo", "Porcelain"] },
-        { title: "Karigare", links: ["Base", "Form"] },
+        { title: "Karigear", links: ["Base", "Form"] },
       ],
     },
     {

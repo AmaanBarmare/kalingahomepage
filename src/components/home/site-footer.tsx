@@ -19,7 +19,7 @@ import { footer } from "@/lib/content";
  *     FOLLOW US         y407 · newsletter y434 + y455 · socials y486 (159 x 25)
  *   Frame 492     x1027 y160   link columns, second column at x1252
  *     COLLECTIONS / PROJECTS y169 ink, links on a 33px pitch
- *     KARIGARE / ABOUT       y411, and the ABOUT block runs on 38 not 33
+ *     KARIGEAR / ABOUT       y411, and the ABOUT block runs on 38 not 33
  *   legal row     x477.5 y664, three items on a 56px gap
  *   bottom rule   x82.5  y724, 1275 wide
  *

@@ -5,7 +5,7 @@ import { CollectionsCarousel } from "@/components/home/collections-carousel";
 import { Applications } from "@/components/home/applications";
 import { MaxGuard } from "@/components/home/maxguard";
 import { Visualiser } from "@/components/home/visualiser";
-import { Karigare } from "@/components/home/karigare";
+import { Karigear } from "@/components/home/karigear";
 import { Testimonials } from "@/components/home/testimonials";
 import { ContactBand } from "@/components/home/contact-band";
 import { SiteFooter } from "@/components/home/site-footer";
@@ -20,7 +20,7 @@ import { SiteFooter } from "@/components/home/site-footer";
  *   2986  Applications           (heading -> tabs -> progress rule -> card rail)
  *   4092  MaxGuard
  *   4894  Surface visualiser
- *   6136  Karigare               (Component 101)
+ *   6136  Karigear               (Component 101)
  *   7273  Testimonials
  *   8519  Contact band
  *   9075  Footer
@@ -38,7 +38,7 @@ export default function HomePage() {
       <Applications />
       <MaxGuard />
       <Visualiser />
-      <Karigare />
+      <Karigear />
       <Testimonials />
       <ContactBand />
       <SiteFooter />

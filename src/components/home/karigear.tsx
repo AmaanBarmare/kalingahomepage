@@ -5,10 +5,10 @@ import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { KsButton } from "@/components/ui/ks-button";
 import { SectionHeading } from "@/components/ui/section-heading";
-import { karigare } from "@/lib/content";
+import { karigear } from "@/lib/content";
 
 /**
- * Karigare — Figma 721:29303 (heading), 764:9494 (BASE column), 721:29349
+ * Karigear — Figma 721:29303 (heading), 764:9494 (BASE column), 721:29349
  * (FORM column), 721:29347 (CTA).
  *
  * REBUILT. The board replaced the six-plate collage (Component 101, now deleted
@@ -55,9 +55,9 @@ import { karigare } from "@/lib/content";
  * resize without duplicating that arithmetic here.
  */
 
-const COUNT = karigare.columns[0].frames.length;
+const COUNT = karigear.columns[0].frames.length;
 
-export function Karigare() {
+export function Karigear() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const windowRef = useRef<HTMLDivElement>(null);
   const trackRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -103,25 +103,25 @@ export function Karigare() {
   }, []);
 
   return (
-    <section className="bg-white pt-[171px]" aria-labelledby="karigare-heading">
-      <SectionHeading title={karigare.headline} body={karigare.body} />
+    <section className="bg-white pt-[171px]" aria-labelledby="karigear-heading">
+      <SectionHeading title={karigear.headline} body={karigear.body} />
 
-      <div ref={sectionRef} className="karigare-scroll">
-        <div className="karigare-sticky">
-          <div className="karigare-stage">
-            <div id="karigare-columns" className="karigare-columns">
-              {karigare.columns.map((column, ci) => (
-                <div key={column.label} className="karigare-column">
+      <div ref={sectionRef} className="karigear-scroll">
+        <div className="karigear-sticky">
+          <div className="karigear-stage">
+            <div id="karigear-columns" className="karigear-columns">
+              {karigear.columns.map((column, ci) => (
+                <div key={column.label} className="karigear-column">
                   <div
                     ref={ci === 0 ? windowRef : undefined}
-                    className="karigare-window"
+                    className="karigear-window"
                     aria-label={`${column.label} — ${COUNT} images`}
                   >
                     <div
                       ref={(node) => {
                         trackRefs.current[ci] = node;
                       }}
-                      className="karigare-track"
+                      className="karigear-track"
                       // The down-running column starts one full travel up, so
                       // its last frame is the one on screen at rest. Inline so
                       // the very first paint is already correct.
@@ -133,7 +133,7 @@ export function Karigare() {
                       }}
                     >
                       {column.frames.map((frame) => (
-                        <div key={frame.src} className="karigare-frame">
+                        <div key={frame.src} className="karigear-frame">
                           <Image
                             src={frame.src}
                             alt={frame.alt}
@@ -147,16 +147,16 @@ export function Karigare() {
                     </div>
                   </div>
 
-                  <Link href={column.href} className="karigare-label">
+                  <Link href={column.href} className="karigear-label">
                     {column.label}
                   </Link>
                 </div>
               ))}
             </div>
 
-            <div className="karigare-cta">
-              <KsButton href={karigare.cta.href} variant="outline-ruby">
-                {karigare.cta.label}
+            <div className="karigear-cta">
+              <KsButton href={karigear.cta.href} variant="outline-ruby">
+                {karigear.cta.label}
               </KsButton>
             </div>
           </div>

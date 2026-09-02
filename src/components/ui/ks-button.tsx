@@ -38,7 +38,7 @@ const VARIANTS: Record<Variant, string> = {
   outline: "border border-white text-white hover:bg-white hover:text-ink",
   // On the cream/white bands.
   "outline-ink": "border border-ink/25 text-ink hover:border-ink hover:bg-ink hover:text-white",
-  // Karigare's "Explore our expertise" (721:29347) — ruby stroke and ruby text
+  // Karigear's "Explore our expertise" (721:29347) — ruby stroke and ruby text
   // on the white band, no fill. Figma reports border-0 here for the same reason
   // it does on `outline`: the stroke lives on the master, not the instance.
   "outline-ruby": "border border-ruby text-ruby hover:bg-ruby hover:text-white",
