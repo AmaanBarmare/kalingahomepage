@@ -30,10 +30,42 @@
  * marble there carries only 2.24 levels RMS of high-frequency detail, so there
  * is nothing to lose.
  *
- * DEAD FRAMES (visualiser). The source holds 101 frozen frame-transitions out
- * of 299 — including a 49-frame (1.63s) completely static tail and a 22-frame
- * freeze after the opening. Trimming to frames 23..250 leaves continuous
- * motion: 25 frozen transitions, longest run 3 frames.
+ * DEAD FRAMES (visualiser), AND WHY 10s OF SOURCE SHIPS AS 6.8s. The delivered
+ * clip is 300 frames at 30fps, but 130 of its 299 transitions are frozen — the
+ * file does not move for a quarter of its length. Re-measured on the clip that
+ * currently ships (kalinga-marble-20-surface-visualizer.mp4), at full
+ * resolution rather than off a thumbnail:
+ *
+ *   frames   0..22    0.77s   frame 0 vs 22 is 59.8dB, max channel delta 9
+ *   frames  23..250   7.60s   motion — frame 23 breaks from 0 at 45.4dB / 210
+ *   frames 251..299   1.63s   frame 250 vs 299 is 71.3dB, max delta 3
+ *
+ * So 2.40s of the 10 is a still frame, at both ends, where a loop can least
+ * afford it. `keep` drops exactly those and nothing else.
+ *
+ * The remaining 0.80s is the loop fold, and it is NOT lost footage: the fade
+ * dissolves the last 24 frames over the first 24 rather than deleting them, so
+ * every one of the 228 moving frames still plays. 228 - 24 = 204 = 6.80s.
+ *
+ * 6.80s READ AS RUSHED, so the clip is now RETIMED to 8.00s rather than cut
+ * differently — there is no more motion to find, only the holds, and putting
+ * those back would trade a rushed loop for a stalled one. `retime: 264` takes
+ * the kept 228 frames to 264 (1.158x) so the fold still leaves 240 = 8.00s at
+ * 30fps.
+ *
+ * The stretch goes through minterpolate's motion-compensated mode, which
+ * SYNTHESISES the in-between frames; plain `setpts` would repeat 36 of them and
+ * a slow dolly shows every duplicate as a stutter. Validated on this clip
+ * rather than assumed: dropping it to 15fps and rebuilding 30 puts the
+ * synthesised frames at 36.5dB against the real ones (blend mode manages
+ * 34.1dB). That is the hard case — a 2-frame gap — where the retime only has
+ * to invent one frame in seven, so the real error is well under it.
+ *
+ * This source is worse inside the cut than the one it replaced: 58 frozen
+ * transitions survive the trim against the previous clip's 25, including two
+ * 18-frame (0.6s) stalls at source frames 165 and 231. The second falls inside
+ * the fold and does no harm; the first is a visible stall mid-clip and is a
+ * note for whoever renders the master, not something to fix here.
  *
  * LOOP SEAM (both). Neither clip loops as delivered: the hero's last->first
  * jump is 21x a typical frame delta, the visualiser's 17x. Both are fixed by
@@ -60,9 +92,11 @@ const POSTER_QUALITY = 82; // transient, so below the plates' 90
 
 /**
  * `display` is the CSS box the clip occupies in the 1440px Figma frame.
- * `pre`   — filters applied to the source before anything else.
- * `keep`  — [startFrame, endFrame) of the source to retain.
- * `fade`  — crossfade length in frames used to close the loop.
+ * `pre`    — filters applied to the source before anything else.
+ * `keep`   — [startFrame, endFrame) of the source to retain.
+ * `retime` — frame count to stretch the kept range to, before the fold. null
+ *            leaves the clip at native speed.
+ * `fade`   — crossfade length in frames used to close the loop.
  */
 const CLIPS = [
   {
@@ -72,6 +106,7 @@ const CLIPS = [
     display: [1440, 1071], // 544:4024 — aspect 1.345 vs the clip's 1.778
     pre: ["delogo=x=1132:y=571:w=57:h=57"], // measured bbox + ~5px margin
     keep: null, // no dead frames; median delta 3.47, zero frozen transitions
+    retime: null, // 10s of unbroken motion in, 9.00s out — native speed is fine
     fade: 24, // 1.0s at 24fps
     crf: { h264: 23, vp9: 31 },
     note: "8-shot montage, cross-dissolved — loops",
@@ -83,6 +118,7 @@ const CLIPS = [
     display: [1440, 815], // 544:4015 — aspect 1.767 vs the clip's 1.778, near-exact
     pre: [],
     keep: [23, 251], // drop the 22-frame head freeze and 49-frame dead tail
+    retime: 264, // 228 -> 264 so the fold leaves 240 = 8.00s; see the note above
     fade: 24, // 0.8s at 30fps
     crf: { h264: 25, vp9: 34 },
     note: "slow dolly push-in — loops",
@@ -148,16 +184,24 @@ const fps = (r) => {
  * Trim, then fold the tail back over the head so the clip loops. Returns a
  * filter_complex whose final label is [v].
  */
-const buildFilter = (clip, srcFrames) => {
+const buildFilter = (clip, srcFrames, rate) => {
   const pre = clip.pre.length ? `${clip.pre.join(",")},` : "";
   const [ks, ke] = clip.keep ?? [0, srcFrames];
   const trim = clip.keep ? `trim=start_frame=${ks}:end_frame=${ke},setpts=PTS-STARTPTS,` : "";
-  const n = ke - ks; // frames after trimming
+  const kept = ke - ks;
+  // Stretch time, then rebuild the timeline at the native rate. minterpolate
+  // SYNTHESISES the in-between frames rather than repeating neighbours, which
+  // is what keeps a 1.16x stretch from reading as judder.
+  const retime = clip.retime
+    ? `setpts=${(clip.retime / kept).toFixed(6)}*PTS,` +
+      `minterpolate=fps=${rate}:mi_mode=mci:mc_mode=aobmc:me_mode=bidir:vsbmc=1,`
+    : "";
+  const n = clip.retime ?? kept; // frames the fold operates on
   const x = clip.fade;
   const l = n - x; // loop length
 
   return [
-    `[0:v]${pre}${trim}split=3[a][b][c]`,
+    `[0:v]${pre}${trim}${retime}split=3[a][b][c]`,
     `[a]trim=start_frame=0:end_frame=${x},setpts=PTS-STARTPTS[head]`,
     `[b]trim=start_frame=${l}:end_frame=${n},setpts=PTS-STARTPTS[tail]`,
     `[c]trim=start_frame=${x}:end_frame=${l},setpts=PTS-STARTPTS[body]`,
@@ -193,7 +237,7 @@ for (const clip of CLIPS) {
       ? (1 - boxAspect / srcAspect) * 100
       : (1 - srcAspect / boxAspect) * 100;
   const [ks, ke] = clip.keep ?? [0, meta.frames];
-  const outFrames = ke - ks - clip.fade;
+  const outFrames = (clip.retime ?? ke - ks) - clip.fade;
 
   console.log(`${clip.out}  (${clip.note})`);
   console.log(
@@ -207,7 +251,9 @@ for (const clip of CLIPS) {
     `  aspect ${srcAspect.toFixed(3)} vs box ${boxAspect.toFixed(3)}  ->  object-cover hides ${cropPct.toFixed(1)}% of the ${srcAspect > boxAspect ? "width" : "height"}`,
   );
   console.log(
-    `  loop   ${clip.keep ? `keep ${ks}..${ke} then ` : ""}fold ${clip.fade}f tail over head  ->  ${outFrames} frames (${(outFrames / rate).toFixed(2)}s)`,
+    `  loop   ${clip.keep ? `keep ${ks}..${ke} then ` : ""}${
+      clip.retime ? `retime ${ke - ks}->${clip.retime}f (${(clip.retime / (ke - ks)).toFixed(3)}x) then ` : ""
+    }fold ${clip.fade}f tail over head  ->  ${outFrames} frames (${(outFrames / rate).toFixed(2)}s)`,
   );
 
   if (AUDIT) {
@@ -215,7 +261,7 @@ for (const clip of CLIPS) {
     continue;
   }
 
-  const fc = buildFilter(clip, meta.frames);
+  const fc = buildFilter(clip, meta.frames, rate);
   const gop = String(Math.round(rate * 2)); // a keyframe every 2s
   const webm = path.join(VIDEO_OUT, `${clip.out}.webm`);
   const mp4 = path.join(VIDEO_OUT, `${clip.out}.mp4`);
