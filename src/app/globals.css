@@ -653,8 +653,14 @@
 
    The section is (COUNT) x 100vh: one viewport of pinning plus one per
    transition, which is the reference's own ratio (it used 300vh for 3 frames). */
+/* Both of these used to hardcode FOUR frames — `400vh` here and `* 4` on the
+   track — while the component derived its own `COUNT` from the content. Cutting
+   the columns to three would have left the runway a viewport too long and the
+   track a frame too tall, so the last frame scrolled up into empty space. The
+   count now comes from `--frame-count`, which karigear.tsx sets from the same
+   array the frames are rendered from, so the two cannot drift apart again. */
 .karigear-scroll {
-  height: 400vh;
+  height: calc(var(--frame-count, 4) * 100vh);
   position: relative;
   /* 6250 - (6023 + 121.5): the gap Figma leaves under the heading block. */
   padding-top: 105px;
@@ -687,7 +693,7 @@
 }
 
 .karigear-track {
-  height: calc(var(--frame-h) * 4);
+  height: calc(var(--frame-h) * var(--frame-count, 4));
   will-change: transform;
 }
 

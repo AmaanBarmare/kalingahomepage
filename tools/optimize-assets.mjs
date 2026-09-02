@@ -72,19 +72,21 @@ const PLATES = [
   // --- surface visualiser --------------------------------------------------
   { src: "vis-raw1.png", out: "visualiser.webp", display: [1449, 815], node: "544:4015" },
 
-  // --- karigare BASE / FORM columns ----------------------------------------
-  // Curated out of the CMC Value Added Services deck (see DESIGN.md). The board
-  // reworked the section full-bleed, so the frame is 722 x 666 per Figma
-  // 764:9496 / 864:28925 and the 2x target is 1444 — the deck's own images all
-  // cap below that and pass through at native width.
-  { src: "karigare/base-1-inlays.png",           out: "karigare-base-1.webp", display: [722, 666], group: "karigare" },
-  { src: "karigare/base-2-inlay-wall.png",       out: "karigare-base-2.webp", display: [722, 666], group: "karigare" },
-  { src: "karigare/base-3-flat-carving.png",     out: "karigare-base-3.webp", display: [722, 666], group: "karigare" },
-  { src: "karigare/base-4-3d-carving.png",       out: "karigare-base-4.webp", display: [722, 666], group: "karigare" },
-  { src: "karigare/form-1-bath.png",             out: "karigare-form-1.webp", display: [722, 666], group: "karigare" },
-  { src: "karigare/form-2-lavabo.png",           out: "karigare-form-2.webp", display: [722, 666], group: "karigare" },
-  { src: "karigare/form-3-furniture-hands.png",  out: "karigare-form-3.webp", display: [722, 666], group: "karigare" },
-  { src: "karigare/form-4-furniture-table.png",  out: "karigare-form-4.webp", display: [722, 666], group: "karigare" },
+  // --- karigear BASE / FORM columns ----------------------------------------
+  // THREE per column now, not four. The board's window is 722 x 666, so the
+  // pipeline wants 1444px of source; these six arrive at ~620-626 wide, i.e.
+  // 0.86x — under even 1:1. Nothing here can invent that detail, so they are
+  // written at native width and the audit flags them source-limited.
+  //
+  // They arrive with an alpha channel, but it is fully opaque and libwebp drops
+  // such a channel on its own — flattening first is measurably a no-op (100.0KB
+  // either way), so there is nothing to do about it here.
+  { src: "karigear/base-1-wave-panel.png",       out: "karigear-base-1.webp", display: [722, 666], group: "karigear" },
+  { src: "karigear/base-2-textured-wall.png",    out: "karigear-base-2.webp", display: [722, 666], group: "karigear" },
+  { src: "karigear/base-3-marble-table.png",     out: "karigear-base-3.webp", display: [722, 666], group: "karigear" },
+  { src: "karigear/form-1-terrazzo-table.png",   out: "karigear-form-1.webp", display: [722, 666], group: "karigear" },
+  { src: "karigear/form-2-travertine-bench.png", out: "karigear-form-2.webp", display: [722, 666], group: "karigear" },
+  { src: "karigear/form-3-inlay-medallion.png",  out: "karigear-form-3.webp", display: [722, 666], group: "karigear" },
 
   // --- karigare collage (Component 101) ------------------------------------
   // Named layers in Figma's own child order, which is the z-order: 1 sits at the
@@ -179,10 +181,15 @@ function report(rows) {
 }
 
 const audit = process.argv.includes("--audit");
-const requestedGroup = process.argv.includes("--collections")
-  ? "collections"
-  : process.argv.includes("--testimonials")
-    ? "testimonials"
-    : null;
+/** `--group=<name>` rebuilds one group; --collections / --testimonials are the
+    two that predate it and still work. Without one, everything is rebuilt. */
+const groupFlag = process.argv.find((a) => a.startsWith("--group="));
+const requestedGroup = groupFlag
+  ? groupFlag.slice("--group=".length)
+  : process.argv.includes("--collections")
+    ? "collections"
+    : process.argv.includes("--testimonials")
+      ? "testimonials"
+      : null;
 const plates = requestedGroup ? PLATES.filter((plate) => plate.group === requestedGroup) : PLATES;
 report(await build({ audit, plates }));

@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type CSSProperties } from "react";
 import { KsButton } from "@/components/ui/ks-button";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { karigear } from "@/lib/content";
@@ -106,7 +106,13 @@ export function Karigear() {
     <section className="bg-white pt-[80px] lg:pt-[171px]" aria-labelledby="karigear-heading">
       <SectionHeading title={karigear.headline} body={karigear.body} />
 
-      <div ref={sectionRef} className="karigear-scroll">
+      {/* The runway and the track height are both COUNT-derived — see the
+          `--frame-count` note in globals.css. */}
+      <div
+        ref={sectionRef}
+        className="karigear-scroll"
+        style={{ "--frame-count": COUNT } as CSSProperties}
+      >
         <div className="karigear-sticky">
           <div className="karigear-stage">
             <div id="karigear-columns" className="karigear-columns">

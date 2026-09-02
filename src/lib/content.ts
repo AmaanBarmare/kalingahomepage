@@ -224,33 +224,32 @@ export const karigear = {
   headline: "Karigear",
   body: LOREM_SHORT,
   cta: { label: "Explore our expertise", href: "/karigear" },
+  // THREE frames per column, not four. Both columns must stay the same length —
+  // the two tracks travel in opposite directions across the same distance, and
+  // `COUNT` is read off this first column for both.
   columns: [
     {
       label: "Base",
       href: "/karigear/base",
       frames: [
-        { src: "/images/karigare-base-1.webp", position: "50% 50%",
-          alt: "Hotel lobby with a swirling stone inlay floor" },
-        { src: "/images/karigare-base-2.webp", position: "50% 50%",
-          alt: "Inlay wall of mother-of-pearl and semi-precious stone beside a veined marble counter" },
-        { src: "/images/karigare-base-3.webp", position: "50% 50%",
-          alt: "Flat-carved stone panel with geometric relief" },
-        { src: "/images/karigare-base-4.webp", position: "50% 50%",
-          alt: "Three-dimensional carved stone panel with flowing relief" },
+        { src: "/images/karigear-base-1.webp", position: "50% 50%",
+          alt: "Carved stone wall panel with a flowing wave relief, lit within a bronze frame" },
+        { src: "/images/karigear-base-2.webp", position: "50% 50%",
+          alt: "Textured stone feature wall above a linear fireplace in a living room" },
+        { src: "/images/karigear-base-3.webp", position: "50% 50%",
+          alt: "Book-matched marble dining table on a solid slab base" },
       ],
     },
     {
       label: "Form",
       href: "/karigear/form",
       frames: [
-        { src: "/images/karigare-form-1.webp", position: "50% 50%",
-          alt: "Freestanding stone bath against book-matched marble" },
-        { src: "/images/karigare-form-2.webp", position: "50% 50%",
-          alt: "Fluted stone vessel basin beneath a backlit mirror" },
-        { src: "/images/karigare-form-3.webp", position: "50% 50%",
-          alt: "Sculptural carved stone table base supporting a glass top" },
-        { src: "/images/karigare-form-4.webp", position: "50% 50%",
-          alt: "Glass-topped table on a carved stone base in daylight" },
+        { src: "/images/karigear-form-1.webp", position: "50% 50%",
+          alt: "Oval terrazzo table on a cylindrical base" },
+        { src: "/images/karigear-form-2.webp", position: "50% 50%",
+          alt: "Travertine bench with a solid slab seat" },
+        { src: "/images/karigear-form-3.webp", position: "50% 50%",
+          alt: "Circular stone inlay floor medallion seen from above, ringed by a curved sofa" },
       ],
     },
   ],
