@@ -84,7 +84,9 @@ export function SiteFooter() {
       <div className="relative mx-auto grid w-full max-w-360 grid-cols-1 items-start gap-14 px-6 pt-16 pb-24.5 lg:grid-cols-[415px_1fr] lg:gap-0 lg:px-19.75 lg:pt-21.75">
         {/* ------------------------------------------------ left column */}
         <div className="lg:w-103.75">
-          <KalingaLogo variant="white" />
+          {/* Same 329px reservation as the bar — at 320 it overhangs the 24px
+              gutter, so it scales down there and back to full size above. */}
+          <KalingaLogo variant="white" className="w-[270px] origin-left scale-[0.82] min-[360px]:w-[329px] min-[360px]:scale-100" />
 
           {/* Figma's auto-layout gaps are 52 / 27 / 9 / 13 / 15, but those are
               between text BOXES and this is between rendered ink, so each is
@@ -107,13 +109,13 @@ export function SiteFooter() {
                     className={`${LEFT_BODY} min-w-0 flex-1 bg-transparent text-[13px] placeholder:text-white/85 focus:outline-none`}
                   />
                   <div className="flex shrink-0 items-start gap-2.25">
-                    <button type="submit" aria-label="Search stores" className="opacity-90 hover:opacity-100">
+                    <button type="submit" aria-label="Search stores" className="-m-3 p-3 opacity-90 hover:opacity-100">
                       <Image src="/icons/search.svg" alt="" width={20} height={20} className="size-[20.3px]" />
                     </button>
                     <span aria-hidden className="text-[13.5px] leading-normal text-white/60">
                       |
                     </span>
-                    <button type="button" aria-label="Use my location" className="opacity-90 hover:opacity-100">
+                    <button type="button" aria-label="Use my location" className="-m-3 p-3 opacity-90 hover:opacity-100">
                       <Image src="/icons/gps.svg" alt="" width={20} height={20} className="size-[20.3px]" />
                     </button>
                   </div>
@@ -157,7 +159,7 @@ export function SiteFooter() {
           {footer.columns.map((col, ci) => (
             <div key={ci} className="flex flex-col">
               {col.groups.map((group, gi) => (
-                <div key={group.title} className={gi > 0 ? "mt-21.5" : ""}>
+                <div key={group.title} className={gi > 0 ? "mt-10 lg:mt-21.5" : ""}>
                   <h2 className="font-nav text-[16px] font-normal tracking-[1.5px] text-[#f3f3f3] uppercase">
                     {group.title}
                   </h2>
@@ -166,10 +168,10 @@ export function SiteFooter() {
                       the board turned it into DISCOVER + three links. */}
                   <ul className="mt-2.25">
                     {group.links.map((link) => (
-                      <li key={link} className="h-8.25">
+                      <li key={link} className="h-11 lg:h-8.25">
                         <Link
-                          href={`/${link.toLowerCase()}`}
-                          className="font-nav text-[16px] font-light tracking-[2px] text-white/70 transition-colors hover:text-white"
+                          href={`/${link.toLowerCase().replace(/\s+/g, "-")}`}
+                          className="flex h-full items-center font-nav text-[16px] font-light tracking-[2px] text-white/70 transition-colors hover:text-white"
                         >
                           {link}
                         </Link>
@@ -190,7 +192,7 @@ export function SiteFooter() {
             <li key={item}>
               <Link
                 href={`/${item.toLowerCase().replace(/\s+/g, "-")}`}
-                className="font-nav text-[13px] font-light tracking-[1px] text-white uppercase transition-colors hover:text-white/70"
+                className="-my-2 block py-2 font-nav text-[13px] font-light tracking-[1px] text-white uppercase transition-colors hover:text-white/70"
               >
                 {item}
               </Link>

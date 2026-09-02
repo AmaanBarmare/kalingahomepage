@@ -55,7 +55,7 @@ export function Testimonials() {
   }
 
   return (
-    <section className="bg-white pt-[127px] pb-[165.4px]" aria-labelledby="testimonials-heading">
+    <section className="bg-white pt-[72px] pb-[80px] lg:pt-[127px] lg:pb-[165.4px]" aria-labelledby="testimonials-heading">
       <SectionHeading title={testimonials.headline} body={testimonials.body} />
 
       <Reveal delay={160}>
@@ -76,7 +76,7 @@ export function Testimonials() {
         onPointerMove={onPointerMove}
         onPointerUp={endDrag}
         onPointerLeave={endDrag}
-        className={`mt-[68px] flex gap-[28.5px] overflow-x-auto px-6 pb-2 [scrollbar-width:none] touch-pan-y lg:px-[82px] [&::-webkit-scrollbar]:hidden ${
+        className={`mt-[40px] flex gap-4 lg:mt-[68px] lg:gap-[28.5px] overflow-x-auto px-6 pb-2 [scrollbar-width:none] touch-pan-y lg:px-[82px] [&::-webkit-scrollbar]:hidden ${
           dragging ? "cursor-grabbing select-none" : "cursor-grab"
         }`}
       >
@@ -120,7 +120,7 @@ export function Testimonials() {
       </div>
 
       <Reveal delay={200}>
-        <KalingaMark className="mx-auto mt-[164.7px] h-[28.577px] w-[28px] text-ruby" />
+        <KalingaMark className="mx-auto mt-[72px] h-[28.577px] w-[28px] text-ruby lg:mt-[164.7px]" />
       </Reveal>
     </section>
   );

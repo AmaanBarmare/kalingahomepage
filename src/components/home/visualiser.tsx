@@ -28,13 +28,13 @@ import { visualiser } from "@/lib/content";
  */
 export function Visualiser() {
   return (
-    <section className="bg-white pt-[147px]" aria-labelledby="visualiser-heading">
+    <section className="bg-white pt-[76px] lg:pt-[147px]" aria-labelledby="visualiser-heading">
       <SectionHeading title={visualiser.headline} body={visualiser.body} />
 
       <Reveal delay={140}>
         <div
           id="visualiser-plate"
-          className="relative mt-[23.3px] aspect-[1440/815] w-full overflow-hidden bg-placeholder"
+          className="relative mt-[26px] aspect-[4/3] w-full overflow-hidden bg-placeholder sm:aspect-[16/10] lg:mt-[23.3px] lg:aspect-[1440/815]"
         >
           {/* The source is trimmed and folded by the video pipeline so its
               surface-swap sequence loops without a frozen tail or hard cut.

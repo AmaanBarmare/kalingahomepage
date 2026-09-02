@@ -516,6 +516,16 @@
   color: #ffffff;
 }
 
+/* The four titles set on ONE line each. "PORCELAIN TILES" is the long one and
+   the only one at risk: at the design width it wants 654px inside a 588px
+   column, so it wrapped at 1440 as well as on every phone — the mid widths
+   around 1200 happen to fit, which is what made it look fine in review.
+
+   `nowrap` alone would only trade the wrap for an overflow, so it is paired
+   with a size rule below 640 (see the small-screen block). Above that the title
+   is allowed to run WIDER than the 588 copy measure: the column governs the
+   paragraph's reading length, not the display line, and the slide is full-bleed
+   with room to spare — at 1440 the line ends at 699 of 1440. */
 .collection-scroll-title {
   font-family: var(--font-display);
   font-size: clamp(28px, 3.17vw, 46px);
@@ -523,6 +533,7 @@
   line-height: 1.2;
   letter-spacing: clamp(4px, 0.48vw, 7px);
   text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .collection-scroll-copy {
@@ -584,6 +595,17 @@
 
   .collection-scroll-copy {
     max-width: 340px;
+  }
+
+  /* Below the 588 column there is no slack to overflow into, so the size has to
+     follow the viewport instead of resting on the clamp's 28px floor. 14.3 is
+     the measured width-per-font-pixel for this face at this tracking (398px at
+     28px, 654px at 45.6px — the same constant both times), so 100vw/14.3 is the
+     largest size that still holds one line; the -3px leaves margin at 320. The
+     em tracking then scales with it instead of needing its own clamp. */
+  .collection-scroll-title {
+    font-size: min(28px, calc(6.9vw - 3px));
+    letter-spacing: 0.14em;
   }
 }
 
@@ -705,6 +727,12 @@
 }
 
 @media (max-width: 1023px) {
+  /* 6250 - (6023 + 121.5) is a desktop gap; at phone widths the heading block
+     is already tight against the columns, so it shrinks with everything else. */
+  .karigear-scroll {
+    padding-top: 56px;
+  }
+
   .karigear-stage {
     --frame-h: min(56vw, calc(100svh - 165px));
   }

@@ -103,7 +103,7 @@ export function Karigear() {
   }, []);
 
   return (
-    <section className="bg-white pt-[171px]" aria-labelledby="karigear-heading">
+    <section className="bg-white pt-[80px] lg:pt-[171px]" aria-labelledby="karigear-heading">
       <SectionHeading title={karigear.headline} body={karigear.body} />
 
       <div ref={sectionRef} className="karigear-scroll">

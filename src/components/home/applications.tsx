@@ -103,7 +103,7 @@ export function Applications() {
 
   return (
     <section
-      className="overflow-hidden bg-white pt-[147px] pb-[67.3px]"
+      className="overflow-hidden bg-white pt-[76px] pb-[52px] lg:pt-[147px] lg:pb-[67.3px]"
       aria-label="Browse by Space"
     >
       <SectionHeading title={applications.headline} body={applications.body} />
@@ -134,7 +134,7 @@ export function Applications() {
         role="region"
         aria-roledescription="carousel"
         aria-label={`${activeSector} spaces`}
-        className="space-track mx-auto mt-[31.3px] w-full max-w-[1440px] px-6 scroll-px-6 lg:px-[82px] lg:scroll-px-[82px]"
+        className="space-track mx-auto mt-[26px] lg:mt-[31.3px] w-full max-w-[1440px] px-6 scroll-px-6 lg:px-[82px] lg:scroll-px-[82px]"
         onMouseDown={startDrag}
         onMouseMove={moveDrag}
         onMouseUp={endDrag}
@@ -199,7 +199,7 @@ export function Applications() {
 
       {/* 721:29308 — "View All", ruby, centred on 720, y3980: 96px below the
           cards' base. It was missing entirely. */}
-      <Reveal delay={160} className="mt-[68.5px] flex justify-center">
+      <Reveal delay={160} className="mt-[44px] flex justify-center lg:mt-[68.5px]">
         <KsButton href={applications.cta.href} variant="ruby">
           {applications.cta.label}
         </KsButton>

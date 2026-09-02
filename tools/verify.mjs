@@ -28,13 +28,13 @@ const TOL = 4;
 const APPLICATIONS_FIGMA_Y = 2839;
 
 /**
- * Karigare is the SECOND scroll story, and it displaces everything under it the
+ * Karigear is the SECOND scroll story, and it displaces everything under it the
  * same way. Figma draws one 660px row of frames; the page gives the two columns
  * a runway to travel through four of them (and, under the reduced-motion
- * fallback this script runs in, stacks all eight). So anchors below Karigare
+ * fallback this script runs in, stacks all eight). So anchors below Karigear
  * take a second rebase, read off the testimonials HEADING (Figma y7283) so the
  * offset is measured rather than assumed. It applies from the testimonials
- * section down — anchors inside Karigare itself sit above its runway.
+ * section down — anchors inside Karigear itself sit above its runway.
  */
 const TESTIMONIALS_FIGMA_Y = 7283;
 
@@ -50,7 +50,7 @@ const ANCHORS = [
   ["visualiser heading", "main > section:nth-of-type(6) h2", 4894],
   ["visualiser plate", "#visualiser-plate", 5037],
   ["visualiser cta", "#visualiser-plate a", 5748],
-  ["karigare heading", "main > section:nth-of-type(7) h2", 6023],
+  ["karigear heading", "main > section:nth-of-type(7) h2", 6023],
   // Component 101's collage is gone from the board; the section is two
   // full-bleed travelling columns now (764:9496 / 864:28925).
   //
@@ -58,7 +58,7 @@ const ANCHORS = [
   // moved the section up 113px when it retimed the visualiser (plate 5065 ->
   // 5037, CTA 5927 -> 5748) and neither move was implemented. Both are now, so
   // the anchors are back on the board's own numbers.
-  ["karigare columns", "#karigare-columns", 6250],
+  ["karigear columns", "#karigear-columns", 6250],
   ["testimonials heading", "main > section:nth-of-type(8) h2", 7283],
   ["testimonial cards", "#testimonial-rail figure", 7546],
   ["contact band", "main > section:nth-of-type(9)", 8548],
@@ -100,17 +100,17 @@ const run = async () => {
     .locator("main > section:nth-of-type(8) h2")
     .first()
     .evaluate((el) => el.getBoundingClientRect().top + window.scrollY);
-  const karigareOvershoot = Math.round(testimonialsY - (TESTIMONIALS_FIGMA_Y + overshoot));
+  const karigearOvershoot = Math.round(testimonialsY - (TESTIMONIALS_FIGMA_Y + overshoot));
 
   console.log(`\nFigma 544:3926 is 1440 x 9849. Page renders 1440 x ${pageH} (${pageH - 9849 >= 0 ? "+" : ""}${pageH - 9849}).`);
   console.log(`Carousel runway adds ${overshoot}px; anchors below it are rebased by that.`);
-  console.log(`Karigare runway adds a further ${karigareOvershoot}px below y${TESTIMONIALS_FIGMA_Y}.\n`);
+  console.log(`Karigear runway adds a further ${karigearOvershoot}px below y${TESTIMONIALS_FIGMA_Y}.\n`);
   console.log(`${"anchor".padEnd(24)}${"figma y".padStart(9)}${"actual".padStart(9)}${"delta".padStart(8)}   `);
 
   let fails = 0;
   for (const [label, sel, rawY] of ANCHORS) {
     let figmaY = rawY > 1715 ? rawY + overshoot : rawY;
-    if (rawY >= TESTIMONIALS_FIGMA_Y) figmaY += karigareOvershoot;
+    if (rawY >= TESTIMONIALS_FIGMA_Y) figmaY += karigearOvershoot;
     const y = await page
       .locator(sel)
       .first()

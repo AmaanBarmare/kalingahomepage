@@ -22,17 +22,17 @@ import { intro } from "@/lib/content";
  */
 export function Intro() {
   return (
-    <section className="bg-white px-6 pt-[237px] pb-[236px] text-center">
+    <section className="bg-white px-6 pt-[96px] pb-[96px] text-center lg:pt-[237px] lg:pb-[236px]">
       <Reveal as="h2" className="heading mx-auto max-w-[644px] text-ink">
         {intro.headline}
       </Reveal>
 
       <Reveal delay={120}>
-        <p className="body-copy mx-auto mt-[31px] max-w-[539px] text-ink">{intro.body}</p>
+        <p className="body-copy mx-auto mt-[24px] max-w-[539px] lg:mt-[31px] text-ink">{intro.body}</p>
       </Reveal>
 
       <Reveal delay={240}>
-        <KalingaMark className="mx-auto mt-[68px] h-[28.577px] w-[28px] text-ruby" />
+        <KalingaMark className="mx-auto mt-[44px] h-[28.577px] w-[28px] text-ruby lg:mt-[68px]" />
       </Reveal>
     </section>
   );

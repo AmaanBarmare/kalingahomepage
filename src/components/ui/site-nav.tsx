@@ -36,7 +36,15 @@ import { nav } from "@/lib/content";
  * currently resolves to the Display cut.
  */
 
-const SECTION_GAP = 96;
+/**
+ * MOBILE. The drawer is a 521-wide desktop panel in Figma and there is no phone
+ * artboard for it, so everything below `sm` is authored. It went out at Figma's
+ * literal values — 58px gutters, a 25/+5 label set `whitespace-nowrap`, a 96px
+ * gap — and on a 320 screen that leaves 204px for labels that measure past 250:
+ * "World of Kalinga" ran 53px off the panel and took its chevron 82px off with
+ * it. The gutter, the type and the gap all step down below `sm`, and the labels
+ * are allowed to wrap rather than being pinned to one line they cannot fit.
+ */
 
 export function SiteNav({ className = "" }: { className?: string }) {
   const [open, setOpen] = useState(false);
@@ -70,9 +78,16 @@ export function SiteNav({ className = "" }: { className?: string }) {
   return (
     <>
       <header className={`h-[90px] w-full bg-white ${className}`}>
-        <div className="mx-auto flex h-full max-w-[1440px] items-center justify-between px-6 lg:px-20">
-          {/* the bar lockup is 308 wide against the component's natural 329 */}
-          <span className="block origin-left scale-[0.78] sm:scale-90 lg:scale-[0.936]">
+        <div className="mx-auto flex h-full max-w-[1440px] items-center justify-between px-4 sm:px-6 lg:px-20">
+          {/* The bar lockup is 308 wide against the component's natural 329.
+              `scale` is a TRANSFORM, so it changes what the lockup looks like
+              and not one pixel of what it reserves: the row went on booking the
+              full 329 at every width, and at 320 that pushed the hamburger 61px
+              past the edge — where the hero's `overflow-hidden` clipped it, so
+              the only way into the menu was simply gone on a small phone. The
+              explicit width is the scaled width, so the box now measures what
+              the eye sees. */}
+          <span className="block w-[218px] origin-left scale-[0.66] min-[360px]:w-[257px] min-[360px]:scale-[0.78] sm:w-[297px] sm:scale-90 lg:w-[308px] lg:scale-[0.936]">
             <KalingaLogo />
           </span>
 
@@ -83,7 +98,7 @@ export function SiteNav({ className = "" }: { className?: string }) {
             aria-expanded={open}
             aria-controls="site-menu"
             aria-label="Open menu"
-            className="grid h-[32px] w-[36px] place-items-center text-ruby transition-opacity hover:opacity-70"
+            className="grid h-[32px] w-[36px] shrink-0 place-items-center text-ruby transition-opacity hover:opacity-70"
           >
             <MenuIcon className="h-[20px] w-[28px]" />
           </button>
@@ -124,8 +139,7 @@ export function SiteNav({ className = "" }: { className?: string }) {
         </div>
 
         <nav
-          className="flex flex-col px-[58px] pt-[57px]"
-          style={{ gap: `${SECTION_GAP}px` }}
+          className="flex flex-col gap-14 px-6 pt-10 sm:gap-24 sm:px-[58px] sm:pt-[57px]"
           aria-label="Main"
         >
           {nav.sections.map((section, i) => {
@@ -139,8 +153,8 @@ export function SiteNav({ className = "" }: { className?: string }) {
                   className="flex h-[40px] w-full items-center gap-[10px] text-left text-white transition-opacity hover:opacity-80"
                 >
                   <span
-                    className="font-nav font-medium whitespace-nowrap uppercase"
-                    style={{ fontSize: 25, letterSpacing: 5, lineHeight: 1.58 }}
+                    className="font-nav text-[20px] font-medium tracking-[3px] uppercase sm:text-[25px] sm:tracking-[5px] sm:whitespace-nowrap"
+                    style={{ lineHeight: 1.58 }}
                   >
                     {section.label}
                   </span>
@@ -162,8 +176,8 @@ export function SiteNav({ className = "" }: { className?: string }) {
                           href={child.href}
                           onClick={close}
                           tabIndex={isOpen ? undefined : -1}
-                          className="font-nav block h-[24px] font-light text-white uppercase transition-opacity hover:opacity-70"
-                          style={{ fontSize: 15, letterSpacing: 5, lineHeight: 1.58 }}
+                          className="font-nav flex min-h-11 items-center text-[15px] font-light tracking-[3px] text-white uppercase transition-opacity hover:opacity-70 sm:block sm:h-[24px] sm:min-h-0 sm:tracking-[5px]"
+                          style={{ lineHeight: 1.58 }}
                         >
                           {child.label}
                         </Link>
@@ -177,14 +191,14 @@ export function SiteNav({ className = "" }: { className?: string }) {
         </nav>
 
         {/* inquiry / rule / legal sit 143, 98 and 79 up from the drawer's base */}
-        <div className="mt-auto px-[45px] pb-[51px]">
+        <div className="mt-auto px-6 pb-10 sm:px-[45px] sm:pb-[51px]">
           {/* Sentence case, lowercase email — 709:6662 renders "Any inquiry
               info@kalingastone.com". Figma's export shows a `capitalize` class
               on the paragraph with `lowercase` on the spans inside; the spans
               win, and title-casing this gives "Info@Kalingastone.Com". */}
           <p
-            className="font-nav font-light text-white"
-            style={{ fontSize: 15, letterSpacing: 1, lineHeight: 1.58 }}
+            className="font-nav text-[15px] font-light tracking-[1px] text-white"
+            style={{ lineHeight: 1.58 }}
           >
             {nav.inquiry.lead}{" "}
             <a href={`mailto:${nav.inquiry.email}`} className="font-bold underline">
@@ -199,8 +213,8 @@ export function SiteNav({ className = "" }: { className?: string }) {
                   href={item.href}
                   onClick={close}
                   tabIndex={open ? undefined : -1}
-                  className="font-nav font-light text-white uppercase transition-opacity hover:opacity-70"
-                  style={{ fontSize: 15, letterSpacing: 1, lineHeight: 1.58 }}
+                  className="font-nav -my-1.5 block py-1.5 text-[15px] font-light tracking-[1px] text-white uppercase transition-opacity hover:opacity-70"
+                  style={{ lineHeight: 1.58 }}
                 >
                   {item.label}
                 </Link>
