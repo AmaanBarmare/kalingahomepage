@@ -466,6 +466,83 @@ Best guess is an effect on the scene layer that the API does not expose —
 Figma's progressive blur, a background blur, or a masked overlay. Everything
 else in the band matches; ask the designer what that layer is.
 
+## Karigare was rebuilt as two counter-scrolling columns
+
+Component 101's six-plate collage is **gone from the board** — 544:4013 and the
+whole 544:3926 home frame now 404 against the Figma API; the file was renumbered
+and the section redrawn as 721:29254. What replaced it is two columns, BASE and
+FORM, each a clipped window with a label under it, and a ruby-outline CTA.
+
+    BASE column   764:9494    x81    y6378.9   641 x 667.7
+    FORM column   721:29349   x724   y6388     637 x 651.4
+    CTA           721:29347   x618.5 y7184     205.19 x 42.7
+
+641 + 2 + 637 = 1280 — the page's content width, the two columns effectively
+touching. The 641/637 and 667.7/651.4 splits are Figma being loose about a pair
+plainly meant to match, so both are one number in code: a **640 x 660 frame and
+a 2px gutter**.
+
+### The board draws the tracks horizontally; they run vertically
+
+BASE's inner frame is **1923 wide = 3 x 641** — a horizontal strip of slides.
+That is how a static comp draws a carousel, not a statement of direction. The
+behaviour is the client's own split-scroll, ported from the hero of
+`github.com/AmaanBarmare/kalinga-two`:
+
+    progress = -rect.top / (section.offsetHeight - innerHeight)   clamped 0..1
+    distance = (frames - 1) * frameHeight
+    left     translateY(-progress * distance)        0 -> -distance   (up)
+    right    translateY((-1 + progress) * distance)  -distance -> 0   (down)
+
+Verified in the browser at five scroll positions: the two transforms **sum to a
+constant -1980** across the whole travel, which is the proof they are exact
+mirrors rather than merely both moving.
+
+Because the right track starts at -distance, the columns are **counter-indexed**
+— BASE frame 1 meets FORM frame 4. The two sets are ordered so every pair that
+meets is deliberate: lobby/glass table, carved wall/carved table, flat
+carving/fluted basin, flowing relief/curved bath.
+
+### Choosing eight images out of a 54-page deck
+
+The frames come from the client's CMC Value Added Services PDF. BASE maps
+cleanly — the deck names exactly four (Inlays, Hydra, Flat Carving, 3-D
+Carving). FORM does not:
+
+- **Monolith is unusable.** All six of its pages are full-slide composites with
+  text baked in; the only photograph crops to **464 x 479** for this frame,
+  0.73x, blurry even at 1x. It is left out and Stone Furniture — a real FORM
+  section in the deck, and the highest-resolution photography in it — takes two
+  slots.
+- **Hydra had one usable frame** and it is nearly featureless centred. At
+  `object-position: 50% 75%` the same file gives the carved wall a focal point
+  (sculptural console, wall light). That crop is why `position` exists per frame
+  in content.ts: the deck is shot for full-bleed slides, so several frames do
+  not want centring.
+- **Flat Carving and 3-D Carving carried in-scene showroom signage** — the words
+  "FLAT CARVING" and "3D CARVE" are physically on the walls in the renders. Both
+  images are narrower than the frame, so `object-position` cannot hide it; they
+  are cropped 19% and 15.5% from the left instead, paying 1.75x -> 1.42x/1.48x
+  to lose text that reads as stray deck chrome next to the section's own label.
+
+### Nothing here reaches 2x, and it was not upscaled
+
+The frame is 640 wide, so 2x wants 1280. The deck's own images cap at
+941-1448px, i.e. **1.42x to 2.26x, six of the eight under 2x**. They pass
+through at native width: a Lanczos upscale would add bytes and no detail, which
+is rule 1 of the asset pipeline. Real super-resolution is the only thing that
+would help, and it means sending the client's imagery to a third-party service —
+their call, not one to make silently.
+
+### It is the page's SECOND scroll story
+
+`tools/verify.mjs` now carries a second rebase for it, read off the testimonials
+heading, exactly as the collections carousel's is read off the applications
+section. Without it every anchor below Karigare reads +1341px and looks broken
+when it is simply displaced by an intended runway.
+
+---
+
 ## The brochures were 1.8 GB, and two thirds of that was invisible
 
 The four collection brochures arrive as Illustrator print masters — PDF/1.4,

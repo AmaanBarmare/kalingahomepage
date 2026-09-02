@@ -1,73 +1,158 @@
+"use client";
+
 import Image from "next/image";
-import { Reveal } from "@/components/ui/reveal";
+import Link from "next/link";
+import { useEffect, useRef } from "react";
+import { KsButton } from "@/components/ui/ks-button";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { karigare } from "@/lib/content";
 
 /**
- * Karigare — Figma 544:3973 (heading) and Component 101 (544:4013).
+ * Karigare — Figma 721:29303 (heading), 764:9494 (BASE column), 721:29349
+ * (FORM column), 721:29347 (CTA).
  *
- * Six plates absolutely placed on a 1420 x 860 frame at x60, every one of them
- * ~430 x 242 (16:9). Positions and z-order are Figma's own child order, which
- * is why they are listed back-to-front here: `inlay` sits underneath everything
- * and only shows as a sliver on the left, and `form1` (the travertine bench)
- * sits on top. Sorting these by position would break the overlaps.
+ * REBUILT. The board replaced the six-plate collage (Component 101, now deleted
+ * from the file) with two columns — BASE and FORM — each a clipped window with
+ * a label beneath it. Geometry, all of it Figma's:
  *
- * Heading block ends 6257.5; the collage starts 6286, so the gap is 28.5.
+ *   BASE column   x81   y6378.9   641 x 667.7   label 39 tall, 41 below
+ *   FORM column   x724  y6388     637 x 651.4   label 39 tall, gap 40
+ *   CTA           x618.5 y7184    205.19 x 42.7
+ *
+ * 641 + 2 + 637 = 1280, i.e. the page's content width with the two columns
+ * essentially touching. The 641/637 and 667.7/651.4 splits are Figma being
+ * loose about a pair that is plainly meant to match, so both are one number
+ * here: a 640 x 660 frame, and a 2px gutter.
+ *
+ * THE TRACKS RUN VERTICALLY, WHICH THE BOARD DOES NOT SHOW. In Figma each
+ * column is a horizontal strip of three slides (BASE's inner frame is 1923 =
+ * 3 x 641 wide) — that is how a static comp draws a carousel, not a direction.
+ * The behaviour is the client's existing split-scroll, ported from the hero of
+ * github.com/AmaanBarmare/kalinga-two: the section is pinned and the two
+ * columns travel in OPPOSITE directions as you scroll, left up and right down.
+ *
+ *   progress = -rect.top / (section.offsetHeight - innerHeight)   clamped 0..1
+ *   distance = (frames - 1) * frameHeight
+ *   left     translateY(-progress * distance)          0    -> -distance
+ *   right    translateY((-1 + progress) * distance)    -distance ->  0
+ *
+ * Because the right track starts at -distance and ends at 0, the columns are
+ * counter-indexed: at rest BASE shows frame 1 against FORM's frame 4. The two
+ * sets are ordered so every pair that meets is deliberate — lobby/table,
+ * carved wall/carved table, flat carving/fluted basin, relief/curved bath.
+ *
+ * The frame is fixed px rather than the reference's 100vh because Figma's is
+ * 660 and near-square; `--frame-h` also takes a viewport ceiling so the whole
+ * pinned composition (frames + labels + CTA) cannot outgrow a short window.
+ * `distance` is measured off the live element, so it stays correct after any
+ * resize without duplicating that arithmetic here.
  */
 
-const PLATES = [
-  { src: "/images/karigare-1.webp", left: 212, top: 359, w: 430, h: 242, drift: 26 },
-  { src: "/images/karigare-2.webp", left: 88, top: 431, w: 431.77, h: 243, drift: 14 },
-  { src: "/images/karigare-3.webp", left: 699, top: 164, w: 431, h: 243, drift: 30 },
-  { src: "/images/karigare-4.webp", left: 567, top: 454, w: 430, h: 242, drift: 10 },
-  { src: "/images/karigare-5.webp", left: 414, top: 333, w: 430, h: 242, drift: 20 },
-  { src: "/images/karigare-6.webp", left: 247, top: 164, w: 431, h: 242, drift: 34 },
-];
-
-const FRAME_W = 1420;
-const FRAME_H = 860;
-const pct = (n: number, of: number) => `${(n / of) * 100}%`;
+const COUNT = karigare.columns[0].frames.length;
 
 export function Karigare() {
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const windowRef = useRef<HTMLDivElement>(null);
+  const trackRefs = useRef<(HTMLDivElement | null)[]>([]);
+
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    let frame = 0;
+
+    const update = () => {
+      frame = 0;
+      const section = sectionRef.current;
+      const win = windowRef.current;
+      if (!section || !win) return;
+
+      const rect = section.getBoundingClientRect();
+      const travel = Math.max(1, section.offsetHeight - window.innerHeight);
+      const progress = Math.min(1, Math.max(0, -rect.top / travel));
+      const distance = (COUNT - 1) * win.offsetHeight;
+
+      trackRefs.current.forEach((track, i) => {
+        if (!track) return;
+        // Column 0 runs up from 0; column 1 runs down from -distance. Any
+        // further column would alternate with it.
+        const y = i % 2 === 0 ? -progress * distance : (-1 + progress) * distance;
+        track.style.transform = `translate3d(0, ${y}px, 0)`;
+      });
+    };
+
+    const requestUpdate = () => {
+      if (frame) return;
+      frame = requestAnimationFrame(update);
+    };
+
+    update();
+    window.addEventListener("scroll", requestUpdate, { passive: true });
+    window.addEventListener("resize", requestUpdate);
+    return () => {
+      window.removeEventListener("scroll", requestUpdate);
+      window.removeEventListener("resize", requestUpdate);
+      if (frame) cancelAnimationFrame(frame);
+    };
+  }, []);
+
   return (
-    <section className="bg-white pt-[166px] pb-[0px]" aria-labelledby="karigare-heading">
+    <section className="bg-white pt-[166px]" aria-labelledby="karigare-heading">
       <SectionHeading title={karigare.headline} body={karigare.body} />
 
-      <div className="mx-auto mt-[30px] w-full max-w-[1440px] overflow-hidden px-6 lg:px-0">
-        <div
-          id="karigare-collage"
-          className="relative aspect-[1420/860] w-full lg:ml-[60px] lg:w-[1420px]"
-        >
-          {PLATES.map((p, i) => (
-            <div
-              key={p.src}
-              className="absolute"
-              style={{
-                left: pct(p.left, FRAME_W),
-                top: pct(p.top, FRAME_H),
-                width: pct(p.w, FRAME_W),
-                height: pct(p.h, FRAME_H),
-                zIndex: i + 1,
-              }}
-            >
-              <Reveal delay={i * 90} className="h-full w-full">
-                <div
-                  className="ks-parallax h-full w-full"
-                  style={{ "--drift": `${p.drift}px` } as React.CSSProperties}
-                >
-                  <div className="relative h-full w-full overflow-hidden bg-placeholder">
-                    <Image
-                      src={p.src}
-                      alt=""
-                      fill
-                      sizes="(max-width: 1024px) 40vw, 431px"
-                      className="object-cover"
-                    />
+      <div ref={sectionRef} className="karigare-scroll">
+        <div className="karigare-sticky">
+          <div className="karigare-stage">
+            <div id="karigare-columns" className="karigare-columns">
+              {karigare.columns.map((column, ci) => (
+                <div key={column.label} className="karigare-column">
+                  <div
+                    ref={ci === 0 ? windowRef : undefined}
+                    className="karigare-window"
+                    aria-label={`${column.label} — ${COUNT} images`}
+                  >
+                    <div
+                      ref={(node) => {
+                        trackRefs.current[ci] = node;
+                      }}
+                      className="karigare-track"
+                      // The down-running column starts one full travel up, so
+                      // its last frame is the one on screen at rest. Inline so
+                      // the very first paint is already correct.
+                      style={{
+                        transform:
+                          ci % 2 === 0
+                            ? "translate3d(0, 0, 0)"
+                            : `translate3d(0, calc(${-(COUNT - 1)} * var(--frame-h)), 0)`,
+                      }}
+                    >
+                      {column.frames.map((frame) => (
+                        <div key={frame.src} className="karigare-frame">
+                          <Image
+                            src={frame.src}
+                            alt={frame.alt}
+                            fill
+                            sizes="(max-width: 1024px) 50vw, 640px"
+                            className="object-cover"
+                            style={{ objectPosition: frame.position }}
+                          />
+                        </div>
+                      ))}
+                    </div>
                   </div>
+
+                  <Link href={column.href} className="karigare-label">
+                    {column.label}
+                  </Link>
                 </div>
-              </Reveal>
+              ))}
             </div>
-          ))}
+
+            <div className="karigare-cta">
+              <KsButton href={karigare.cta.href} variant="outline-ruby">
+                {karigare.cta.label}
+              </KsButton>
+            </div>
+          </div>
         </div>
       </div>
     </section>

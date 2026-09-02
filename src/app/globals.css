@@ -620,3 +620,127 @@
     will-change: auto;
   }
 }
+
+/* ------------------------------------------------------------------ karigare
+   Two columns travelling in opposite directions while the section is pinned —
+   the client's split-scroll, ported from kalinga-two's hero. See karigare.tsx
+   for the geometry and the progress maths.
+
+   The section is (COUNT) x 100vh: one viewport of pinning plus one per
+   transition, which is the reference's own ratio (it used 300vh for 3 frames).
+   --frame-h is Figma's 660 with a viewport ceiling, so the pinned composition
+   (frames + label + CTA) can never outgrow a short window. */
+.karigare-scroll {
+  height: 400vh;
+  position: relative;
+  /* 6378.9 - (6136 + 121.5): the gap Figma leaves under the heading block. */
+  padding-top: 121px;
+}
+
+.karigare-sticky {
+  position: sticky;
+  top: 0;
+  display: grid;
+  height: 100vh;
+  place-items: center;
+  overflow: hidden;
+}
+
+.karigare-stage {
+  --frame-h: min(660px, calc(100svh - 215px));
+  width: 100%;
+  max-width: 1280px;
+  padding-inline: 24px;
+}
+
+.karigare-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px; /* 724 - (81 + 641) */
+}
+
+.karigare-window {
+  position: relative;
+  height: var(--frame-h);
+  overflow: hidden;
+  background: var(--color-placeholder, #e8e4de);
+}
+
+.karigare-track {
+  height: calc(var(--frame-h) * 4);
+  will-change: transform;
+}
+
+.karigare-frame {
+  position: relative;
+  height: var(--frame-h);
+  overflow: hidden;
+}
+
+/* 764:9509 / I721:29349;404:3024 — Halogen Medium 24 / +5 / uppercase, ink. */
+.karigare-label {
+  display: block;
+  margin-top: 40px;
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 1.58;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  color: var(--color-ink);
+  transition: color 0.3s var(--ease-out-expo);
+}
+
+.karigare-label:hover {
+  color: var(--color-ruby);
+}
+
+/* 721:29347 sits 66px under the label row. */
+.karigare-cta {
+  display: flex;
+  justify-content: center;
+  margin-top: 26px;
+}
+
+@media (max-width: 1023px) {
+  .karigare-stage {
+    --frame-h: min(520px, calc(100svh - 190px));
+  }
+
+  .karigare-label {
+    margin-top: 24px;
+    font-size: 18px;
+    letter-spacing: 3px;
+  }
+}
+
+/* A reader who asked for stillness gets the eight frames as a plain grid, with
+   no pinning and no travel — the same bargain the collections carousel makes. */
+@media (prefers-reduced-motion: reduce) {
+  .karigare-scroll {
+    height: auto !important;
+  }
+
+  .karigare-sticky {
+    position: relative;
+    top: auto;
+    height: auto;
+    overflow: visible;
+  }
+
+  .karigare-stage {
+    --frame-h: min(520px, 70svh);
+  }
+
+  .karigare-window {
+    height: auto;
+    overflow: visible;
+  }
+
+  .karigare-track {
+    height: auto;
+    transform: none !important;
+    display: grid;
+    gap: 2px;
+  }
+}

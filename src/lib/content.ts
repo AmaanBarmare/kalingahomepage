@@ -210,9 +210,49 @@ export const visualiser = {
 } as const;
 
 /** Karigare collage — Component 101 (544:4013). */
+/**
+ * Karigare — Figma 721:29303 (heading), 764:9494 (BASE), 721:29349 (FORM),
+ * 721:29347 (CTA).
+ *
+ * The eight frames are curated out of the client's CMC Value Added Services
+ * deck; see DESIGN.md for why these eight and not others. `position` is the
+ * object-position each one needs in the near-square 640 x 660 frame — the deck
+ * is shot for full-bleed slides, so several of them do not want centring.
+ */
 export const karigare = {
   headline: "Karigare",
   body: LOREM_SHORT,
+  cta: { label: "Explore our expertise", href: "/karigare" },
+  columns: [
+    {
+      label: "Base",
+      href: "/karigare/base",
+      frames: [
+        { src: "/images/karigare-base-1.webp", position: "50% 50%",
+          alt: "Hotel lobby with a swirling stone inlay floor" },
+        { src: "/images/karigare-base-2.webp", position: "50% 75%",
+          alt: "Deeply carved Hydra stone wall behind a sculptural console" },
+        { src: "/images/karigare-base-3.webp", position: "50% 50%",
+          alt: "Flat-carved stone panel with geometric relief" },
+        { src: "/images/karigare-base-4.webp", position: "50% 50%",
+          alt: "Three-dimensional carved stone panel with flowing relief" },
+      ],
+    },
+    {
+      label: "Form",
+      href: "/karigare/form",
+      frames: [
+        { src: "/images/karigare-form-1.webp", position: "50% 50%",
+          alt: "Freestanding stone bath against book-matched marble" },
+        { src: "/images/karigare-form-2.webp", position: "50% 50%",
+          alt: "Fluted stone vessel basin beneath a backlit mirror" },
+        { src: "/images/karigare-form-3.webp", position: "50% 50%",
+          alt: "Sculptural carved stone table base supporting a glass top" },
+        { src: "/images/karigare-form-4.webp", position: "50% 50%",
+          alt: "Glass-topped table on a carved stone base in daylight" },
+      ],
+    },
+  ],
 } as const;
 
 /**
