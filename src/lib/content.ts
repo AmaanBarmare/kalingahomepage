@@ -311,6 +311,16 @@ export const contact = {
   body: LOREM_SHORT,
   cta: { label: "Download brochure" },
   /**
+   * The band carries TWO buttons now, and the brochure one changed fill: it was
+   * the white outline every CTA on photography uses, and is the ruby Primary
+   * here. The second is the visualiser's own CTA, repeated — same label, same
+   * destination, so the two are kept identical deliberately.
+   *
+   * NOTE the spelling: the visualiser section already ships "Visualise", and a
+   * page must not offer the same button under two spellings, so this follows it.
+   */
+  secondaryCta: { label: "Visualise Your Space", href: "/visualiser" },
+  /**
    * The CTA is a menu, not a link — see brochure-menu.tsx. These are the four
    * studio brochures, downsampled from their 300ppi CMYK print masters by
    * tools/optimize-brochures.py; they open in a new tab rather than download.

@@ -132,7 +132,12 @@ const PLATES = [
   // 544:4018 replaced the old 1672-wide bleed plate with a 1440 x 640 image
   // sitting flush in the frame, so the display box is the frame width now. The
   // source is exactly 1440 wide, i.e. 1x — see README, Outstanding.
-  { src: "contact-scene.png", out: "contact.webp", display: [1440, 640], node: "544:4018" },
+  // New plate, and a NEW FILENAME with it — same reason as the testimonial
+  // cards: replacing bytes at a path the optimizer has already cached leaves
+  // the old picture on screen for hours. Supplied at 1440x640, i.e. 1x for a
+  // full-width band, so it is upscaled to the 2880 the box wants; the untouched
+  // original is in assets-src/originals/.
+  { src: "contact-lounge.png", out: "contact-lounge.webp", display: [1440, 640], node: "544:4018" },
 ];
 
 async function build({ audit, plates = PLATES }) {

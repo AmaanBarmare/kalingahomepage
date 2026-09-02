@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { BrochureMenu } from "@/components/home/brochure-menu";
+import { KsButton } from "@/components/ui/ks-button";
 import { Reveal } from "@/components/ui/reveal";
 import { contact } from "@/lib/content";
 
@@ -49,7 +50,7 @@ export function ContactBand() {
     // top of the open panel.
     <section className="relative isolate z-20 w-full bg-black" aria-labelledby="contact-heading">
       <div className="relative aspect-9/4 min-h-120 w-full">
-        <Image src="/images/contact.webp" alt="" fill sizes="100vw" className="object-cover" />
+        <Image src="/images/contact-lounge.webp" alt="" fill sizes="100vw" className="object-cover" />
 
         <div
           className="pointer-events-none absolute inset-0"
@@ -70,8 +71,13 @@ export function ContactBand() {
             <p className="body-copy mt-2.25 max-w-174.5 text-white">{contact.body}</p>
           </Reveal>
 
-          <Reveal delay={200} className="mt-5.75 block">
+          {/* Two buttons on one row. They wrap rather than shrink on a narrow
+              phone — KS/Button is fixed px everywhere on this page. */}
+          <Reveal delay={200} className="mt-5.75 flex flex-wrap items-center gap-3 lg:gap-4">
             <BrochureMenu />
+            <KsButton href={contact.secondaryCta.href} variant="outline">
+              {contact.secondaryCta.label}
+            </KsButton>
           </Reveal>
         </div>
       </div>
