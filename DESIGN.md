@@ -643,13 +643,13 @@ visible on the stone. Worth revisiting only if deploy size becomes a problem.
 ## Video
 
 `npm run video` rebuilds `public/videos` from `assets-src/video`;
-`npm run video:audit` reports without writing. Two clips, **2.7 MB** for a
-browser that takes WebM (4.0 MB if it falls back to MP4).
+`npm run video:audit` reports without writing. Two clips, **4.34 MB** for a
+browser that takes WebM (4.84 MB if it falls back to MP4).
 
 | Clip | Source | Ships | Box | DPR |
 |---|---|---|---|---|
 | `hero` | 1280×720 24fps 10.0s | 216f / 9.00s — webm 870 KB, mp4 1514 KB | 1440×1071 | **0.89×** |
-| `visualiser` | 1920×1080 30fps 10.0s | 204f / 6.80s — webm 1829 KB, mp4 2387 KB | 1440×815 | **1.33×** |
+| `visualiser` | 1920×1080 30fps 10.0s | 276f / 9.20s — webm 3574 KB, mp4 3440 KB | 1440×815 | **1.33×** |
 
 WebM is listed first in the `<source>` order because VP9 won on both axes: at
 matched SSIM it came in ~25% under H.264. CRFs are per-clip, from a sweep —
@@ -719,10 +719,10 @@ the old dolly push-in. It is a different clip — PSNR against the previous raw 
 Space": it shows a cursor picking swatches and the surface actually changing,
 rather than a static room.
 
-**The pipeline config did not need to move.** Measuring the new clip's per-frame
-delta gives a 23-frame head freeze and a 50-frame dead tail with motion in
-frames 23–250 — the same structure as the clip it replaces, so the existing
-`keep: [23, 251]` trim and 24-frame loop fold were already correct. The four
+Measuring the new clip's per-frame delta gives a 23-frame head freeze and a
+50-frame dead tail with motion in frames 23–250. The pipeline keeps that active
+range, retimes its 228 frames to 300 to preserve the relaxed pace, then folds
+the last 24 frames over the first 24 for a seamless 9.2-second loop. The four
 internal holds are 3 frames each, which are the deliberate pauses on each
 surface and are kept.
 

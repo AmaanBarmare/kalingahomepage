@@ -185,19 +185,22 @@ export const applications = {
   materialCta: "View Material",
 } as const;
 
-/** MaxGuard band — 542:5281 and siblings. */
+/** MaxGuard band — 906:32016 and siblings. */
 export const maxguard = {
   // The board's ghost headline ("lorem" / "ipsum" / "cal", set behind a cutout
-  // of the couple) is gone — 665:15191 and 665:15192 are a real headline and
+  // of the couple) is gone — 721:30948 and 721:30949 are a real headline and
   // body in its place.
   headline: "Lorem ipsum",
   body: LOREM_BRIEF,
   cta: { label: "Discover MaxGuard", href: "/maxguard" },
-  appPrompt: "Download the App",
-  stores: [
-    { label: "Get it on Google Play", href: "https://play.google.com/store" },
-    { label: "Download on the App Store", href: "https://www.apple.com/app-store/" },
-  ],
+  // 998:37554. The app row — a "Download the App" label with Google Play and
+  // App Store marks at the bottom right — is gone. The board now pairs a
+  // second, outline KS/Button with the ruby one at the bottom left, so this is
+  // a CTA rather than a label plus two store links.
+  //
+  // The board gives it no destination; `/maxguard/app` follows the same
+  // placeholder convention as every other href in this file.
+  appCta: { label: "Download the App", href: "/maxguard/app" },
 } as const;
 
 /** Surface visualiser — 544:3967 / 544:4015. */

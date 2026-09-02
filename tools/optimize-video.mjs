@@ -56,29 +56,16 @@
  * marble there carries only 2.24 levels RMS of high-frequency detail, so there
  * is nothing to lose.
  *
- * THE VISUALISER SHIPS AS DELIVERED — no trim, no retime, no fold. That is a
- * deliberate reversal and both halves of it were tried first, so the reasons
- * are worth keeping.
+ * THE VISUALISER needs its frozen head and tail removed before the fold. The
+ * master is 300 frames at 30fps, but motion only runs through frames 23..250:
+ * frames 0..22 hold on the opening and frames 251..299 hold on the ending. If
+ * those stays are left in, every repeat appears to pause for ~1.6s before an
+ * abrupt jump back to the start.
  *
- * The master is 300 frames at 30fps, but only 228 of them move. Measured at
- * full resolution: frames 0..22 are frozen (frame 0 vs 22 is 59.8dB, max
- * channel delta 9), frames 251..299 are frozen (250 vs 299 is 71.3dB, delta 3),
- * and motion runs 23..250 — frame 23 breaks from frame 0 at 45.4dB / 210. So
- * 2.40s of the 10 is a still frame, at both ends, where a loop can least afford
- * it, and 58 frozen transitions survive inside the cut including a 0.6s stall
- * at frame 165.
- *
- * Trimming those and folding the tail gave 6.80s, which read as rushed.
- * Retiming that back up to 8.00s through minterpolate's motion-compensated mode
- * fixed the pace and cost picture quality — synthesised frames are only as good
- * as the motion estimate, and on this render they were not good enough.
- *
- * Between a clip that is paced wrong and one that is soft, the client's call
- * was the master's own timing. So `keep`, `retime` and `fade` are all off here
- * and every bit goes to the encode instead. What that accepts, on the record:
- * a ~1.6s stall before each loop, and a restart that jumps ~17x a normal frame
- * delta because nothing smooths the seam. Both are properties of the delivered
- * file. The fix for either is a better master, not a better pipeline.
+ * Keeping frames 23..250 removes the dead time. The active sequence is then
+ * eased back to 300 frames before the final 24 frames are folded over the
+ * first 24. That produces a 276-frame (9.2s) continuous loop: close to the
+ * master's original pace, but without the frozen tail or hard restart.
  *
  * LOOP SEAM (both). Neither clip loops as delivered: the hero's last->first
  * jump is 21x a typical frame delta, the visualiser's 17x. Both are fixed by
@@ -130,11 +117,11 @@ const CLIPS = [
     poster: "visualiser-poster.webp",
     display: [1440, 815], // 544:4015 — aspect 1.767 vs the clip's 1.778, near-exact
     pre: [],
-    keep: null, // ship the master's own timeline — see the note above
-    retime: null,
-    fade: 0, // no fold: the loop seam is the master's, untouched
+    keep: [23, 251], // remove the frozen opening and 1.63s dead tail
+    retime: 300, // restore a relaxed ~10s pace after removing the dead frames
+    fade: 24, // 0.8s fold closes the last-to-first seam
     crf: { h264: 23, vp9: 24 }, // quality-matched at ~47.2dB; see the sweep above
-    note: "slow dolly push-in — loops",
+    note: "surface-swap demo — seamless loop",
   },
 ];
 

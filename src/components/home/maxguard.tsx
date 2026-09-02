@@ -4,72 +4,76 @@ import { Reveal } from "@/components/ui/reveal";
 import { maxguard } from "@/lib/content";
 
 /**
- * MaxGuard band — y4092 -> 4747, 655 tall. Every node is rebased to that top and
- * expressed as a percentage of the 1440 x 655 box, so the composition scales as
- * one piece.
+ * MaxGuard band — frame y4092 -> 4747, 655 tall. Every node is rebased to that
+ * top and expressed as a percentage of the 1440 x 655 box, so the composition
+ * scales as one piece.
  *
- *   542:5281  scene            x    0  y   0    1440 x 655
- *   551:5470  scrim            x   -3  y 328    1459 x 327
- *   665:15196 scrim            x   -3  y 325    1459 x 327
- *   542:5283  MaxGuard lockup  x   56  y  23     273.25 x 59.17
- *   542:5282  warranty badge   x 1176  y  21     197 x 132
- *   665:15191 LOREM IPSUM      x   79  y 464     442 x 47
- *   665:15192 body             x   79  y 521     487 x 50
- *   721:30918  Download the App x 1020    y 584.85  251 x 21
- *   721:30908  google play      x 1287.11 y 575      39 x 39
- *   721:30951  app store        x 1339.11 y 575      39 x 39
- *   721:30920  KS/Button        x   80    y 581     184.19 x 42.69
+ *   721:30906  photo plate       x  -16  y   0    1472 x 655
+ *   721:30917  scrim, light      x  -14  y  -2    1459 x 327   (flipped)
+ *   721:30907  scrim, ink        x  -14  y 328    1459 x 327
+ *   721:30950  MaxGuard lockup   x   56  y  23     273.25 x 59.17
+ *   721:30919  warranty badge    x 1176  y  21     197 x 132
+ *   721:30948  LOREM IPSUM       x   80  y 435     442 x 47
+ *   721:30949  body              x   80  y 492     487 x 50
+ *   721:30920  KS/Button ruby    x   81  y 552     184.19 x 42.69
+ *   998:37554  KS/Button outline x  297  y 551     175.19 x 42.69
  *
- * REBUILT. The board dropped the whole two-layer composition this used to be:
- * there is no ghost headline any more, and no cutout of the couple laid back
- * over it, so `maxguard-foreground.webp` and the `ghost` copy are gone with
- * them. The lockup moved from the bottom left to the top left, the CTA moved
- * from the middle to the bottom right and became the ruby Style=Primary, and a
- * real headline and body arrived where the ghost type used to be.
+ * THE APP ROW IS GONE AND IT DID NOT MOVE — IT WAS REPLACED. The board used to
+ * close the band with a "Download the App" label at x1020 and two 39px store
+ * marks at x1287.11 / x1339.11, all on the bottom right. Those three nodes
+ * (721:30918, 721:30908, 721:30951) are deleted from the file. In their place
+ * 998:37554 puts a SECOND KS/Button — the plain white-outline variant, label
+ * "Download the app" — immediately to the right of the ruby one, so the band
+ * now ends in a two-button row at the bottom left and nothing at all on the
+ * bottom right. The Play/App Store SVGs in `public/icons` are now unreferenced.
  *
- * THE PLATE'S NODE BOX LIES. 542:5281 reports x-16 and width 1472, which reads
- * like a 16px bleed on each edge — but Figma CROPS the fill to the frame rather
- * than scaling into that box, and matching a clean background patch against the
- * board's own render gives scale 1.000 at offset (0,0), r = 0.998. The scene is
- * 1:1 across 1440; scaling it to 1472 zooms the kitchen ~2%.
+ * THAT SECOND BUTTON IS NOT INSIDE THE PAGE FRAME. 998:37554 is parented to the
+ * "Homepage" SECTION, not to the "Home Page" frame that holds every other node
+ * here, so it does not appear as a sibling of the band and a node-list walk of
+ * the frame misses it entirely — it only shows up in a render, or in a scan
+ * that leaves the frame. It is a layering slip in the board, not a signal; it
+ * sits in the band, so it belongs to the band.
  *
- * THERE ARE TWO SCRIMS, NOT ONE, AND ONE OF THEM IS FLIPPED. 906:32016 carries
- * a matched pair of 1459 x 327 rects sharing one 193.78deg axis:
+ * THE WHOLE TEXT COLUMN ROSE 29px. Headline 464 -> 435, body 521 -> 492, ruby
+ * CTA 581 -> 552, one constant shift, and the left margin went 79/80 -> 80/81.
+ * The block had to climb to open the room the second button now occupies.
+ *
+ * The two buttons disagree about their own top by 1px (552 vs 551) at identical
+ * heights, which is board noise rather than intent, so they are laid out as one
+ * flex row on 551 instead of being placed apart and left 1px out of true. The
+ * 31.81px between them is the real measurement: the ruby button closes at
+ * 265.19 and the outline one opens at 297. It is a fixed px gap because
+ * KS/Button is fixed px everywhere on this page — it does not scale with the
+ * plate, so a percentage gap would drift away from the buttons it separates.
+ *
+ * THE BODY IS WHITE NOW, not #eee — 721:30949 carries the shared "Body Copy"
+ * style, White #FFFFFF.
+ *
+ * THE PLATE'S NODE BOX IS REAL, and the fill carries the crop rather than the
+ * box: 721:30906 is 1472 wide at x-16 with an IMAGE/CROP fill whose transform
+ * is [[1,0,0],[0,0.667459,0.238621]] — a window 0.667459 of the source tall
+ * starting 0.238621 down it. So the image draws at 1/0.667459 = 149.82% of the
+ * node's height, offset -35.75%, which is an object-position of
+ * 0.238621 / (1 - 0.667459) = 71.76%. Letting the image simply cover the band
+ * instead centres it and moves every landmark up ~90px.
+ *
+ * THERE ARE TWO SCRIMS, NOT ONE, AND ONE OF THEM IS FLIPPED. The band carries a
+ * matched pair of 1459 x 327 rects sharing one 193.78deg axis:
  *
  *   721:30917  y  -2 .. 325   ends rgb(253,253,253)   scaleY(-1)
  *   721:30907  y 328 .. 655   ends rgb(20,16,14)
  *
  * The vertical flip on the top one is the whole trick and it is invisible in a
- * node list. Flipping negates the axis's vertical component, so 193.78deg (down
- * and slightly left) becomes 346.22deg (UP and slightly left) — which is why a
- * gradient whose box sits in the top half puts its white end in the top-left
- * CORNER. Figma renders that corner at rgb(252,252,252); this used to render it
- * at rgb(143,140,105), a clear window onto a garden, and that was the whole of
- * the mismatch. The ink half was already right.
+ * node list — it lives in the relativeTransform as a -1 in the y row. Flipping
+ * negates the axis's vertical component, so 193.78deg (down and slightly left)
+ * becomes 346.22deg (UP and slightly left) — which is why a gradient whose box
+ * sits in the top half puts its white end in the top-left CORNER. Figma renders
+ * that corner at rgb(252,252,252); a single unflipped scrim renders it at
+ * rgb(143,140,105), a clear window onto a garden, and that is the whole of the
+ * difference. The ink half is the same either way.
  *
- * Both are Figma's literal values now, on Figma's literal boxes, rather than the
- * single full-bleed gradient this used to solve for by dividing the board's
- * render by the untouched source. That fit was good — it reproduced the bottom
- * half to under one 8-bit level — but it could only ever find what it was
- * looking for, and it was not looking for a second layer above the fold.
- *
- * "Download the App" is Halogen **Bold** 13.053 / +4.3511 (542:5284) — the
- * display face, a heavier weight than it looks, and much wider tracking. It is
- * white now that it sits on the scrim rather than on the lockup's light plate.
- *
- * THE TWO BOTTOM BLOCKS TRADED SIDES. The board moved the CTA from the bottom
- * right to the bottom left and sent the app row the other way; everything above
- * them — lockup, badge, headline, body — measures unchanged.
- *
- * THE CTA ALSO DROPPED 19px, 562 -> 581, and that is not decoration. The body it
- * now sits beneath runs 521..571, so at its old height the button overlapped the
- * last line of copy. On the right, where it used to live, there was nothing
- * under it and the number never had to mean anything. Moving a block sideways
- * moved it into a column that was already occupied.
- *
- * The app row went the other way and down 4. Its right edge lands on 1378.11 —
- * not the 80px margin, not the badge's edge, nothing derivable; it is just where
- * the board puts it.
+ * "Download the App" is a button label now, so the Halogen Bold 13.053 / +4.35
+ * display setting that used to carry it as loose type is gone with the row.
  *
  * The badge and lockup are alpha-bearing originals. Figma's own `export` of each
  * flattens opaque white behind it, invisible in Figma (they sit on white there)
@@ -128,17 +132,13 @@ const SCRIM_TOP =
 const SCRIM_BOTTOM =
   "linear-gradient(193.78deg, rgba(0,0,0,0) 50.817%, rgba(7,6,5,0.5) 67.361%, rgb(20,16,14) 97.235%)";
 
-const STORE_ICONS = ["/icons/google-play.svg", "/icons/app-store.svg"];
-
 export function MaxGuard() {
   return (
     <section className="relative isolate w-full overflow-hidden bg-ink" aria-label="MaxGuard">
       <div className="relative aspect-1440/655 w-full">
         {/* The node is 1472 wide at x-16 and its fill is a 3:2 image drawn at
             1472 x 981.4 with the top 234.2 cropped away, so the wrapper is the
-            node box and object-position carries the crop: 234.2 / (981.4 - 655)
-            = 71.76%. Letting the image simply cover the band instead centres it
-            and moves every landmark up ~90px. */}
+            node box and object-position carries the crop. */}
         <div
           className="absolute inset-y-0 overflow-hidden"
           style={{ left: X(-16), width: X(1472) }}
@@ -200,7 +200,12 @@ export function MaxGuard() {
           </Reveal>
         </div>
 
-        <div className="absolute" style={{ left: X(79), top: Y(464), width: X(487) }}>
+        {/* 721:30948 and 721:30949 are placed on their own node tops rather than
+            flowed one under the other: a Figma text box already includes its
+            half-leading, so top-to-top is exact and needs no margin to guess at.
+            Both get the body's 487 column — the headline measures 442 and sets
+            on one line inside it. */}
+        <div className="absolute" style={{ left: X(80), top: Y(435), width: X(487) }}>
           <Reveal>
             <h2
               className="font-display font-medium text-white uppercase"
@@ -213,12 +218,13 @@ export function MaxGuard() {
               {maxguard.headline}
             </h2>
           </Reveal>
+        </div>
 
+        <div className="absolute" style={{ left: X(80), top: Y(492), width: X(487) }}>
           <Reveal delay={120}>
             <p
-              className="font-body font-light text-[#eee]"
+              className="font-body font-light text-white"
               style={{
-                marginTop: Y(12.2),
                 fontSize: `clamp(12px, ${VW(16)}, 16px)`,
                 letterSpacing: `clamp(0.5px, ${VW(1)}, 1px)`,
                 lineHeight: 1.5,
@@ -229,38 +235,17 @@ export function MaxGuard() {
           </Reveal>
         </div>
 
-        <p
-          className="absolute font-display font-bold whitespace-nowrap text-white uppercase"
-          style={{
-            left: X(1020),
-            top: Y(584.85),
-            fontSize: `clamp(9px, ${VW(13.053)}, 13.053px)`,
-            letterSpacing: `clamp(1.5px, ${VW(4.3511)}, 4.3511px)`,
-            lineHeight: 1.58,
-          }}
+        {/* 721:30920 + 998:37554 — see the note above for why these are one row
+            on 551 and why the gap is fixed px rather than a percentage. */}
+        <div
+          className="absolute flex items-center"
+          style={{ left: X(81), top: Y(551), gap: "31.81px" }}
         >
-          {maxguard.appPrompt}
-        </p>
-
-        {/* Two separate 39 x 39 marks on a 52px pitch — 665:15367 and 665:15352,
-            not the single flattened strip the board used to carry. */}
-        {maxguard.stores.map((store, i) => (
-          <a
-            key={store.label}
-            href={store.href}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label={store.label}
-            className="absolute transition-opacity hover:opacity-80"
-            style={{ left: X(1287.11 + i * 52), top: Y(575), width: X(39), height: Y(39) }}
-          >
-            <Image src={STORE_ICONS[i]} alt="" width={39} height={39} className="h-full w-full" />
-          </a>
-        ))}
-
-        <div className="absolute" style={{ left: X(80), top: Y(581) }}>
           <KsButton href={maxguard.cta.href} variant="ruby">
             {maxguard.cta.label}
+          </KsButton>
+          <KsButton href={maxguard.appCta.href} variant="outline">
+            {maxguard.appCta.label}
           </KsButton>
         </div>
       </div>

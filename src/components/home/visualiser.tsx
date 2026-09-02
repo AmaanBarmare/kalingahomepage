@@ -36,10 +36,9 @@ export function Visualiser() {
           id="visualiser-plate"
           className="relative mt-[23.3px] aspect-[1440/815] w-full overflow-hidden bg-placeholder"
         >
-          {/* A slow dolly push-in, so it loops. The seam is real — frame 0 is
-              wide, the last frame is pushed in — but the clip sits mid-page and
-              is paused whenever it is off-screen, so the cut lands far less
-              often than the hero's would. preload="none": it is ~4800px down. */}
+          {/* The source is trimmed and folded by the video pipeline so its
+              surface-swap sequence loops without a frozen tail or hard cut.
+              preload="none": it is ~4800px down the page. */}
           <BackgroundVideo
             src="visualiser"
             poster="/images/visualiser-poster.webp"
