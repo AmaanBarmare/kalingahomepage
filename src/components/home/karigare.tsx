@@ -103,7 +103,7 @@ export function Karigare() {
   }, []);
 
   return (
-    <section className="bg-white pt-[166px]" aria-labelledby="karigare-heading">
+    <section className="bg-white pt-[171px]" aria-labelledby="karigare-heading">
       <SectionHeading title={karigare.headline} body={karigare.body} />
 
       <div ref={sectionRef} className="karigare-scroll">

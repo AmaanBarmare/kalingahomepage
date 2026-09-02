@@ -157,25 +157,19 @@ export function SiteFooter() {
           {footer.columns.map((col, ci) => (
             <div key={ci} className="flex flex-col">
               {col.groups.map((group, gi) => (
-                <div key={group.title ?? `g${gi}`} className={gi > 0 ? "mt-21.5" : ""}>
-                  {group.title ? (
-                    <h2 className="font-nav text-[16px] font-normal tracking-[1.5px] text-[#f3f3f3] uppercase">
-                      {group.title}
-                    </h2>
-                  ) : null}
-                  <ul className={group.title ? "mt-2.25" : ""}>
+                <div key={group.title} className={gi > 0 ? "mt-21.5" : ""}>
+                  <h2 className="font-nav text-[16px] font-normal tracking-[1.5px] text-[#f3f3f3] uppercase">
+                    {group.title}
+                  </h2>
+                  {/* All four groups now run on the same 33px pitch. The fourth
+                      used to be a headless block of uppercase lines on 38 —
+                      the board turned it into DISCOVER + three links. */}
+                  <ul className="mt-2.25">
                     {group.links.map((link) => (
-                      // The ABOUT block is one text node with a blank line
-                      // between each entry, so it runs on 38 where the others
-                      // run on 33.
-                      <li key={link} className={group.headingStyle ? "h-9.5" : "h-8.25"}>
+                      <li key={link} className="h-8.25">
                         <Link
                           href={`/${link.toLowerCase()}`}
-                          className={
-                            group.headingStyle
-                              ? "font-nav text-[16px] font-normal tracking-[1.5px] text-[#f3f3f3] uppercase transition-colors hover:text-white"
-                              : "font-nav text-[16px] font-light tracking-[2px] text-white/70 transition-colors hover:text-white"
-                          }
+                          className="font-nav text-[16px] font-light tracking-[2px] text-white/70 transition-colors hover:text-white"
                         >
                           {link}
                         </Link>

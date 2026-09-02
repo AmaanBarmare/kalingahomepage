@@ -7,9 +7,9 @@
  * design exactly. Real copy drops in here without touching a single component.
  *
  * The contact paragraph and the footer navigation ARE real and are transcribed
- * as-is. Note `MAXGAURD` in the footer: that is Figma's spelling (544:4401),
- * kept deliberately so the discrepancy stays visible rather than being
- * silently "fixed" — see DESIGN.md § Known Figma-side issues.
+ * as-is. The footer's `MAXGAURD` misspelling is gone with the node that carried
+ * it (544:4401) — the board's footer now runs DISCOVER / About / Blogs / Media.
+ * The drawer's own misspellings are still live and still preserved; see below.
  */
 
 const LOREM_SHORT =
@@ -120,6 +120,8 @@ export const applications = {
   headline: "Lorem IPSUM",
   body: LOREM_DUMMY,
   sectors: ["Residential", "Commercial", "Hospitality", "Healthcare"],
+  /** 721:29308 — the ruby "View All" under the strip. */
+  cta: { label: "View All", href: "/spaces" },
   spacesBySector: {
     Residential: [
       { index: "01", name: "Hallway",     href: "/spaces/hallway",     src: "/images/residential-hallway-canva.webp",     alt: "A sunlit residential hallway with pale stone floors and warm plaster walls",
@@ -168,18 +170,16 @@ export const applications = {
         material: "Savvanna",                materialSrc: "/images/material-surface-savvanna.webp",       materialAlt: "Savvanna terrazzo surface with bold charcoal and beige aggregate on white" },
     ],
     Healthcare: [
-      { index: "01", name: "Entrance & Arrivals",            href: "/spaces/healthcare/entrance-arrivals",          src: "/images/healthcare-entrance-arrivals.webp",          alt: "An accessible healthcare entrance finished with large-format warm ivory porcelain facade panels and slip-resistant paving",
-        material: "Ivory Limestone Porcelain", materialSrc: "/images/material-v2-ivory-limestone-porcelain.webp",          materialAlt: "Close detail of warm ivory porcelain with subtle blue-grey limestone movement" },
-      { index: "02", name: "Reception & Waiting",            href: "/spaces/healthcare/reception-waiting",          src: "/images/healthcare-reception-waiting.webp",          alt: "A healthcare reception and waiting area centred on a curved pale mineral-blue engineered quartz desk and wall",
-        material: "Aqua Mineral Quartz",       materialSrc: "/images/material-v2-aqua-mineral-quartz.webp",          materialAlt: "Close detail of pale mineral-blue engineered quartz with fine white and grey aggregate" },
-      { index: "03", name: "Lobby & Corridors",              href: "/spaces/healthcare/lobby-corridors",            src: "/images/healthcare-lobby-corridors.webp",            alt: "A naturally lit healthcare corridor with warm-white engineered terrazzo flooring, coved skirting and wall protection",
-        material: "Bianco Terrazzo",           materialSrc: "/images/material-v2-bianco-terrazzo.webp",            materialAlt: "Close detail of warm-white engineered terrazzo with small sage, charcoal and grey aggregate" },
-      { index: "04", name: "Consultation & Admin Area",      href: "/spaces/healthcare/consultation-admin-area",     src: "/images/healthcare-consultation-admin-area.webp",     alt: "A healthcare consultation and administration area with dove-grey engineered quartz worktops, counter faces and backsplash",
-        material: "Michelangelo Quartz",       materialSrc: "/images/material-v2-michelangelo-quartz.webp",     materialAlt: "Close detail of warm dove-grey engineered quartz with restrained cream mineral veining" },
-      { index: "05", name: "Patient Rooms & Suites",         href: "/spaces/healthcare/patient-rooms-suites",        src: "/images/healthcare-patient-rooms-suites.webp",        alt: "A private patient suite with a warm ivory engineered marble headwall and matching bedside surfaces",
-        material: "Crema Nova",                materialSrc: "/images/material-v3-crema-nova-patient-rooms.webp", materialAlt: "Close detail of smooth warm ivory engineered marble with sparse hairline beige veining matching the patient-room headwall" },
-      { index: "06", name: "Wellness & Rehabilitation",      href: "/spaces/healthcare/wellness-rehabilitation",     src: "/images/healthcare-wellness-rehabilitation.webp",     alt: "A rehabilitation studio with pale sage porcelain wall cladding, non-slip terrazzo flooring and a sculpted therapy bench",
-        material: "Verde Aurora Porcelain",    materialSrc: "/images/material-v2-verde-aurora-porcelain.webp",     materialAlt: "Close detail of pale sage healthcare porcelain with soft cloudy mineral texture" },
+      { index: "01", name: "Entrance & Arrivals",       href: "/spaces/healthcare/entrance-arrivals",      src: "/images/healthcare-entrance-arrivals-canva.webp",       alt: "A contemporary healthcare entrance clad in pale aggregate stone with a dark sheltered arrival canopy",
+        material: "Savvanna",                  materialSrc: "/images/material-surface-savvanna.webp",               materialAlt: "Savvanna terrazzo surface with bold charcoal and beige aggregate on white" },
+      { index: "02", name: "Reception & Waiting",       href: "/spaces/healthcare/reception-waiting",      src: "/images/healthcare-reception-waiting-canva.webp",       alt: "A softly lit healthcare reception with a curved grey stone desk and pale polished flooring",
+        material: "Palladio Grey",             materialSrc: "/images/material-surface-palladio-grey.webp",          materialAlt: "Palladio Grey marble surface with fine organic movement through a warm grey field" },
+      { index: "03", name: "Lobby & Corridors",         href: "/spaces/healthcare/lobby-corridors",        src: "/images/healthcare-lobby-corridors-canva.webp",         alt: "A bright healthcare lobby with a sweeping staircase and expressive blue-grey stone flooring",
+        material: "Blue Crystal Agathe",       materialSrc: "/images/material-surface-blue-crystal-agathe.webp",   materialAlt: "Blue Crystal Agathe quartz surface with broad flowing blue and white crystalline bands" },
+      { index: "04", name: "Consultation & Admin Area", href: "/spaces/healthcare/consultation-admin-area", src: "/images/healthcare-consultation-admin-area-canva.webp", alt: "A calm healthcare consultation room with a pale stone feature wall, desk and floor",
+        material: "Calacatta Imperiale",       materialSrc: "/images/material-surface-calacatta-imperiale.webp",   materialAlt: "Calacatta Imperiale quartz surface with fine warm-gold veining on white" },
+      { index: "05", name: "Patient Rooms & Suites",    href: "/spaces/healthcare/patient-rooms-suites",    src: "/images/healthcare-patient-rooms-suites-canva.webp",    alt: "A private patient suite with warm neutral finishes, city views and softly veined pale flooring",
+        material: "Crema Nova",                materialSrc: "/images/material-surface-crema-nova.webp",              materialAlt: "Crema Nova marble surface in a warm cream tone with subtle natural movement" },
     ],
   },
   materialCta: "View Material",
@@ -305,7 +305,7 @@ export const contact = {
   ],
 } as const;
 
-export type FooterGroup = { title: string | null; links: string[]; headingStyle?: boolean };
+export type FooterGroup = { title: string; links: string[] };
 
 /** Footer — 555:2863. */
 export const footer: {
@@ -344,9 +344,11 @@ export const footer: {
     {
       groups: [
         { title: "Projects", links: ["Residential", "Hospitality", "Commercial", "Healthcare"] },
-        // 544:4401 is a single text node holding four uppercase lines with no
-        // child links — rendered here as headings, matching the design.
-        { title: null, links: ["About", "Maxgaurd", "Media", "Contact"], headingStyle: true },
+        // Was 544:4401, one text node of four uppercase lines with no heading
+        // and no child links. The board replaced it with a normal group — a
+        // DISCOVER heading over three links on the same 33px pitch as the rest
+        // (I880:27210;665:7419), which also retired the MAXGAURD misspelling.
+        { title: "Discover", links: ["About", "Blogs", "Media"] },
       ],
     },
   ],

@@ -32,11 +32,11 @@ const APPLICATIONS_FIGMA_Y = 2839;
  * same way. Figma draws one 660px row of frames; the page gives the two columns
  * a runway to travel through four of them (and, under the reduced-motion
  * fallback this script runs in, stacks all eight). So anchors below Karigare
- * take a second rebase, read off the testimonials HEADING (Figma y7273) so the
+ * take a second rebase, read off the testimonials HEADING (Figma y7283) so the
  * offset is measured rather than assumed. It applies from the testimonials
  * section down — anchors inside Karigare itself sit above its runway.
  */
-const TESTIMONIALS_FIGMA_Y = 7273;
+const TESTIMONIALS_FIGMA_Y = 7283;
 
 /** [label, selector, figmaY] — y is the element's top in the 1440x9849 frame. */
 const ANCHORS = [
@@ -44,29 +44,29 @@ const ANCHORS = [
   ["intro headline", "main > section:nth-of-type(2) h2", 1129],
   ["collections carousel", "main > section:nth-of-type(3)", 1715],
   ["applications heading", "main > section:nth-of-type(4) h2", 2986],
-  ["applications tabs", '[role="tablist"][aria-label="Project sectors"]', 3141],
+  ["applications tabs", '[role="tablist"][aria-label="Project sectors"]', 3135],
   ["progress rule", "#progress-rule", 3230],
   ["maxguard band", "main > section:nth-of-type(5)", 4092],
   ["visualiser heading", "main > section:nth-of-type(6) h2", 4894],
-  ["visualiser plate", "#visualiser-plate", 5065],
-  ["karigare heading", "main > section:nth-of-type(7) h2", 6136],
+  ["visualiser plate", "#visualiser-plate", 5037],
+  ["visualiser cta", "#visualiser-plate a", 5748],
+  ["karigare heading", "main > section:nth-of-type(7) h2", 6023],
   // Component 101's collage is gone from the board; the section is two
   // full-bleed travelling columns now (764:9496 / 864:28925).
   //
-  // The board has since moved the whole section UP 113px (heading 6136 -> 6023)
-  // because the visualiser above it was retimed — its plate went 5065 -> 5037
-  // and its CTA 5927 -> 5748, neither of which is implemented. So the heading
-  // stays pinned to 6136, which is where the unchanged sections above put it,
-  // and the columns are checked on their OFFSET FROM IT: 6250 - 6023 = 227.
-  ["karigare columns", "#karigare-columns", 6136 + 227],
-  ["testimonials heading", "main > section:nth-of-type(8) h2", 7273],
-  ["testimonial cards", "#testimonial-rail figure", 7555],
-  ["contact band", "main > section:nth-of-type(9)", 8519],
+  // These used to be checked against 6136 + an offset, because the board had
+  // moved the section up 113px when it retimed the visualiser (plate 5065 ->
+  // 5037, CTA 5927 -> 5748) and neither move was implemented. Both are now, so
+  // the anchors are back on the board's own numbers.
+  ["karigare columns", "#karigare-columns", 6250],
+  ["testimonials heading", "main > section:nth-of-type(8) h2", 7283],
+  ["testimonial cards", "#testimonial-rail figure", 7546],
+  ["contact band", "main > section:nth-of-type(9)", 8548],
   // The footer FRAME starts at 9075 in Figma, but the contact band is drawn
   // over its first 84px and only reaches pure black at 9159 — so 9159 is where
   // the footer element can actually begin. Its first content still lands on
   // Figma's y9243.
-  ["footer", "footer", 9159],
+  ["footer", "footer", 9188],
 ];
 
 const run = async () => {

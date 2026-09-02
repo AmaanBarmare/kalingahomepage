@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { KsButton } from "@/components/ui/ks-button";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { TabBar } from "@/components/ui/tab-bar";
 import { Reveal } from "@/components/ui/reveal";
@@ -102,14 +103,14 @@ export function Applications() {
 
   return (
     <section
-      className="overflow-hidden bg-white pt-[147px] pb-[183px]"
+      className="overflow-hidden bg-white pt-[147px] pb-[67.3px]"
       aria-label="Browse by Space"
     >
       <SectionHeading title={applications.headline} body={applications.body} />
 
       <Reveal delay={160}>
         <TabBar
-          className="mt-[35px]"
+          className="mt-[29.3px]"
           label="Project sectors"
           items={applications.sectors}
           active={sectorIndex}
@@ -120,7 +121,7 @@ export function Applications() {
 
       <div
         id="progress-rule"
-        className="mx-auto mt-[55px] hidden h-[2px] w-full max-w-[1440px] px-[80px] lg:block"
+        className="mx-auto mt-[61px] hidden h-[2px] w-full max-w-[1440px] px-[80px] lg:block"
         aria-hidden
       >
         <div className="h-full w-full overflow-hidden bg-line-soft">
@@ -133,7 +134,7 @@ export function Applications() {
         role="region"
         aria-roledescription="carousel"
         aria-label={`${activeSector} spaces`}
-        className="space-track mx-auto mt-[27px] w-full max-w-[1440px] px-6 scroll-px-6 lg:px-[82px] lg:scroll-px-[82px]"
+        className="space-track mx-auto mt-[31.3px] w-full max-w-[1440px] px-6 scroll-px-6 lg:px-[82px] lg:scroll-px-[82px]"
         onMouseDown={startDrag}
         onMouseMove={moveDrag}
         onMouseUp={endDrag}
@@ -195,6 +196,14 @@ export function Applications() {
           </article>
         ))}
       </div>
+
+      {/* 721:29308 — "View All", ruby, centred on 720, y3980: 96px below the
+          cards' base. It was missing entirely. */}
+      <Reveal delay={160} className="mt-[68.5px] flex justify-center">
+        <KsButton href={applications.cta.href} variant="ruby">
+          {applications.cta.label}
+        </KsButton>
+      </Reveal>
     </section>
   );
 }
