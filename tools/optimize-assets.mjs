@@ -116,9 +116,17 @@ const PLATES = [
 
   // --- testimonials (video poster frames) -----------------------------------
   { src: "testimonial-clean-1.png", out: "testimonial-clean-1.webp", display: [321, 646], group: "testimonials" },
-  { src: "testimonial-clean-2.png", out: "testimonial-clean-2.webp", display: [321, 646], group: "testimonials" },
+  // Cards 2 and 4 are no longer poster frames — they are still lifes of the
+  // work, and they get NEW FILENAMES rather than reusing the old ones. Next's
+  // image optimizer caches on the request URL, not on the bytes behind it, and
+  // it sends `Cache-Control: max-age=14400` to the browser on top of that. So
+  // replacing a file in place leaves both caches serving the old picture for
+  // hours while the surrounding code updates immediately — which reads exactly
+  // like "the image didn't change". A new name is a new URL, and both caches
+  // miss on it the first time.
+  { src: "testimonial-work-sample-wall.png", out: "testimonial-work-sample-wall.webp", display: [321, 646], group: "testimonials" },
   { src: "testimonial-clean-3.png", out: "testimonial-clean-3.webp", display: [321, 646], group: "testimonials" },
-  { src: "testimonial-clean-4.png", out: "testimonial-clean-4.webp", display: [321, 646], group: "testimonials" },
+  { src: "testimonial-work-drawing-desk.png", out: "testimonial-work-drawing-desk.webp", display: [321, 646], group: "testimonials" },
 
   // --- contact band ----------------------------------------------------------
   // 544:4018 replaced the old 1672-wide bleed plate with a 1440 x 640 image

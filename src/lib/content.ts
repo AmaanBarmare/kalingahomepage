@@ -51,7 +51,7 @@ export const nav: {
         { label: "Quartz", href: "/collections/quartz" },
         { label: "Marble", href: "/collections/marble" },
         { label: "Terazzo", href: "/collections/terrazzo" },
-        { label: "Porcelain Tiles", href: "/collections/porcelain" },
+        { label: "Porcelain", href: "/collections/porcelain" },
       ],
     },
     {
@@ -106,7 +106,7 @@ export const collections = [
   { title: "Quartz", body: LOREM_SHORT, surfaces: "30 surfaces", image: "/images/collection-scroll-quartz.webp", href: "/collections/quartz" },
   { title: "Marble", body: LOREM_SHORT, surfaces: "40 surfaces", image: "/images/collection-scroll-marble.webp", href: "/collections/marble" },
   { title: "Terrazzo", body: LOREM_SHORT, surfaces: "30 surfaces", image: "/images/collection-scroll-terrazzo.webp", href: "/collections/terrazzo" },
-  { title: "Porcelain Tiles", body: LOREM_SHORT, surfaces: "70 surfaces", image: "/images/collection-scroll-porcelain.webp", href: "/collections/porcelain" },
+  { title: "Porcelain", body: LOREM_SHORT, surfaces: "70 surfaces", image: "/images/collection-scroll-porcelain.webp", href: "/collections/porcelain" },
 ] as const;
 
 /**
@@ -266,11 +266,28 @@ export const testimonials = {
   headline: "Lorem IPSUM",
   body: LOREM_DUMMY,
   audiences: ["Architects", "Partners", "Consumers"],
+  // TWO OF THE FOUR ARE VIDEOS, NOT ALL FOUR. The board draws the ring-and-
+  // triangle on 721:29315 and 721:29310 only; 721:29312 and 721:29321 are still
+  // lifes of the work itself — a hand against a sample wall, and a desk of
+  // drawings and swatches — and carry no control. `isVideo` is what the play
+  // button keys off; `videoHref` stays for the destination, which the board
+  // still does not give.
+  //
+  // `alt` is per-card now rather than built from role and place: that reads as
+  // a portrait ("Architect, Dubai") and two of these are no longer portraits.
   cards: [
-    { image: "/images/testimonial-clean-1.webp", role: "Homeowner", place: "Mumbai", videoHref: null },
-    { image: "/images/testimonial-clean-2.webp", role: "Architect", place: "Dubai", videoHref: null },
-    { image: "/images/testimonial-clean-3.webp", role: "Designer", place: "Singapore", videoHref: null },
-    { image: "/images/testimonial-clean-4.webp", role: "Homeowner", place: "Mumbai", videoHref: null },
+    { image: "/images/testimonial-clean-1.webp", role: "Homeowner", place: "Mumbai",
+      isVideo: true, videoHref: null,
+      alt: "A homeowner speaking to camera in a marble kitchen" },
+    { image: "/images/testimonial-work-sample-wall.webp", role: "Architect", place: "Dubai",
+      isVideo: false, videoHref: null,
+      alt: "A hand selecting a stone sample from a wall of textured tiles" },
+    { image: "/images/testimonial-clean-3.webp", role: "Designer", place: "Singapore",
+      isVideo: true, videoHref: null,
+      alt: "A designer speaking to camera beside a stone counter" },
+    { image: "/images/testimonial-work-drawing-desk.webp", role: "Homeowner", place: "Mumbai",
+      isVideo: false, videoHref: null,
+      alt: "Hands working over architectural drawings, stone swatches and samples" },
   ],
 } as const;
 
@@ -339,7 +356,7 @@ export const footer: {
   columns: [
     {
       groups: [
-        { title: "Collections", links: ["Quartz", "Marble", "Terrazzo", "Porcelain Tiles"] },
+        { title: "Collections", links: ["Quartz", "Marble", "Terrazzo", "Porcelain"] },
         { title: "Karigear", links: ["Base", "Form"] },
       ],
     },

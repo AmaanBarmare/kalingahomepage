@@ -86,26 +86,32 @@ export function Testimonials() {
               <div className="relative aspect-[321/607.6] w-full overflow-hidden bg-ink">
                 <Image
                   src={card.image}
-                  alt={`${card.role}, ${card.place}`}
+                  alt={card.alt}
                   fill
                   sizes="(max-width: 1024px) 260px, 321px"
                   draggable={false}
                   className="object-cover"
                 />
-                <button
-                  type="button"
-                  disabled={!card.videoHref}
-                  aria-label={`Play testimonial — ${card.role}, ${card.place}`}
-                  className="absolute top-1/2 left-1/2 z-10 flex size-[84px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-2 border-white bg-black/10 text-white shadow-[0_3px_16px_rgba(20,16,14,0.2)] transition-colors duration-300 hover:bg-black/20 disabled:cursor-default lg:size-[96px]"
-                >
-                  <svg
-                    aria-hidden
-                    viewBox="0 0 40 48"
-                    className="ml-1 h-[34px] w-[29px] lg:h-[38px] lg:w-[32px]"
+                {/* Only the two video cards carry it — see the note in
+                    content.ts. It used to render on all four, disabled, which
+                    put a play control over two still lifes that will never
+                    play. */}
+                {card.isVideo ? (
+                  <button
+                    type="button"
+                    disabled={!card.videoHref}
+                    aria-label={`Play testimonial — ${card.role}, ${card.place}`}
+                    className="absolute top-1/2 left-1/2 z-10 flex size-[84px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-2 border-white bg-black/10 text-white shadow-[0_3px_16px_rgba(20,16,14,0.2)] transition-colors duration-300 hover:bg-black/20 disabled:cursor-default lg:size-[96px]"
                   >
-                    <path d="M4 3.5L37 24 4 44.5V3.5Z" fill="currentColor" />
-                  </svg>
-                </button>
+                    <svg
+                      aria-hidden
+                      viewBox="0 0 40 48"
+                      className="ml-1 h-[34px] w-[29px] lg:h-[38px] lg:w-[32px]"
+                    >
+                      <path d="M4 3.5L37 24 4 44.5V3.5Z" fill="currentColor" />
+                    </svg>
+                  </button>
+                ) : null}
               </div>
 
               <figcaption className="mt-[10px] flex items-center">
