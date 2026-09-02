@@ -77,7 +77,7 @@ const PLATES = [
   // is 640 x 660 per Figma 764:9494 / 721:29349, so the 2x target is 1280 — the
   // deck's own images cap below that and pass through at native width.
   { src: "karigare/base-1-inlays.png",           out: "karigare-base-1.webp", display: [640, 660], group: "karigare" },
-  { src: "karigare/base-2-hydra.png",            out: "karigare-base-2.webp", display: [640, 660], group: "karigare" },
+  { src: "karigare/base-2-inlay-wall.png",       out: "karigare-base-2.webp", display: [640, 660], group: "karigare" },
   { src: "karigare/base-3-flat-carving.png",     out: "karigare-base-3.webp", display: [640, 660], group: "karigare" },
   { src: "karigare/base-4-3d-carving.png",       out: "karigare-base-4.webp", display: [640, 660], group: "karigare" },
   { src: "karigare/form-1-bath.png",             out: "karigare-form-1.webp", display: [640, 660], group: "karigare" },

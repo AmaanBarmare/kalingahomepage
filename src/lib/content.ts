@@ -230,8 +230,8 @@ export const karigare = {
       frames: [
         { src: "/images/karigare-base-1.webp", position: "50% 50%",
           alt: "Hotel lobby with a swirling stone inlay floor" },
-        { src: "/images/karigare-base-2.webp", position: "50% 75%",
-          alt: "Deeply carved Hydra stone wall behind a sculptural console" },
+        { src: "/images/karigare-base-2.webp", position: "50% 50%",
+          alt: "Inlay wall of mother-of-pearl and semi-precious stone beside a veined marble counter" },
         { src: "/images/karigare-base-3.webp", position: "50% 50%",
           alt: "Flat-carved stone panel with geometric relief" },
         { src: "/images/karigare-base-4.webp", position: "50% 50%",

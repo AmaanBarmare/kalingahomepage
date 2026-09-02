@@ -505,20 +505,32 @@ carving/fluted basin, flowing relief/curved bath.
 
 ### Choosing eight images out of a 54-page deck
 
-The frames come from the client's CMC Value Added Services PDF. BASE maps
-cleanly — the deck names exactly four (Inlays, Hydra, Flat Carving, 3-D
-Carving). FORM does not:
+The frames come from the client's CMC Value Added Services PDF. Neither side
+maps one-image-per-subcategory, and both failures are the deck's, not the
+selection's:
 
 - **Monolith is unusable.** All six of its pages are full-slide composites with
   text baked in; the only photograph crops to **464 x 479** for this frame,
   0.73x, blurry even at 1x. It is left out and Stone Furniture — a real FORM
   section in the deck, and the highest-resolution photography in it — takes two
   slots.
-- **Hydra had one usable frame** and it is nearly featureless centred. At
-  `object-position: 50% 75%` the same file gives the carved wall a focal point
-  (sculptural console, wall light). That crop is why `position` exists per frame
-  in content.ts: the deck is shot for full-bleed slides, so several frames do
-  not want centring.
+- **Hydra is out, because its only photograph is out of focus.** Pages 42-48
+  carry exactly one image above 900px (the carved white wall, p44) and it is
+  soft in the source — not small, soft. Measuring the variance of the Laplacian
+  over the rendered 640 x 660 crop puts it at **4.4 against 67-1019 for the
+  other seven**, an order of magnitude below the next softest, which is why it
+  reads as blurry on the page while everything beside it is crisp. No crop or
+  upscale fixes a shallow depth of field. The dark waterjet slide (p47) is sharp
+  at 2301 but carries annotations across the photograph, and no text-free crop
+  survives above 0.91x; every remaining page in the range is 478 x 850, i.e.
+  0.75x, and p45's is soft in the same way. So Inlays takes two slots: the lobby
+  floor, and the material wall of mother-of-pearl and semi-precious stone —
+  different application, and the most literal picture of what BASE actually is.
+  It measures 435.8, second sharpest of the eight.
+- `position` is kept per frame in content.ts even though all eight currently
+  centre. The deck is shot for full-bleed slides, so a swapped-in frame often
+  does not want centring, and two of these have already been replaced once.
+
 - **Flat Carving and 3-D Carving carried in-scene showroom signage** — the words
   "FLAT CARVING" and "3D CARVE" are physically on the walls in the renders. Both
   images are narrower than the frame, so `object-position` cannot hide it; they
