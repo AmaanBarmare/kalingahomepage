@@ -2,15 +2,37 @@ import type { SVGProps } from "react";
 
 /**
  * Navbar icons, exported from Figma 709:6387 and inlined so they inherit
- * `currentColor` — the hamburger is ink on the white bar, the close mark and
+ * `currentColor` — the hamburger is ruby on the white bar, the close mark and
  * the chevrons are white on the ruby drawer. Path data is Figma's own, not
- * redrawn.
+ * redrawn — with one exception, the hamburger, for the reason below.
  */
 
+/**
+ * Hamburger — 721:30947 / 686:3726. REDRAWN ON A WHOLE-PIXEL GRID, and this is
+ * the only icon here that is not Figma's own path.
+ *
+ * Figma's export is 27.75 x 20.8125 with 2.3125-thick bars. Centred in the
+ * 36 x 32 button that puts the icon at a fractional offset (y 34.59375), so
+ * each bar lands on a different subpixel phase and the browser antialiases
+ * each one differently. Measured at 1x: bar 1 came out two solid rows, bar 2
+ * one solid row flanked by 44% and 56% grey (reads fat and blurred), bar 3 one
+ * solid row over 56% grey (reads thin and washed out). Three identical bars,
+ * three visibly different weights.
+ *
+ * So the geometry is rounded to integers — 28 x 20, 2-thick bars at y 0/9/18,
+ * even 7px gaps, rx 1 for the same stadium caps the export draws with arcs.
+ * Centred in 36 x 32 that is a 4/6 inset and the button itself sits at x1324
+ * y29, so every edge is on a device pixel and all three bars rasterise
+ * identically. The cost is 0.25px of width and 0.81px of height against the
+ * board — below the threshold of sight, and the alternative is what it looked
+ * like before.
+ */
 export function MenuIcon(props: SVGProps<SVGSVGElement>) {
   return (
-    <svg viewBox="0 0 27.75 20.8125" fill="none" aria-hidden focusable="false" {...props}>
-      <path d="M27.75 10.4062C27.75 10.7129 27.6282 11.007 27.4113 11.2238C27.1945 11.4407 26.9004 11.5625 26.5938 11.5625H1.15625C0.849593 11.5625 0.555497 11.4407 0.338658 11.2238C0.121819 11.007 0 10.7129 0 10.4062C0 10.0996 0.121819 9.8055 0.338658 9.58866C0.555497 9.37182 0.849593 9.25 1.15625 9.25H26.5938C26.9004 9.25 27.1945 9.37182 27.4113 9.58866C27.6282 9.8055 27.75 10.0996 27.75 10.4062ZM1.15625 2.3125H26.5938C26.9004 2.3125 27.1945 2.19068 27.4113 1.97384C27.6282 1.757 27.75 1.46291 27.75 1.15625C27.75 0.849593 27.6282 0.555497 27.4113 0.338658C27.1945 0.121819 26.9004 0 26.5938 0H1.15625C0.849593 0 0.555497 0.121819 0.338658 0.338658C0.121819 0.555497 0 0.849593 0 1.15625C0 1.46291 0.121819 1.757 0.338658 1.97384C0.555497 2.19068 0.849593 2.3125 1.15625 2.3125ZM26.5938 18.5H1.15625C0.849593 18.5 0.555497 18.6218 0.338658 18.8387C0.121819 19.0555 0 19.3496 0 19.6562C0 19.9629 0.121819 20.257 0.338658 20.4738C0.555497 20.6907 0.849593 20.8125 1.15625 20.8125H26.5938C26.9004 20.8125 27.1945 20.6907 27.4113 20.4738C27.6282 20.257 27.75 19.9629 27.75 19.6562C27.75 19.3496 27.6282 19.0555 27.4113 18.8387C27.1945 18.6218 26.9004 18.5 26.5938 18.5Z" fill="currentColor" />
+    <svg viewBox="0 0 28 20" fill="none" aria-hidden focusable="false" {...props}>
+      <rect width="28" height="2" y="0" rx="1" fill="currentColor" />
+      <rect width="28" height="2" y="9" rx="1" fill="currentColor" />
+      <rect width="28" height="2" y="18" rx="1" fill="currentColor" />
     </svg>
   );
 }

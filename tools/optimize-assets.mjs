@@ -73,17 +73,18 @@ const PLATES = [
   { src: "vis-raw1.png", out: "visualiser.webp", display: [1449, 815], node: "544:4015" },
 
   // --- karigare BASE / FORM columns ----------------------------------------
-  // Curated out of the CMC Value Added Services deck (see DESIGN.md). The frame
-  // is 640 x 660 per Figma 764:9494 / 721:29349, so the 2x target is 1280 — the
-  // deck's own images cap below that and pass through at native width.
-  { src: "karigare/base-1-inlays.png",           out: "karigare-base-1.webp", display: [640, 660], group: "karigare" },
-  { src: "karigare/base-2-inlay-wall.png",       out: "karigare-base-2.webp", display: [640, 660], group: "karigare" },
-  { src: "karigare/base-3-flat-carving.png",     out: "karigare-base-3.webp", display: [640, 660], group: "karigare" },
-  { src: "karigare/base-4-3d-carving.png",       out: "karigare-base-4.webp", display: [640, 660], group: "karigare" },
-  { src: "karigare/form-1-bath.png",             out: "karigare-form-1.webp", display: [640, 660], group: "karigare" },
-  { src: "karigare/form-2-lavabo.png",           out: "karigare-form-2.webp", display: [640, 660], group: "karigare" },
-  { src: "karigare/form-3-furniture-hands.png",  out: "karigare-form-3.webp", display: [640, 660], group: "karigare" },
-  { src: "karigare/form-4-furniture-table.png",  out: "karigare-form-4.webp", display: [640, 660], group: "karigare" },
+  // Curated out of the CMC Value Added Services deck (see DESIGN.md). The board
+  // reworked the section full-bleed, so the frame is 722 x 666 per Figma
+  // 764:9496 / 864:28925 and the 2x target is 1444 — the deck's own images all
+  // cap below that and pass through at native width.
+  { src: "karigare/base-1-inlays.png",           out: "karigare-base-1.webp", display: [722, 666], group: "karigare" },
+  { src: "karigare/base-2-inlay-wall.png",       out: "karigare-base-2.webp", display: [722, 666], group: "karigare" },
+  { src: "karigare/base-3-flat-carving.png",     out: "karigare-base-3.webp", display: [722, 666], group: "karigare" },
+  { src: "karigare/base-4-3d-carving.png",       out: "karigare-base-4.webp", display: [722, 666], group: "karigare" },
+  { src: "karigare/form-1-bath.png",             out: "karigare-form-1.webp", display: [722, 666], group: "karigare" },
+  { src: "karigare/form-2-lavabo.png",           out: "karigare-form-2.webp", display: [722, 666], group: "karigare" },
+  { src: "karigare/form-3-furniture-hands.png",  out: "karigare-form-3.webp", display: [722, 666], group: "karigare" },
+  { src: "karigare/form-4-furniture-table.png",  out: "karigare-form-4.webp", display: [722, 666], group: "karigare" },
 
   // --- karigare collage (Component 101) ------------------------------------
   // Named layers in Figma's own child order, which is the z-order: 1 sits at the

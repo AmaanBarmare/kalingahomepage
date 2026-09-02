@@ -51,10 +51,14 @@ const ANCHORS = [
   ["visualiser plate", "#visualiser-plate", 5065],
   ["karigare heading", "main > section:nth-of-type(7) h2", 6136],
   // Component 101's collage is gone from the board; the section is two
-  // travelling columns now (764:9494 / 721:29349). Its internal spacing is set
-  // by the sticky centring rather than by a fixed gap, exactly as the
-  // collections carousel's is, so the section top is the meaningful anchor.
-  ["karigare columns", "#karigare-columns", 6378],
+  // full-bleed travelling columns now (764:9496 / 864:28925).
+  //
+  // The board has since moved the whole section UP 113px (heading 6136 -> 6023)
+  // because the visualiser above it was retimed — its plate went 5065 -> 5037
+  // and its CTA 5927 -> 5748, neither of which is implemented. So the heading
+  // stays pinned to 6136, which is where the unchanged sections above put it,
+  // and the columns are checked on their OFFSET FROM IT: 6250 - 6023 = 227.
+  ["karigare columns", "#karigare-columns", 6136 + 227],
   ["testimonials heading", "main > section:nth-of-type(8) h2", 7273],
   ["testimonial cards", "#testimonial-rail figure", 7555],
   ["contact band", "main > section:nth-of-type(9)", 8519],

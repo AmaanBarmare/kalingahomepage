@@ -15,14 +15,21 @@ import { karigare } from "@/lib/content";
  * from the file) with two columns — BASE and FORM — each a clipped window with
  * a label beneath it. Geometry, all of it Figma's:
  *
- *   BASE column   x81   y6378.9   641 x 667.7   label 39 tall, 41 below
- *   FORM column   x724  y6388     637 x 651.4   label 39 tall, gap 40
- *   CTA           x618.5 y7184    205.19 x 42.7
+ *   heading  Group 266   x421   y6023   599 x 121.5
+ *   BASE     Frame 507   x0     y6250   722 x 666
+ *   FORM     Frame 621   x722   y6250   726 x 666
+ *   BASE lbl Frame 518   x300   y6965   122 x 39
+ *   FORM lbl Frame 554   x1024  y6965   122 x 39
+ *   CTA      721:29347   x618.5 y7053   205.19 x 42.7
  *
- * 641 + 2 + 637 = 1280, i.e. the page's content width with the two columns
- * essentially touching. The 641/637 and 667.7/651.4 splits are Figma being
- * loose about a pair that is plainly meant to match, so both are one number
- * here: a 640 x 660 frame, and a 2px gutter.
+ * FULL-BLEED. The board reworked this from a 1280-wide pair inset at x81 to two
+ * columns running 0..722 and 722..1448 — edge to edge, no gutter, no content
+ * container. The 1448 overruns the 1440 frame by 8px, which is Figma looseness
+ * on a pair plainly meant to halve the frame, so it is 50/50 here.
+ *
+ * Both labels now CENTRE on their column rather than sitting at its left edge:
+ * the label boxes centre on 361 and 1085, which are exactly the two column
+ * centres. Gaps went 40/26 -> 49/49.
  *
  * THE TRACKS RUN VERTICALLY, WHICH THE BOARD DOES NOT SHOW. In Figma each
  * column is a horizontal strip of three slides (BASE's inner frame is 1923 =
@@ -131,7 +138,7 @@ export function Karigare() {
                             src={frame.src}
                             alt={frame.alt}
                             fill
-                            sizes="(max-width: 1024px) 50vw, 640px"
+                            sizes="50vw"
                             className="object-cover"
                             style={{ objectPosition: frame.position }}
                           />

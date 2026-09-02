@@ -14,6 +14,11 @@ import { nav } from "@/lib/content";
  *   lockup    308 x 35.93 at x80  y27
  *   hamburger  36 x 32    at x1324 y29   (1324 + 36 = 1360 = 1440 - 80)
  *
+ * The hamburger is RUBY, not ink — the same #70000E the lockup's two SVGs carry
+ * literally, reached here through --color-ruby so the two can never drift. The
+ * icon takes it via `currentColor`, which the lockup cannot do: it is served
+ * through next/image, and an SVG rendered as its own document inherits nothing.
+ *
  * DRAWER (709:6661 "Frame 443") — 521 x 937 at x919, i.e. flush right, and it
  * starts at the TOP of the page, so it covers the bar's right end including the
  * hamburger. Fill #70020f, which is NOT the brand ruby #70000e; the extra green
@@ -78,9 +83,9 @@ export function SiteNav({ className = "" }: { className?: string }) {
             aria-expanded={open}
             aria-controls="site-menu"
             aria-label="Open menu"
-            className="grid h-[32px] w-[36px] place-items-center text-ink transition-opacity hover:opacity-70"
+            className="grid h-[32px] w-[36px] place-items-center text-ruby transition-opacity hover:opacity-70"
           >
-            <MenuIcon className="h-[20.813px] w-[27.75px]" />
+            <MenuIcon className="h-[20px] w-[28px]" />
           </button>
         </div>
       </header>

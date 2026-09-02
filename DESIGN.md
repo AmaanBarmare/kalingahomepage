@@ -473,14 +473,32 @@ whole 544:3926 home frame now 404 against the Figma API; the file was renumbered
 and the section redrawn as 721:29254. What replaced it is two columns, BASE and
 FORM, each a clipped window with a label under it, and a ruby-outline CTA.
 
-    BASE column   764:9494    x81    y6378.9   641 x 667.7
-    FORM column   721:29349   x724   y6388     637 x 651.4
-    CTA           721:29347   x618.5 y7184     205.19 x 42.7
+    heading  Group 266   x421   y6023   599 x 121.5
+    BASE     Frame 507   x0     y6250   722 x 666
+    FORM     Frame 621   x722   y6250   726 x 666
+    BASE lbl Frame 518   x300   y6965   122 x 39
+    FORM lbl Frame 554   x1024  y6965   122 x 39
+    CTA      721:29347   x618.5 y7053   205.19 x 42.7
 
-641 + 2 + 637 = 1280 — the page's content width, the two columns effectively
-touching. The 641/637 and 667.7/651.4 splits are Figma being loose about a pair
-plainly meant to match, so both are one number in code: a **640 x 660 frame and
-a 2px gutter**.
+**IT IS FULL-BLEED.** The first pass built it as the board then had it — a
+1280-wide pair inset at x81 with a 2px gutter. The board has since reworked it
+to two columns running 0..722 and 722..1448: edge to edge, no gutter, no content
+container. 1448 overruns the 1440 frame by 8px, which is looseness on a pair
+plainly meant to halve the frame, so the code splits 50/50.
+
+The frame is 722 x 666, i.e. **0.9224 of half the width** — that ratio is where
+the `46.12vw` in `--frame-h` comes from, so the band scales with the viewport as
+a full-bleed band should rather than freezing at Figma's 1440 pixel values. An
+`svh` term caps it so the pinned composition (frames + label + CTA = frame-h +
+180) cannot outgrow a short window.
+
+Both labels moved from the column's left edge to **centred on it** — the label
+boxes centre on 361 and 1085, which are exactly the two column centres — and the
+gaps went 40/26 to **49/49**.
+
+Going full-bleed cost resolution: the frame went 640 -> 722 wide, so the 2x
+target went 1280 -> 1444 and every plate dropped a step. Six of eight now sit at
+1.21x-1.42x, and the two Stone Furniture frames scrape 2.01x.
 
 ### The board draws the tracks horizontally; they run vertically
 
@@ -534,8 +552,13 @@ selection's:
 - **Flat Carving and 3-D Carving carried in-scene showroom signage** — the words
   "FLAT CARVING" and "3D CARVE" are physically on the walls in the renders. Both
   images are narrower than the frame, so `object-position` cannot hide it; they
-  are cropped 19% and 15.5% from the left instead, paying 1.75x -> 1.42x/1.48x
-  to lose text that reads as stray deck chrome next to the section's own label.
+  are cropped from the left instead. Flat Carving's cut was first set at 19% and
+  that was **7px short** — it clipped the "G" of CARVING rather than removing it,
+  which only became obvious once the section went full-bleed and the frames grew.
+  Measuring the caption properly puts its right edge at x220 and the panel's lit
+  edge at x255, so the cut is 250px (22.3%); 3-D Carving's caption ends at x110,
+  well inside its 15.5%. The pair pays 1.56x -> 1.21x/1.31x to lose text that
+  reads as stray deck chrome next to the section's own label.
 
 ### Nothing here reaches 2x, and it was not upscaled
 

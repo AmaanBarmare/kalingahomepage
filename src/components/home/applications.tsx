@@ -167,7 +167,6 @@ export function Applications() {
             </Link>
 
             <div className="cap">
-              <div className="n">{space.index}</div>
               <div className="t">{space.name}</div>
             </div>
 

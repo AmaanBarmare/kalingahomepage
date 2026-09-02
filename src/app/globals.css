@@ -300,15 +300,7 @@
   transition: bottom 420ms var(--ease-glide);
 }
 
-.space-card .cap .n {
-  font-family: var(--font-display);
-  font-size: 12px;
-  line-height: 1;
-  font-weight: 400;
-}
-
 .space-card .cap .t {
-  margin-top: 10px;
   font-family: var(--font-display);
   font-size: 20px;
   line-height: 1.58;
@@ -626,15 +618,24 @@
    the client's split-scroll, ported from kalinga-two's hero. See karigare.tsx
    for the geometry and the progress maths.
 
+   FULL-BLEED as of the board's rework: Frame 507 runs x0..722 and Frame 621
+   x722..1448, so the pair spans the frame edge to edge with NO gutter and no
+   content-width container. (1448 overruns 1440 by 8px on the right — Figma
+   looseness on a pair plainly meant to halve the frame, so this is 50/50.)
+
+   The frame is 722 x 666, i.e. 0.9224 of half the width, which is where the
+   46.12vw comes from: the columns scale with the viewport as a full-bleed band
+   should, rather than freezing at Figma's 1440 pixel values. The svh term is a
+   ceiling so the pinned composition (frames + label + CTA = frame-h + 180)
+   cannot outgrow a short window.
+
    The section is (COUNT) x 100vh: one viewport of pinning plus one per
-   transition, which is the reference's own ratio (it used 300vh for 3 frames).
-   --frame-h is Figma's 660 with a viewport ceiling, so the pinned composition
-   (frames + label + CTA) can never outgrow a short window. */
+   transition, which is the reference's own ratio (it used 300vh for 3 frames). */
 .karigare-scroll {
   height: 400vh;
   position: relative;
-  /* 6378.9 - (6136 + 121.5): the gap Figma leaves under the heading block. */
-  padding-top: 121px;
+  /* 6250 - (6023 + 121.5): the gap Figma leaves under the heading block. */
+  padding-top: 105px;
 }
 
 .karigare-sticky {
@@ -647,16 +648,13 @@
 }
 
 .karigare-stage {
-  --frame-h: min(660px, calc(100svh - 215px));
+  --frame-h: min(46.12vw, calc(100svh - 190px));
   width: 100%;
-  max-width: 1280px;
-  padding-inline: 24px;
 }
 
 .karigare-columns {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 2px; /* 724 - (81 + 641) */
 }
 
 .karigare-window {
@@ -677,15 +675,19 @@
   overflow: hidden;
 }
 
-/* 764:9509 / I721:29349;404:3024 — Halogen Medium 24 / +5 / uppercase, ink. */
+/* 764:9509 / 872:27060 — Halogen Medium 24 / +5 / uppercase, ink. Both label
+   boxes are centred on their own column (361 and 1085 against column centres of
+   361 and 1085), so these centre rather than sitting at the column's left edge
+   as they did before the rework. Images close at 6916, labels open at 6965. */
 .karigare-label {
   display: block;
-  margin-top: 40px;
+  margin-top: 49px;
   font-family: var(--font-display);
   font-size: 24px;
   font-weight: 500;
   line-height: 1.58;
   letter-spacing: 5px;
+  text-align: center;
   text-transform: uppercase;
   color: var(--color-ink);
   transition: color 0.3s var(--ease-out-expo);
@@ -695,22 +697,26 @@
   color: var(--color-ruby);
 }
 
-/* 721:29347 sits 66px under the label row. */
+/* 721:29347 — labels close at 7004, the button opens at 7053. */
 .karigare-cta {
   display: flex;
   justify-content: center;
-  margin-top: 26px;
+  margin-top: 49px;
 }
 
 @media (max-width: 1023px) {
   .karigare-stage {
-    --frame-h: min(520px, calc(100svh - 190px));
+    --frame-h: min(56vw, calc(100svh - 165px));
   }
 
   .karigare-label {
     margin-top: 24px;
     font-size: 18px;
     letter-spacing: 3px;
+  }
+
+  .karigare-cta {
+    margin-top: 28px;
   }
 }
 
@@ -729,7 +735,7 @@
   }
 
   .karigare-stage {
-    --frame-h: min(520px, 70svh);
+    --frame-h: min(46.12vw, 70svh);
   }
 
   .karigare-window {
@@ -741,6 +747,5 @@
     height: auto;
     transform: none !important;
     display: grid;
-    gap: 2px;
   }
 }
