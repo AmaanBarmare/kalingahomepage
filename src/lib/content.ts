@@ -151,8 +151,8 @@ export const intro = {
 export const collections = [
   { title: "Quartz", body: LOREM_SHORT, surfaces: "30 surfaces", image: "/images/collection-scroll-quartz.webp", href: "/collections/quartz" },
   { title: "Marble", body: LOREM_SHORT, surfaces: "40 surfaces", image: "/images/collection-scroll-marble.webp", href: "/collections/marble" },
-  { title: "Terrazzo", body: LOREM_SHORT, surfaces: "30 surfaces", image: "/images/collection-scroll-terrazzo.webp", href: "/collections/terrazzo" },
-  { title: "Porcelain", body: LOREM_SHORT, surfaces: "70 surfaces", image: "/images/collection-scroll-porcelain.webp", href: "/collections/porcelain" },
+  { title: "Terrazzo", body: LOREM_SHORT, surfaces: "30 surfaces", image: "/images/collection-scroll-terrazzo-waterwall.webp", href: "/collections/terrazzo" },
+  { title: "Porcelain", body: LOREM_SHORT, surfaces: "70 surfaces", image: "/images/collection-scroll-porcelain-sunlit.webp", href: "/collections/porcelain" },
 ] as const;
 
 /**

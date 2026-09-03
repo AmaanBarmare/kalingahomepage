@@ -36,8 +36,11 @@ const PLATES = [
 
   // --- homepage collections scroll story --------------------------------
   // These are the four user-supplied production plates. Keep their own native
-  // crop and never upscale; the two larger sources are capped at a 2880px 2x
-  // master and the two smaller sources remain at their full native width.
+  // crop. The new porcelain and terrazzo inputs arrived at 616px, so both were
+  // first enhanced as faithful high-detail architectural photographs, then
+  // resampled once to the 2880px width this 1440px box needs at 2x DPR. Their
+  // untouched enhanced outputs stay in assets-src/originals; the 2880px PNGs
+  // listed here are the deliberate production masters.
   //
   // QUARTZ is Figma 903:30034 "Quartz_Bianco cinnati 1", a loose 1451 x 1017
   // plate parked off-canvas at x5044 y19809. It is the SAME photograph as the
@@ -55,13 +58,8 @@ const PLATES = [
   // making the difference up by upscaling.
   { src: "quartz-bianco-cinnati.png", out: "collection-scroll-quartz.webp", display: [1440, 1000], group: "collections" },
   { src: "collections-scroll-marble.png", out: "collection-scroll-marble.webp", display: [1440, 1000], group: "collections" },
-  { src: "collections-scroll-terrazzo.png", out: "collection-scroll-terrazzo.webp", display: [1440, 1000], group: "collections" },
-  // PORCELAIN is Figma 1177:87800, a loose 1672 x 941 plate at x7442 y20938,
-  // drawn `object-cover` at size-full — the frame IS the image's own 16:9 box,
-  // so unlike quartz there is no crop to honour, just the file. It replaces the
-  // porcelain-lined lobby (2157 x 1437) with the clifftop pool terrace, which
-  // drops the plate from 1.50x to 1.16x. Client's asset, client's call.
-  { src: "porcelain-pool-terrace.png", out: "collection-scroll-porcelain.webp", display: [1440, 1000], group: "collections" },
+  { src: "collections-scroll-terrazzo-waterwall.png", out: "collection-scroll-terrazzo-waterwall.webp", display: [1440, 1000], group: "collections" },
+  { src: "collections-scroll-porcelain-sunlit.png", out: "collection-scroll-porcelain-sunlit.webp", display: [1440, 1000], group: "collections" },
 
   // --- applications strip (544:3950) -------------------------------------
   // Figma draws 3 cards; the strip's rawImages carry 4 scenes + 1 material swatch.
