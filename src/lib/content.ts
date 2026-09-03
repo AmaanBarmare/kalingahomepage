@@ -74,8 +74,8 @@ export const nav: {
           alt: "A curved stone staircase rising through a sunlit plaster hall" },
         { label: "Terazzo", href: "/collections/terrazzo", image: "/images/menu-terazzo.webp",
           alt: "A pale stone pool wall with a wide sheet waterfall falling into turquoise water" },
-        { label: "Porcelain", href: "/collections/porcelain", image: "/images/menu-porcelain.webp", position: "50% 100%",
-          alt: "A hillside villa terrace with loungers along a long pool" },
+        { label: "Porcelain", href: "/collections/porcelain", image: "/images/menu-porcelain.webp",
+          alt: "A sunlit interior with a large-format stone wall, a curved bench and dappled palm shadows" },
       ],
     },
     {

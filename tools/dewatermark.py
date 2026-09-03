@@ -10,7 +10,7 @@ takes as its source.
 
 WHY NOT INPAINT. The obvious move — mask the mark and interpolate — is what the
 first CMC hero had to resort to, and it is why that clip was cropped to
-1120x630 and scaled back up: interpolating a 61x49 patch leaves visible smears
+1120x630 and scaled back up: interpolating a 48x48 patch leaves visible smears
 whenever the mark crosses a marble vein, and dropping 12.5% of the frame was
 cheaper than living with them. Neither is necessary. The mark is ONE STATIC
 RGBA OVERLAY composited onto the finished render, so every frame carries
@@ -24,8 +24,10 @@ smeared, and the full-resolution frame survives intact.
 HOW THE CONSTANTS ARE RECOVERED.
 
   1. seed    A static bright shape is exactly what survives temporal averaging,
-             so it stands proud of a local median of the mean frame. Largest
-             connected blob wins; marble speckle does not survive the median.
+             so it stands proud of a local median of the mean frame. The
+             STRONGEST such blob wins, not the largest — over a full frame of
+             marble the largest is scene content, and picking it silently
+             leaves the mark in place.
 
   2. fit     Least squares for `a` over all frames, using a per-frame border
              inpaint as the stand-in for `orig`. Any single inpaint is wrong in
@@ -41,20 +43,21 @@ HOW THE CONSTANTS ARE RECOVERED.
              success: after inversion the TEMPORAL MEAN must be locally smooth,
              because a static mark is precisely what averaging preserves. Each
              pass measures the leftover static residual and folds it back into
-             `a`. Watch `rms-resid` fall to the noise floor; on the CMC v2 hero
-             it goes 17.88 -> 0.30 levels, a 60x reduction, and the peak drops
+             `a`. Watch `rms` fall to the noise floor; on the CMC v2 hero it
+             goes 20.70 -> 0.41 levels, a 50x reduction, and the peak drops
              from 41.03 to 3.11.
 
   4. invert  orig = (obs - a*C) / (1 - a), written out as lossless FFV1 so the
              encoder sweep downstream starts from clean pixels. `a` peaks near
-             0.36, so the division amplifies coding noise by at most ~1.6x over
-             the 61x49 patch and nowhere else in the frame.
+             0.35, so the division amplifies coding noise by at most ~1.5x over
+             the 48x48 patch and nowhere else in the frame.
 
-VERIFY IT WORKED. The script prints a full-frame scan of the result: the peak
-static residual and the hottest 16x16 cells. Before the fix the hot list is the
-mark, contiguous and dominant. After, it must be scattered scene content with a
-much lower peak — that is the check that the mark is gone AND that there was
-only one of them.
+VERIFY IT WORKED. The script prints a full-frame scan before and after: the peak
+static residual and the hottest 16x16 cells. Before, the hot list is the mark,
+contiguous and dominant (36.8 on this clip, six adjacent cells). After, it must
+be scattered scene content with a much lower peak (8.9, spread across the
+frame). That is the check that the mark is gone AND that there was only one of
+them; the script says `ok:` or WARNS if the peak barely moved.
 
 Requires numpy + opencv-python (`pip install opencv-python`), and ffmpeg on PATH.
 """
@@ -91,7 +94,7 @@ def frames_of(path):
 
 def static_residual(img):
     """What survives temporal averaging: the image minus a local median of
-    itself. A 61x49 overlay cannot survive a 41px median; scene content can."""
+    itself. A 48x48 overlay cannot survive a 41px median; scene content can."""
     g = np.clip(img, 0, 255).astype(np.uint8)
     b = np.stack([cv2.medianBlur(g[:, :, c], 41) for c in range(3)], axis=2)
     return img - b.astype(np.float64), b.astype(np.float64)
@@ -108,6 +111,7 @@ def scan(mean_img, label):
     hot = np.dstack(np.unravel_index(np.argsort(pooled.ravel())[::-1][:6], pooled.shape))[0]
     cells = ", ".join(f"({c * 16},{rr * 16})@{pooled[rr, c]:.1f}" for rr, c in hot)
     print(f"  {label:<8} peak {r.max():6.2f}  rms {np.sqrt((r ** 2).mean()):.3f}   hot cells: {cells}")
+    return r.max()
 
 
 def main():
@@ -127,19 +131,31 @@ def main():
 
     full_mean = np.mean([f.astype(np.float64) for f in frames], axis=0)
     print("static-overlay scan:")
-    scan(full_mean, "before")
+    peak_before = scan(full_mean, "before")
 
-    # ---- 1. seed the footprint from the whole-frame mean
+    # ---- 1. seed the footprint from the whole-frame mean.
+    # Pick the STRONGEST static anomaly, not the largest: over a full frame of
+    # marble the biggest blob above a fixed threshold is scene content, and on
+    # this clip that mis-selection quietly grabbed a 442x143 patch of veining
+    # while the 48x48 mark sailed through untouched. The mark is instead the
+    # brightest thing that survives averaging by a wide margin — 36.8 levels
+    # against 8.9 for the busiest real edge — so seed from the peak and take
+    # the component it belongs to, with the threshold scaled to that peak.
     g = full_mean.mean(axis=2)
     b = cv2.medianBlur(np.clip(g, 0, 255).astype(np.uint8), 41).astype(np.float64)
-    seed = ((g - b) > 1.5).astype(np.uint8)
+    r = g - b
+    peak = r.max()
+    if peak < 4.0:
+        sys.exit(f"no static overlay found (peak residual {peak:.2f}) — nothing to remove")
+    seed = (r > max(1.5, 0.12 * peak)).astype(np.uint8)
     seed = cv2.morphologyEx(seed, cv2.MORPH_CLOSE, np.ones((5, 5), np.uint8))
-    n, lab, stats, _ = cv2.connectedComponentsWithStats(seed, 8)
-    if n <= 1:
-        sys.exit("no static overlay found — nothing to remove")
-    k = 1 + int(np.argmax(stats[1:, cv2.CC_STAT_AREA]))
-    seed = (lab == k).astype(np.uint8)
+    n, lab, _, _ = cv2.connectedComponentsWithStats(seed, 8)
+    py, px = np.unravel_index(int(np.argmax(r)), r.shape)
+    seed = (lab == lab[py, px]).astype(np.uint8)
     ys, xs = np.nonzero(seed)
+    area_pct = 100.0 * seed.sum() / (H * W)
+    if area_pct > 5.0:
+        sys.exit(f"seeded blob covers {area_pct:.1f}% of the frame — that is scene content, not a mark")
     print(
         f"footprint x {xs.min()}..{xs.max()}  y {ys.min()}..{ys.max()}"
         f"  ({xs.max() - xs.min() + 1}x{ys.max() - ys.min() + 1})"
@@ -192,7 +208,16 @@ def main():
     for t in range(T):
         frames[t][Y0:Y1, X0:X1] = np.clip(np.rint(rec[t]), 0, 255).astype(np.uint8)
     print("static-overlay scan:")
-    scan(np.mean([f.astype(np.float64) for f in frames], axis=0), "after")
+    peak_after = scan(np.mean([f.astype(np.float64) for f in frames], axis=0), "after")
+    # The hot list must stop being the mark. If the peak barely moved, the seed
+    # grabbed the wrong thing and the clip is unchanged where it matters.
+    if peak_after > 0.5 * peak_before:
+        print(
+            f"  WARNING: peak only fell {peak_before:.1f} -> {peak_after:.1f}. "
+            "The mark is probably still there — check the hot cells above."
+        )
+    else:
+        print(f"  ok: peak static residual {peak_before:.1f} -> {peak_after:.1f}")
 
     p = subprocess.Popen(
         # fmt: off

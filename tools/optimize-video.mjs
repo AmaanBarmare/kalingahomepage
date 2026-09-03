@@ -10,15 +10,48 @@
  *     to make of whoever renders the clips, not something to paper over with a
  *     resample. `--audit` reports the shortfall.
  *  2. Settings are DERIVED from a measured sweep, not picked by feel. The CMC
- *     hero was compared against a lossless render of its crop + loop timeline:
+ *     v2 hero was compared against a lossless ffv1 render of its de-watermarked
+ *     + folded 227-frame timeline. PSNR frame-aligned (see the warning below);
+ *     `detail` is a 520x260 crop at 420,230, the window with the highest
+ *     sustained |laplacian| in the clip — the marble aggregate, which is the
+ *     first thing compression eats:
  *
- *       vp9  crf 28  1489 KB  SSIM .9900    h264 crf 20  2362 KB  SSIM .9909
- *            crf 30  1308 KB       .9895         crf 22  1832 KB       .9899
- *            crf 32  1122 KB       .9886         crf 24  1436 KB       .9887
+ *       vp9  crf 26   960 KB  .99044  46.75dB   h264 crf 20  1719 KB  .99236  47.74dB
+ *            crf 28   824 KB  .98993  46.34         crf 21  1509 KB  .99176  47.19
+ *            crf 30   713 KB  .98936  45.89         crf 22  1323 KB  .99117  46.66
+ *            crf 32   609 KB  .98868  45.42         crf 23  1157 KB  .99055  46.17
+ *            crf 34   527 KB  .98785  44.88         crf 24  1015 KB  .98992  45.66
  *
- *     VP9 30 and H.264 22 sit at the measured size/quality knee, both near .990
- *     SSIM. The visualiser is a far more detailed render and needs its own
- *     numbers: at the hero's crf its MP4 came out LARGER than the source file.
+ *     No knee — a smooth curve, so it is a budget call, and three numbers set it.
+ *
+ *     THE MASTER IS THE CEILING. The raw arrives at 1.82 Mbps: 2451 KB for 240
+ *     frames, so 2264 KB for the 227 that ship. Past that we would be spending
+ *     bitrate to reproduce Gemini's own compression artefacts. Everything in
+ *     the table is comfortably under.
+ *
+ *     THE AGGREGATE IS THE FLOOR. The old ship called 44.2 dB on its finest
+ *     crop a match by eye; the chosen rung holds 46.10 dB, so 1.9 dB of
+ *     headroom on a texture at least as fine.
+ *
+ *     TUNING THE VP9 ARGS *DOES* PAY HERE, unlike on the visualiser. cpu-used 1
+ *     with auto-alt-ref 6, lag-in-frames 25 and tile-columns 2 turns crf 30
+ *     into 723 KB / .98988 / 46.10dB — crf 28's quality (824 KB, .98993,
+ *     46.34) for crf 30's bytes, a 12% saving. Hence `vp9Args` per clip: the
+ *     visualiser keeps the plain args its own sweep was run with.
+ *
+ *     So vp9 30 tuned, and h264 23 at preset veryslow to MATCH IT rather than
+ *     to match its size — 46.03 dB against 46.10, so Safari and Chrome get the
+ *     same picture. That costs the MP4 1097 KB against the WebM's 723; the
+ *     match is worth more than the parity, because the MP4 is what pre-17.4
+ *     iOS Safari actually plays.
+ *
+ *     Against the v1 hero (1292 KB webm / 1801 KB mp4) that is 44% and 39% off
+ *     at equal-or-better SSIM. Most of the saving is not the encoder: v1 spent
+ *     its bitrate on a 1120px crop resampled up to 1280, so an eighth of every
+ *     frame it encoded was interpolation. See WATERMARK below.
+ *
+ *     The visualiser is a far more detailed render and needs its own numbers:
+ *     at the hero's crf its MP4 came out LARGER than the source file.
  *
  *     The visualiser was re-swept for the marble-20 master, against a LOSSLESS
  *     ffv1 render of the folded 270-frame timeline rather than against the raw
@@ -52,10 +85,10 @@
  *     ~1.3 dB ahead at equal size on this clip); the match is worth more than
  *     the parity, because the MP4 is what pre-17.4 iOS Safari actually plays.
  *
- *     Tuning the VP9 args instead of the crf buys nothing: cpu-used 1 with
- *     auto-alt-ref 6, lag-in-frames 25 and tile-columns 2 gave 47.87 dB for
- *     2790 KB, which is where plain crf 22 already sits. Same curve, more
- *     wall-clock. The args below stay as they are.
+ *     Tuning the VP9 args instead of the crf buys nothing ON THE VISUALISER:
+ *     cpu-used 1 with auto-alt-ref 6, lag-in-frames 25 and tile-columns 2 gave
+ *     47.87 dB for 2790 KB, which is where plain crf 22 already sits. Same
+ *     curve, more wall-clock. Its args stay as they are — the hero's do not.
  *
  *     MEASURE PSNR/SSIM WITH THE TIMEBASE NORMALISED — `[0:v]settb=AVTB,
  *     setpts=N` on both inputs. Without it ffmpeg silently pairs frames by
@@ -64,13 +97,24 @@
  *
  * Three things this fixes that are invisible until you measure them.
  *
- * WATERMARK (hero). A Gemini sparkle sits at x1135..1184 y574..629 in all 240
- * frames. Interpolating that 50x56 patch leaves obvious horizontal/vertical
- * smears when it crosses marble veins, floor reflections and furniture. The
- * final therefore removes the marked pixels completely: crop the clean
- * 1120x630 region at x0/y45, then Lanczos-scale it back to 1280x720. Contact
- * sheets at every half-second confirm the mark is gone and the left/centre
- * architectural subjects remain framed cleanly.
+ * WATERMARK (hero). A Gemini sparkle sits at x1136..1183 y576..623 in all 240
+ * frames of the raw. THIS IS NO LONGER HANDLED HERE. v1 cropped the marked
+ * pixels away — the clean 1120x630 region at x0/y45, Lanczos-scaled back to
+ * 1280x720 — because interpolating the patch smeared visibly wherever it
+ * crossed a vein. That worked, but it paid for the mark twice: an eighth of
+ * the frame was thrown away, and then the encoder spent bitrate on the
+ * resampled pixels that replaced it.
+ *
+ * tools/dewatermark.py removes it instead, by inverting the composite that
+ * applied it rather than by painting over it — the mark is one static RGBA
+ * overlay, so obs = (1-a)*orig + a*C with a and C constant, and solving for
+ * the two of them brings the marble underneath back exactly. Its own docstring
+ * has the method and the verification; on this clip the full-frame static
+ * residual peaks at 36.8 levels before and 8.9 after — and what is left is
+ * scattered scene edges, not a contiguous mark.
+ *
+ * So this pipeline now takes `hero-cmc-v2-clean.mkv` — lossless, full frame,
+ * no crop, no resample — and `pre` carries nothing but a colour tag.
  *
  * THE VISUALISER's dead tail comes off; its frozen head does NOT. Measured on
  * the marble-20 master (300 frames at 30fps, mean abs frame delta on a 192x108
@@ -96,10 +140,31 @@
  *     O(t) = orig(t)                               for t >= X
  * with L = N - X, which makes the loop point continuous by construction.
  *
- * The hero's final dark-marble shot starts at frame 216. Dropping its first four
- * source frames and folding 20 frames makes the 9-second wrap land between
- * source frames 219/220, inside that continuous shot instead of on its opening
- * cut. The visualiser fold is only clean if BOTH inputs are frozen — otherwise
+ * The CMC v2 hero is a seven-shot montage. Same measurement as the visualiser
+ * below (mean abs frame delta, 192x108 grey), cuts at frames 35, 72, 104, 178,
+ * 204 and 226, so the shots run 35 / 37 / 32 / 74 / 26 / 22 / 14 frames.
+ *
+ * That last shot is the whole problem. At 14 frames it is 0.58s against a
+ * 0.92s-to-3.1s house style — the generator ran out of runtime mid-shot — so
+ * it cannot simply play. It also cannot simply be dropped: shots 6, 7 and 1 are
+ * all white Calacatta under raking light, and cutting 6 straight to 1 reads as
+ * a jump rather than a cut.
+ *
+ * The fold solves both at once. The wrap lands at source frame `ke - X`, so
+ * with ke = 240 and X = 13 it falls between frames 226/227 — one frame INSIDE
+ * shot 7, not on its opening cut. Because that join is continuous by
+ * construction, the 1-frame-then-wrap shape is invisible: what a viewer sees
+ * is shot 6, its authored cut into shot 7, and then shot 7 running its full 14
+ * frames while dissolving into shot 1. The truncation is hidden by the very
+ * dissolve that closes the loop, and all 240 source frames stay in play.
+ *
+ * X = 13 is the ceiling, not a preference: X = 14 would put the wrap on the
+ * 225/226 cut, and the tail [240-X, 240) has to stay inside shot 7's 14 frames.
+ * Output is N - X = 227 frames, 9.46s. The wrap measures 9.04 against a 57.37
+ * in-clip maximum — six times quieter than the quietest authored cut, and it
+ * is ordinary shot-7 camera motion rather than a seam.
+ *
+ * The visualiser fold is only clean if BOTH inputs are frozen — otherwise
  * the cursor and its swatch card fade in and out mid-dissolve. So X is pinned
  * to its frozen head: X = 23, no more. `keep` then follows from the length:
  * 9.00s is 270 frames out, output is N - X, so N = 293. Frames 270..292 are
@@ -111,6 +176,11 @@
  * is now quieter than the busiest ordinary frame transition in the clip.
  *
  * Usage:  node tools/optimize-video.mjs [--audit] [--clip=hero|visualiser]
+ *
+ * The hero's source is produced by a separate pre-step, because it needs
+ * opencv and this does not:
+ *
+ *     python3 tools/dewatermark.py hero-cmc-v2-raw.mp4
  */
 import { spawn } from "node:child_process";
 import sharp from "sharp";
@@ -127,29 +197,33 @@ const POSTER_QUALITY = 82; // transient, so below the plates' 90
 
 /**
  * `display` is the CSS box the clip occupies in the 1440px Figma frame.
- * `pre`    — filters applied to the source before anything else.
- * `keep`   — [startFrame, endFrame) of the source to retain.
- * `retime` — frame count to stretch the kept range to, before the fold. null
- *            leaves the clip at native speed.
- * `fade`   — crossfade length in frames used to close the loop.
+ * `pre`     — filters applied to the source before anything else.
+ * `keep`    — [startFrame, endFrame) of the source to retain.
+ * `retime`  — frame count to stretch the kept range to, before the fold. null
+ *             leaves the clip at native speed.
+ * `fade`    — crossfade length in frames used to close the loop.
+ * `vp9Args` / `x264Preset` — encoder settings, per clip because each clip's
+ *             crf was swept with the args it ships with. Changing these
+ *             invalidates the table above; re-sweep, do not guess.
  */
+const VP9_DEFAULT = ["-cpu-used", "2"];
+const VP9_TUNED = ["-cpu-used", "1", "-auto-alt-ref", "6", "-lag-in-frames", "25", "-tile-columns", "2"];
 const CLIPS = [
   {
-    src: "hero-cmc-raw.mp4",
+    // de-watermarked by tools/dewatermark.py; see WATERMARK above
+    src: "hero-cmc-v2-clean.mkv",
     out: "hero",
     poster: "hero-poster.webp",
     display: [1440, 892], // 544:4024 — aspect 1.614 vs the clip's 1.778
-    pre: [
-      "crop=1120:630:0:45",
-      "scale=1280:720:flags=lanczos",
-      "format=yuv420p",
-      "setparams=range=limited:color_primaries=bt709:color_trc=bt709:colorspace=bt709",
-    ],
-    keep: [4, 240], // shifts the loop join four frames inside the final shot
+    // nothing to fix in the picture any more, so just tag the colour
+    pre: ["setparams=range=limited:color_primaries=bt709:color_trc=bt709:colorspace=bt709"],
+    keep: [0, 240], // every source frame stays in play
     retime: null, // preserve the authored 24fps motion
-    fade: 20, // 0.83s dissolve; 236 kept - 20 folded = 216 frames / 9.00s
-    crf: { h264: 22, vp9: 30 },
-    note: "8-shot CMC marble montage — clean crop, seamless loop",
+    fade: 13, // 0.54s dissolve; wraps inside shot 7 -> 227 frames / 9.46s
+    crf: { h264: 23, vp9: 30 },
+    vp9Args: VP9_TUNED, // pays 12% on this clip; see the sweep above
+    x264Preset: "veryslow",
+    note: "7-shot CMC v2 marble montage — full frame, seamless loop",
   },
   {
     src: "visualiser-raw.mp4",
@@ -161,6 +235,8 @@ const CLIPS = [
     retime: null, // the authored pace is right — four swaps and their dwells in 6.5s
     fade: 23, // = the frozen head exactly, so the 0.77s dissolve never catches the cursor
     crf: { h264: 23, vp9: 28 }, // quality-matched at ~47.0dB on the rug; see the sweep above
+    vp9Args: VP9_DEFAULT, // tuning measured flat on this clip — leave it
+    x264Preset: "slow",
     note: "surface-swap demo — seamless loop",
   },
 ];
@@ -322,7 +398,7 @@ for (const clip of selectedClips) {
     "-y", "-v", "error", "-i", src,
     "-filter_complex", fc, "-map", "[v]", "-r", String(rate),
     "-c:v", "libvpx-vp9", "-crf", String(clip.crf.vp9), "-b:v", "0",
-    "-row-mt", "1", "-cpu-used", "2", "-g", gop,
+    "-row-mt", "1", ...(clip.vp9Args ?? VP9_DEFAULT), "-g", gop,
     "-pix_fmt", "yuv420p",
     "-color_range", "tv", "-colorspace", "bt709",
     "-color_primaries", "bt709", "-color_trc", "bt709",
@@ -334,7 +410,7 @@ for (const clip of selectedClips) {
   await run("ffmpeg", [
     "-y", "-v", "error", "-i", src,
     "-filter_complex", fc, "-map", "[v]", "-r", String(rate),
-    "-c:v", "libx264", "-preset", "slow", "-crf", String(clip.crf.h264),
+    "-c:v", "libx264", "-preset", clip.x264Preset ?? "slow", "-crf", String(clip.crf.h264),
     "-profile:v", "high", "-level", "3.1", "-g", gop,
     "-pix_fmt", "yuv420p",
     "-color_range", "tv", "-colorspace", "bt709",
@@ -358,9 +434,15 @@ for (const clip of selectedClips) {
   const [w, m, p] = await Promise.all([stat(webm), stat(mp4), stat(poster)]);
   total += w.size + m.size + p.size;
   const srcSize = (await stat(src)).size;
+  // "% under source" only means something against a COMPRESSED source. The
+  // hero's is a lossless ffv1 master now, so the honest number there is the
+  // shipped bitrate — which is what the master-is-the-ceiling rule compares.
+  const kbps = ((w.size * 8) / (outFrames / rate) / 1000).toFixed(0);
   console.log(
     `  webm ${kb(w.size)}   mp4 ${kb(m.size)}   poster ${kb(p.size)}` +
-      `   (webm is ${((1 - w.size / srcSize) * 100).toFixed(0)}% under source)`,
+      (src.endsWith(".mkv")
+        ? `   (webm ${kbps} kbps)`
+        : `   (webm is ${((1 - w.size / srcSize) * 100).toFixed(0)}% under source)`),
   );
   console.log("");
 }
