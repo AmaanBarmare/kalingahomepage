@@ -312,8 +312,14 @@ export const testimonials = {
   //
   // `alt` is per-card now rather than built from role and place: that reads as
   // a portrait ("Architect, Dubai") and two of these are no longer portraits.
+  //
+  // CARDS 1 AND 4 CARRY LOREM IN THE ROLE SLOT, and that is the board, not a
+  // slip — it reads "LOREM IPSUM · MUMBAI" on both while 2 and 3 still name a
+  // real role. The client is swapping this section to placeholder a card at a
+  // time. `place` is untouched on all four. `alt` stays descriptive: it is the
+  // image, not the caption, so it does not go lorem with it.
   cards: [
-    { image: "/images/testimonial-clean-1.webp", role: "Homeowner", place: "Mumbai",
+    { image: "/images/testimonial-clean-1.webp", role: "Lorem Ipsum", place: "Mumbai",
       isVideo: true, videoHref: null,
       alt: "A homeowner speaking to camera in a marble kitchen" },
     { image: "/images/testimonial-work-sample-wall-2.webp", role: "Architect", place: "Dubai",
@@ -322,7 +328,7 @@ export const testimonials = {
     { image: "/images/testimonial-clean-3.webp", role: "Designer", place: "Singapore",
       isVideo: true, videoHref: null,
       alt: "A designer speaking to camera beside a stone counter" },
-    { image: "/images/testimonial-work-drawing-desk.webp", role: "Homeowner", place: "Mumbai",
+    { image: "/images/testimonial-work-drawing-desk.webp", role: "Lorem Ipsum", place: "Mumbai",
       isVideo: false, videoHref: null,
       alt: "Hands working over architectural drawings, stone swatches and samples" },
   ],
