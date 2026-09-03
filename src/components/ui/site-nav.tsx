@@ -48,6 +48,16 @@ import { nav } from "@/lib/content";
  * `aria-hidden` and `pointer-events-none` in there: the card is already a
  * link, so the arrow is the affordance for it, not a second target.
  *
+ * NOT EVERY ROW OPENS. Contact Us is one destination rather than an index over
+ * several, so it carries no children and renders as a plain link across the
+ * whole row: no toggle and no strip. Everything else about an open row it
+ * keeps — hovering brings in the 33px mark on the same 0fr -> 1fr track, takes
+ * the label to white, shifts it from x357 to x418 behind the mark, and reveals
+ * the 40px arrow plate. Hover IS this row's open state, so it should look like
+ * one; a row that answered with less would read as the odd one out. The branch
+ * is on `children.length`, not on a flag: a section with nothing to show cannot
+ * be an accordion, and that is the whole condition.
+ *
  * Label colour is state, and the board is explicit about all three values:
  * nothing open, every label is #f2f2f2 (Frame 675); one open, that one goes to
  * pure white and the rest drop to rgba(242,242,242,0.52) (1040:42104). Karigear
@@ -180,6 +190,70 @@ export function SiteNav({ className = "" }: { className?: string }) {
           <nav aria-label="Main" onMouseLeave={() => setExpanded(null)}>
             {nav.sections.map((section, i) => {
               const isOpen = expanded === i;
+
+              // A section with no children has no strip to open, so the whole
+              // row is simply the link. Entering it CLOSES whatever was open —
+              // the same thing leaving the list does — because "one row open at
+              // a time" has to hold when the row you moved onto is not one that
+              // opens. Hover then borrows the open row's two signals, since
+              // they already mean what the leaf needs: the label goes white,
+              // and the arrow plate appears. On the rows above, that plate is
+              // the link to the section index while the label only toggles;
+              // here there is no toggle, so the row and the plate are one
+              // target and the plate is decoration on it.
+              if (section.children.length === 0) {
+                return (
+                  <div
+                    key={section.label}
+                    onPointerEnter={(e) => {
+                      if (e.pointerType === "mouse") setExpanded(null);
+                    }}
+                    className={`border-b border-[#9F9F9F] ${i > 0 ? "pt-6.5 lg:pt-8" : ""}`}
+                  >
+                    <Link
+                      href={section.href}
+                      onClick={close}
+                      onFocus={() => setExpanded(null)}
+                      tabIndex={open ? 0 : -1}
+                      className="group/row flex items-center gap-4 pb-6.5 sm:gap-5.5 lg:gap-7 lg:pb-8.25"
+                    >
+                      <span className="flex min-w-0 flex-1 items-center">
+                        {/* Same mark, same 0fr -> 1fr track, same 500ms as an
+                            opening row — driven by CSS rather than by
+                            `isOpen`, because hover is this row's open. Hence
+                            the arbitrary-property utilities instead of the
+                            inline style the rows below use: there is no state
+                            to read, and no re-render on hover this way. */}
+                        <span
+                          aria-hidden
+                          className="grid shrink-0 [grid-template-columns:0fr] transition-[grid-template-columns] duration-500 ease-out-expo group-hover/row:[grid-template-columns:1fr] group-focus-visible/row:[grid-template-columns:1fr]"
+                        >
+                          <span className="overflow-hidden">
+                            <KalingaMark className="mr-4 block h-[26.54px] w-6.5 text-white sm:mr-5.5 sm:h-[30.62px] sm:w-7.5 lg:mr-7 lg:h-[33.68px] lg:w-8.25" />
+                          </span>
+                        </span>
+                        <span
+                          className={`font-display text-[20px] font-medium tracking-[3px] uppercase transition-colors duration-500 group-hover/row:text-white group-focus-visible/row:text-white sm:text-[24px] sm:tracking-[4px] lg:text-[30px] lg:tracking-[5px] ${
+                            expanded === null
+                              ? "text-gray-6"
+                              : "text-[rgba(242,242,242,0.52)]"
+                          }`}
+                          style={{ lineHeight: 1.58 }}
+                        >
+                          {section.label}
+                        </span>
+                      </span>
+                      <span
+                        aria-hidden
+                        className="text-ruby grid h-10 w-10 shrink-0 place-items-center bg-white opacity-0 transition-opacity duration-500 group-hover/row:opacity-100 group-focus-visible/row:opacity-100"
+                      >
+                        <ArrowRightIcon className="h-10 w-10" />
+                      </span>
+                    </Link>
+                  </div>
+                );
+              }
+
               return (
                 <div
                   key={section.label}

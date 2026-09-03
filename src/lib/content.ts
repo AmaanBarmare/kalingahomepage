@@ -118,6 +118,15 @@ export const nav: {
           alt: "A wall of stone samples arranged in a studio" },
       ],
     },
+    {
+      // A LEAF. Contact Us is one destination, not an index over several, so it
+      // has nothing to put in a card strip and `children` is empty on purpose
+      // rather than pending. site-nav.tsx reads that emptiness and renders the
+      // row as a plain link instead of an accordion — see the note there.
+      label: "Contact Us",
+      href: "/contact",
+      children: [],
+    },
   ],
   inquiry: { lead: "Any inquiry", email: "info@kalingastone.com" },
   legal: [
