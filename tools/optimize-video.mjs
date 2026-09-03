@@ -15,21 +15,37 @@
  *     The visualiser is a far more detailed render and needs its own numbers:
  *     at the hero's crf its MP4 came out LARGER than the source file.
  *
- *     Swept against the 3754 KB master, PSNR frame-aligned (see the warning
- *     below), the visualiser's curve is:
+ *     The visualiser was re-swept for the marble-20 master, against a LOSSLESS
+ *     ffv1 render of the folded 270-frame timeline rather than against the raw
+ *     file — the fold is part of the picture, so the untrimmed master is the
+ *     wrong reference. PSNR frame-aligned (see the warning below):
  *
- *       vp9  crf 24  2324 KB  47.26 dB      h264 crf 21  3048 KB  48.98 dB
- *            crf 26  1972 KB  46.53 dB           crf 22  2728 KB  48.06 dB
- *            crf 28  1718 KB  45.93 dB           crf 23  2413 KB  47.17 dB
- *            crf 30  1510 KB  45.37 dB           crf 25  1876 KB  45.63 dB
- *            crf 34  1114 KB  44.07 dB
+ *       vp9  crf 22  2298 KB  49.29 dB      h264 crf 20  3152 KB  50.78 dB
+ *            crf 24  2133 KB  48.91 dB           crf 21  2883 KB  50.31 dB
+ *            crf 26  1874 KB  48.26 dB           crf 22  2626 KB  49.23 dB
+ *            crf 28  1685 KB  47.71 dB           crf 23  2364 KB  48.34 dB
+ *            crf 30  1513 KB  47.17 dB           crf 25  1867 KB  46.77 dB
+ *            crf 32  1324 KB  46.48 dB           crf 27  1480 KB  45.33 dB
  *
- *     There is no knee — it is close to linear — so this is a budget call, and
- *     the budget is set by what the picture does. At crf 34, which is what used
- *     to ship, the rug weave in the middle of frame 150 goes visibly soft; by
- *     crf 24 that crop is 44.2 dB and matches the master by eye. So vp9 24, and
- *     h264 23 to MATCH IT rather than to match its size: 47.17 against 47.26,
- *     so Safari and Chrome get the same picture. Both land under the master.
+ *     Still no knee, so still a budget call. Two numbers set it.
+ *
+ *     THE MASTER IS THE CEILING. marble-20 arrives already compressed at 1.56
+ *     Mbps — 1901 KB for 300 frames, so 1711 KB for the 270 we keep. Spending
+ *     more than that re-encodes its artefacts at higher fidelity and buys
+ *     nothing. vp9 28 is the last rung under it.
+ *
+ *     THE RUG IS THE FLOOR. Same test crop as before (520x260 at 560,660, the
+ *     jute weave — the finest detail in frame): vp9 28 holds it at 47.01 dB,
+ *     and an 8x-amplified difference against the master is structureless. The
+ *     old ship called 44.2 dB on this crop a match by eye, so there is 2.8 dB
+ *     of headroom. The softer master is why: at 1.56 Mbps in there is less
+ *     fine detail left to lose than the 3.1 Mbps predecessor had.
+ *
+ *     So vp9 28, and h264 23 to MATCH IT rather than to match its size —
+ *     46.99 dB against 47.01 on that crop, so Safari and Chrome get the same
+ *     picture. h264 cannot reach that under the master's byte count (VP9 is
+ *     ~1.3 dB ahead at equal size on this clip); the match is worth more than
+ *     the parity, because the MP4 is what pre-17.4 iOS Safari actually plays.
  *
  *     Tuning the VP9 args instead of the crf buys nothing: cpu-used 1 with
  *     auto-alt-ref 6, lag-in-frames 25 and tile-columns 2 gave 47.87 dB for
@@ -56,25 +72,43 @@
  * marble there carries only 2.24 levels RMS of high-frequency detail, so there
  * is nothing to lose.
  *
- * THE VISUALISER needs its frozen head and tail removed before the fold. The
- * master is 300 frames at 30fps, but motion only runs through frames 23..250:
- * frames 0..22 hold on the opening and frames 251..299 hold on the ending. If
- * those stays are left in, every repeat appears to pause for ~1.6s before an
- * abrupt jump back to the start.
+ * THE VISUALISER's dead tail comes off; its frozen head does NOT. Measured on
+ * the marble-20 master (300 frames at 30fps, mean abs frame delta on a 192x108
+ * grey downscale), the structure is:
  *
- * Keeping frames 23..250 removes the dead time. The active sequence is then
- * eased back to 300 frames before the final 24 frames are folded over the
- * first 24. That produces a 276-frame (9.2s) continuous loop: close to the
- * master's original pace, but without the frozen tail or hard restart.
+ *     0..22    frozen     the bare room, before the cursor arrives
+ *     23..62   motion     swap 1 — floor
+ *     63..74   hold       0.4s dwell on the result
+ *     75..114  motion     swap 2 — wall
+ *     115..125 hold
+ *     126..165 motion     swap 3 — staircase
+ *     166..178 hold
+ *     179..217 motion     swap 4 — soffit
+ *     218..299 frozen     2.73s of nothing
+ *
+ * The four holds are authored beats and stay. The 82-frame tail is dead air
+ * and mostly goes. The 23-frame head is NOT dead air here — it is exactly the
+ * runway the fold needs, which is what sets `fade`.
  *
  * LOOP SEAM (both). Neither clip loops as delivered: the hero's last->first
- * jump is 21x a typical frame delta, the visualiser's 17x. Both are fixed by
- * folding the tail back over the head —
+ * jump is 21x a typical frame delta, the visualiser's 105x — it ends on a
+ * fully re-dressed room and restarts on a bare one. Both are fixed by folding
+ * the tail back over the head —
  *     O(t) = orig(t)*(t/X) + orig(t+L)*(1 - t/X)   for t < X
  *     O(t) = orig(t)                               for t >= X
- * with L = N - X, which makes the loop point continuous by construction. That
- * takes the hero to 0.7x and the visualiser to 1.4x, i.e. the wrap is now no
- * more visible than an ordinary frame transition.
+ * with L = N - X, which makes the loop point continuous by construction.
+ *
+ * That fold is only clean if BOTH of its inputs are frozen — otherwise the
+ * cursor and its swatch card fade in and out mid-dissolve. So X is pinned to
+ * the frozen head: X = 23, no more. `keep` then follows from the length: 9.00s
+ * is 270 frames out, output is N - X, so N = 293. Frames 270..292 are the
+ * fold's tail side and all sit inside the frozen 218..299 run, as required.
+ * What is left over — frames 218..269, 1.73s — is the dwell on the finished
+ * room, which is the shot the CTA sits on and the one worth holding.
+ *
+ * The result measures 1.05 against a 1.60 in-clip maximum: the wrap is now
+ * QUIETER than the busiest ordinary frame transition in the clip. The hero
+ * lands at 0.7x its median by the same treatment.
  *
  * Usage:  node tools/optimize-video.mjs [--audit]
  */
@@ -117,10 +151,10 @@ const CLIPS = [
     poster: "visualiser-poster.webp",
     display: [1440, 815], // 544:4015 — aspect 1.767 vs the clip's 1.778, near-exact
     pre: [],
-    keep: [23, 251], // remove the frozen opening and 1.63s dead tail
-    retime: 300, // restore a relaxed ~10s pace after removing the dead frames
-    fade: 24, // 0.8s fold closes the last-to-first seam
-    crf: { h264: 23, vp9: 24 }, // quality-matched at ~47.2dB; see the sweep above
+    keep: [0, 293], // keep the frozen head (the fold needs it); drop the dead tail
+    retime: null, // the authored pace is right — four swaps and their dwells in 6.5s
+    fade: 23, // = the frozen head exactly, so the 0.77s dissolve never catches the cursor
+    crf: { h264: 23, vp9: 28 }, // quality-matched at ~47.0dB on the rug; see the sweep above
     note: "surface-swap demo — seamless loop",
   },
 ];

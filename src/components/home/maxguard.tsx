@@ -16,52 +16,75 @@ import { maxguard } from "@/lib/content";
  *   721:30948  LOREM IPSUM       x   80  y 435     442 x 47
  *   721:30949  body              x   80  y 492     487 x 50
  *   721:30920  KS/Button ruby    x   81  y 552     184.19 x 42.69
- *   998:37554  KS/Button outline x  297  y 551     175.19 x 42.69
  *
- * THE APP ROW IS GONE AND IT DID NOT MOVE — IT WAS REPLACED. The board used to
- * close the band with a "Download the App" label at x1020 and two 39px store
- * marks at x1287.11 / x1339.11, all on the bottom right. Those three nodes
- * (721:30918, 721:30908, 721:30951) are deleted from the file. In their place
- * 998:37554 puts a SECOND KS/Button — the plain white-outline variant, label
- * "Download the app" — immediately to the right of the ruby one, so the band
- * now ends in a two-button row at the bottom left and nothing at all on the
- * bottom right. The Play/App Store SVGs in `public/icons` are now unreferenced.
+ * THE BAND IS BACK TO ONE BUTTON, FOR NOW. The history, because this node keeps
+ * moving and the next reader will otherwise re-derive it: the band once closed
+ * on a "Download the App" label at x1020 with two 39px store marks at the
+ * bottom right (721:30918, 721:30908, 721:30951 — all deleted). Those were
+ * replaced by a second KS/Button, the white-outline variant, to the right of
+ * the ruby one. That button, 998:37554, is STILL IN THE FILE but is no longer
+ * in this band: it is parented to the "Homepage" SECTION rather than to the
+ * "Home Page" frame, and its section coordinates are now x1359 y5794 — frame
+ * x297 y5162, inside the visualiser plate (962:30520, y5058..5874), about 519px
+ * below where it used to sit. It was not deleted, it was dragged onto the next
+ * section.
  *
- * THAT SECOND BUTTON IS NOT INSIDE THE PAGE FRAME. 998:37554 is parented to the
- * "Homepage" SECTION, not to the "Home Page" frame that holds every other node
- * here, so it does not appear as a sibling of the band and a node-list walk of
- * the frame misses it entirely — it only shows up in a render, or in a scan
- * that leaves the frame. It is a layering slip in the board, not a signal; it
- * sits in the band, so it belongs to the band.
+ * THE CLIENT HAS SAID IT IS COMING BACK — the board is simply not carrying it
+ * yet. So this is a removal from the render only: `maxguard.appCta` stays in
+ * content.ts, and the note on it in this file's git history has the exact
+ * markup. Restoring it is putting the outline KS/Button back beside the ruby
+ * one and returning the row to `flex flex-wrap gap-3 lg:flex-nowrap
+ * lg:gap-[31.81px]`. The Play/App Store SVGs in `public/icons` stay
+ * unreferenced either way — the board made it a button, not a label plus two
+ * store marks, and that part has not been walked back.
  *
  * THE WHOLE TEXT COLUMN ROSE 29px. Headline 464 -> 435, body 521 -> 492, ruby
  * CTA 581 -> 552, one constant shift, and the left margin went 79/80 -> 80/81.
  * The block had to climb to open the room the second button now occupies.
  *
- * The two buttons disagree about their own top by 1px (552 vs 551) at identical
- * heights, which is board noise rather than intent, so they are laid out as one
- * flex row on 551 instead of being placed apart and left 1px out of true. The
- * 31.81px between them is the real measurement: the ruby button closes at
- * 265.19 and the outline one opens at 297. It is a fixed px gap because
- * KS/Button is fixed px everywhere on this page — it does not scale with the
- * plate, so a percentage gap would drift away from the buttons it separates.
+ * The 31.81px that used to separate the two buttons goes with the second one.
+ * It is recorded here because it is the measurement, not a guess, and the
+ * button is expected back: the ruby button closed at 265.19 and the outline one
+ * opened at 297. Fixed px, because KS/Button is fixed px everywhere on this
+ * page and does not scale with the plate. The ruby button has not moved — still
+ * x81 y552, which rounds to the same 84.1221% the pair was laid out on.
  *
  * THE BODY IS WHITE NOW, not #eee — 721:30949 carries the shared "Body Copy"
  * style, White #FFFFFF.
  *
  * THE PLATE'S NODE BOX IS REAL, and the fill carries the crop rather than the
- * box: 721:30906 is 1472 wide at x-16 with an IMAGE/CROP fill whose transform
- * is [[1,0,0],[0,0.667459,0.238621]] — a window 0.667459 of the source tall
- * starting 0.238621 down it. So the image draws at 1/0.667459 = 149.82% of the
- * node's height, offset -35.75%, which is an object-position of
- * 0.238621 / (1 - 0.667459) = 71.76%. Letting the image simply cover the band
- * instead centres it and moves every landmark up ~90px.
+ * box: 721:30906 is 1472 wide at x-16, drawing the source at 149.82% of the
+ * node's height with a top offset of -18.51%.
+ *
+ * THE CROP MOVED, and this is the change that makes the band look redesigned
+ * even though not one asset in it was replaced. The window height is what it
+ * always was — 1/1.4982 = 0.667468 of the source — but its START slid up the
+ * source, from 0.238621 down it to 0.123534. As an object-position:
+ *
+ *   0.123534 / (1 - 0.667468) = 37.15%,  where it used to read 71.76%
+ *
+ * which lifts the whole kitchen and brings the ceiling into the top of the
+ * band. The consequence worth remembering: the MaxGuard lockup at x56 y23 used
+ * to sit over the middle of the garden window, bright and busy, and now sits on
+ * plain wall. THE MARK ITSELF DID NOT CHANGE — 721:30950 still carries the same
+ * "ChatGPT Image Jul 29, 2026, 12_06_06 PM 1" fill in the same box, and
+ * 721:30919 is untouched too. Only the photograph behind them moved.
+ *
+ * Letting the image simply cover the band centres it, which is a third framing
+ * again and matches neither.
  *
  * THERE ARE TWO SCRIMS, NOT ONE, AND ONE OF THEM IS FLIPPED. The band carries a
  * matched pair of 1459 x 327 rects sharing one 193.78deg axis:
  *
- *   721:30917  y  -2 .. 325   ends rgb(253,253,253)   scaleY(-1)
- *   721:30907  y 328 .. 655   ends rgb(20,16,14)
+ *   721:30917  x  -9  y   1 .. 328   191.39deg  ends rgb(253,253,253)  scaleY(-1)
+ *   721:30907  x -14  y 328 .. 655   193.78deg  ends rgb(20,16,14)
+ *
+ * The light half's numbers drifted with the recrop — angle 193.78 -> 191.39,
+ * first stop 50.817% -> 48.543%, last 97.235% -> 107.81% (so the ramp is cut
+ * off before it reaches full white), and its box from x-14 y-2 to x-9 y1.
+ * Rendering the band both ways against the board's own export: the new numbers
+ * land at a mean absolute error of 2.0/255 against 4.4 for the old ones, so
+ * this is a real change and not export noise. The ink half is unchanged.
  *
  * The vertical flip on the top one is the whole trick and it is invisible in a
  * node list — it lives in the relativeTransform as a -1 in the y row. Flipping
@@ -112,7 +135,8 @@ import { maxguard } from "@/lib/content";
  *   x  -14 -> -0.9722%    x   80 ->  5.5556%    x   81 ->  5.6250%
  *   w 1472 -> 102.2222%   w 1459 -> 101.3194%   w  487 -> 33.8194%
  *   w  197 ->  13.6806%   w 273.25 -> 18.9757%
- *   y   -2 ->  -0.3053%   y   21 ->  3.2061%    y   23 ->  3.5115%
+ *   x   -9 ->  -0.6250%    y    1 ->  0.1527%    y   21 ->  3.2061%
+ *   y   23 ->  3.5115%
  *   y  328 ->  50.0763%   y  435 -> 66.4122%    y  492 -> 75.1145%
  *   y  551 ->  84.1221%   h  327 -> 49.9237%
  */
@@ -157,10 +181,10 @@ function straight(
   });
 }
 
-/** 721:30917. 193.78deg flipped vertically — see the note above. */
+/** 721:30917. 191.39deg flipped vertically — see the note above. */
 const SCRIM_TOP =
-  "linear-gradient(346.22deg, rgba(0,0,0,0) 50.817%, " +
-  straight([7, 6, 5], 0.5, 67.361, [253, 253, 253], 1, 97.235, 12).join(", ") +
+  "linear-gradient(348.61deg, rgba(0,0,0,0) 48.543%, " +
+  straight([7, 6, 5], 0.5, 67.363, [253, 253, 253], 1, 107.81, 12).join(", ") +
   ")";
 /** 721:30907, exactly as exported. */
 const SCRIM_BOTTOM =
@@ -183,7 +207,7 @@ export function MaxGuard() {
             alt="A kitchen with MaxGuard-protected surfaces"
             fill
             sizes="(max-width: 1023px) 100vw, 103vw"
-            className="object-cover object-[50%_50%] lg:object-[50%_71.76%]"
+            className="object-cover object-[50%_50%] lg:object-[50%_37.15%]"
           />
         </div>
 
@@ -193,8 +217,8 @@ export function MaxGuard() {
         <div
           className="pointer-events-none absolute hidden lg:block"
           style={{
-            left: "-0.9722%",
-            top: "-0.3053%",
+            left: "-0.6250%",
+            top: "0.1527%",
             width: "101.3194%",
             height: "49.9237%",
             background: SCRIM_TOP,
@@ -286,16 +310,11 @@ export function MaxGuard() {
           </Reveal>
         </div>
 
-        {/* 721:30920 + 998:37554 — see the note above for why these are one row
-            on 551 and why the desktop gap is fixed px rather than a percentage.
-            The pair measures 391px against a 390px phone, so below lg they are
-            allowed to wrap onto two rows instead of being shrunk to fit. */}
-        <div className="mt-7 flex flex-wrap items-center gap-3 lg:absolute lg:mt-0 lg:top-[84.1221%] lg:left-[5.6250%] lg:flex-nowrap lg:gap-[31.81px]">
+        {/* 721:30920, on its own again — see the note above. y552 rounds into
+            the same 84.1221% the pair used, so the ruby button has not moved. */}
+        <div className="mt-7 lg:absolute lg:mt-0 lg:top-[84.1221%] lg:left-[5.6250%]">
           <KsButton href={maxguard.cta.href} variant="ruby">
             {maxguard.cta.label}
-          </KsButton>
-          <KsButton href={maxguard.appCta.href} variant="outline">
-            {maxguard.appCta.label}
           </KsButton>
         </div>
       </div>

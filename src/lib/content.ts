@@ -230,10 +230,13 @@ export const maxguard = {
   headline: "Lorem ipsum",
   body: LOREM_BRIEF,
   cta: { label: "Discover MaxGuard", href: "/maxguard" },
-  // 998:37554. The app row — a "Download the App" label with Google Play and
-  // App Store marks at the bottom right — is gone. The board now pairs a
-  // second, outline KS/Button with the ruby one at the bottom left, so this is
-  // a CTA rather than a label plus two store links.
+  // 998:37554. PARKED, NOT DEAD — nothing reads this right now. The app row
+  // (a "Download the App" label with Google Play and App Store marks at the
+  // bottom right) became a second, outline KS/Button beside the ruby one, and
+  // the board has since dragged that button off the MaxGuard band onto the
+  // visualiser plate. The client has confirmed it is coming back, so the label
+  // and href stay here rather than being deleted and retyped later; see the
+  // note in maxguard.tsx for the exact markup and the 31.81px gap it sat on.
   //
   // The board gives it no destination; `/maxguard/app` follows the same
   // placeholder convention as every other href in this file.

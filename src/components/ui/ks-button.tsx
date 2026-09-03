@@ -17,7 +17,7 @@ import type { ComponentProps, ReactNode } from "react";
  * instance. The rendered frame is the authority, so `outline` carries a border.
  */
 
-type Variant = "outline" | "outline-ink" | "outline-ruby" | "ruby";
+type Variant = "outline" | "outline-ink" | "outline-ruby" | "ruby" | "ruby-on-light";
 
 const BASE =
   "inline-flex h-[42.7px] items-center justify-center whitespace-nowrap pl-6 " +
@@ -44,31 +44,24 @@ const TRAILING = "gap-3.25 pr-4.5";
  * and the contact band's chevron stay exactly where they were — the only thing
  * that leaves is the red.
  *
- * WHY THE LABEL'S COLOUR IS DELAYED. White -> ruby has to happen while the
- * ruby is gone, or the label spends the crossover as ruby on ruby and vanishes.
- * ease-out-expo is heavily front-loaded (about 99% of the travel is spent by
- * two-thirds of the duration), so the fill has effectively cleared the box by
- * 240ms; the colour waits for that, then takes 200ms. Leaving hover carries no
- * delay, which is the order you want on the way back too: the label is white
- * again well before the fill has finished returning underneath it.
+ * THE LABEL STAYS WHITE THROUGHOUT. It briefly went ruby once the fill had
+ * cleared, which needed a 240ms delay on the colour so the label did not spend
+ * the crossover as ruby on ruby; white needs none of that, so the delay, the
+ * hover duration and the `before:delay-0` guard that went with them are all
+ * gone. Nothing about this element animates now except the fill.
  *
- * `before:delay-0` pins the wipe to start immediately. transition-delay does
- * not inherit, so today the 240ms on the button cannot reach the pseudo on its
- * own — this is a guard, and a cheap one: it keeps the two timings independent
- * if the label's delay ever moves to a custom property, which does inherit.
- *
- * Contrast on the way out: the three instances over photography (visualiser,
- * MaxGuard, contact band) sit on light frames — sampled luminance 126, 197 and
- * 141 of 255 — so ruby-on-image holds up. The fourth is on the white
- * applications band. If a darker frame ever lands behind one of these, this
- * variant is the place to fix it, not the call site.
+ * WHICH LEAVES ONE GROUND WHITE CANNOT SURVIVE. Three of the four ruby CTAs are
+ * over photography and the hover reads well on all three: MaxGuard and the
+ * contact band both put the button in their own scrim-to-ink bottom, and the
+ * visualiser's frame samples at 141/255. The fourth, "View All" in Browse by
+ * Space, is on `bg-white` — white on white, so once the fill leaves there is
+ * no label. It is given `ruby-on-light` below rather than being left broken.
  */
 const RUBY_WIPE =
-  "relative isolate border border-ruby text-white " +
+  "relative isolate border border-ruby " +
   "before:absolute before:inset-0 before:-z-10 before:bg-ruby before:origin-bottom " +
-  "before:transition-transform before:duration-[420ms] before:delay-0 " +
-  "before:ease-[var(--ease-out-expo)] hover:before:scale-y-0 " +
-  "hover:text-ruby hover:duration-200 hover:delay-[240ms]";
+  "before:transition-transform before:duration-[420ms] " +
+  "before:ease-[var(--ease-out-expo)] hover:before:scale-y-0";
 
 const VARIANTS: Record<Variant, string> = {
   // On photography — hero, MaxGuard, contact band, carousel slides.
@@ -85,7 +78,13 @@ const VARIANTS: Record<Variant, string> = {
   // `hover:bg-ruby-pressed`, which swapped one red for a darker red and read as
   // a dead press state rather than a hover. Now the ruby wipes upward off the
   // box and what is left is the outline and the label — see RUBY_WIPE.
-  ruby: RUBY_WIPE,
+  ruby: `${RUBY_WIPE} text-white`,
+  // The same wipe on a light band. Identical in every respect but the label,
+  // which cannot be white here and cannot be ruby either — ruby is the fill
+  // that just left, and reading the button as still-filled is exactly the
+  // confusion the wipe exists to avoid. Ink is the page's own text colour and
+  // is what every other control on a white band already uses.
+  "ruby-on-light": `${RUBY_WIPE} text-white hover:text-ink`,
 };
 
 type Props = {

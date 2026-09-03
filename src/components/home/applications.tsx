@@ -199,8 +199,11 @@ export function Applications() {
 
       {/* 721:29308 — "View All", ruby, centred on 720, y3980: 96px below the
           cards' base. It was missing entirely. */}
+      {/* `ruby-on-light`, not `ruby`: this is the one ruby CTA on a white band,
+          and the hover wipe would otherwise leave a white label on white. Same
+          fill, same wipe, ink label once the red is gone — see ks-button.tsx. */}
       <Reveal delay={160} className="mt-[44px] flex justify-center lg:mt-[68.5px]">
-        <KsButton href={applications.cta.href} variant="ruby">
+        <KsButton href={applications.cta.href} variant="ruby-on-light">
           {applications.cta.label}
         </KsButton>
       </Reveal>
