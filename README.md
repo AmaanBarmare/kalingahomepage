@@ -130,9 +130,10 @@ mark changes.
   these three want art from the client.
 - Eleven image plates are below 2× DPR because the supplied sources are
   1280–1920px. Not a pipeline limit; see DESIGN.md § Assets.
-- Both clips are under 2× too (hero 0.89×, visualiser 1.33×). The hero is also
-  16:9 in a 1.345 box, so `object-cover` throws away 24.4% of its width — it
-  wants a re-render at the section's aspect, not a harder crop.
+- Both clips are under 2× too (hero 0.89×, visualiser 1.33×). The hero is 16:9
+  in a 1.614 box, so `object-cover` hides 9.2% of its width. Its CMC master is
+  reframed before encoding to remove the fixed lower-right generation mark;
+  an unmarked render at 1440×892 or larger would preserve the complete frame.
 - Only `/` exists, so footer and CTA links prefetch to 404s in the console.
   `/brochure`, behind the band's new Download brochure CTA, is one of them.
 - The contact plate is 1x (1440px source against a 1440px box).

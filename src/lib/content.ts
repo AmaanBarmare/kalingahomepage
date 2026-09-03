@@ -432,7 +432,7 @@ export const footer: {
     {
       title: "Engineered Surfaces",
       links: [
-        { label: "Elixir - Premium Edition", href: "/collections/elixir" },
+        { label: "Elixir", href: "/collections/elixir" },
         { label: "Quartz", href: "/collections/quartz" },
         { label: "Marble", href: "/collections/marble" },
         { label: "Terrazzo", href: "/collections/terrazzo" },

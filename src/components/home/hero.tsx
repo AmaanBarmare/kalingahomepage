@@ -33,7 +33,7 @@ export function Hero() {
         <BackgroundVideo
           src="hero"
           poster="/images/hero-poster.webp"
-          alt="Kalinga Stone surfaces across a kitchen, living room and bath"
+          alt="Kalinga Stone marble across sculptural stairs, a kitchen, bath and bedroom"
           loop
           preload="auto"
           className="absolute inset-0 h-full w-full object-cover"

@@ -9,11 +9,16 @@
  *     hero's 1280x720 lands UNDER 1x for its 1440-wide box; that is a request
  *     to make of whoever renders the clips, not something to paper over with a
  *     resample. `--audit` reports the shortfall.
- *  2. Settings are DERIVED from a measured sweep, not picked by feel. On the
- *     hero, SSIM against its own master moved 0.9915 -> 0.9876 across crf
- *     18..24 — 0.4% for 2x the bytes — so the knee sits well below the default.
- *     The visualiser is a far more detailed render and needs its own numbers:
- *     at the hero's crf its MP4 came out LARGER than the source file.
+ *  2. Settings are DERIVED from a measured sweep, not picked by feel. The CMC
+ *     hero was compared against a lossless render of its crop + loop timeline:
+ *
+ *       vp9  crf 28  1489 KB  SSIM .9900    h264 crf 20  2362 KB  SSIM .9909
+ *            crf 30  1308 KB       .9895         crf 22  1832 KB       .9899
+ *            crf 32  1122 KB       .9886         crf 24  1436 KB       .9887
+ *
+ *     VP9 30 and H.264 22 sit at the measured size/quality knee, both near .990
+ *     SSIM. The visualiser is a far more detailed render and needs its own
+ *     numbers: at the hero's crf its MP4 came out LARGER than the source file.
  *
  *     The visualiser was re-swept for the marble-20 master, against a LOSSLESS
  *     ffv1 render of the folded 270-frame timeline rather than against the raw
@@ -59,18 +64,13 @@
  *
  * Three things this fixes that are invisible until you measure them.
  *
- * WATERMARK (hero). A Gemini sparkle sits at x1137..1182 y576..622 (46x47,
- * inset 97px from both the right and bottom edges). It is a constant white
- * composite: solving it per-pixel across all 240 frames gives alpha
- * [0.315, 0.314, 0.315] over RGB — equal across channels, i.e. a neutral
- * overlay, which is what makes the solve trustworthy — peaking at 0.37 over
- * [241.2, 239.2, 235.9]. Un-blending that recovers the true marble, but the
- * glyph's anti-aliased edge cannot be pinned precisely enough and leaves a
- * visible rim. delogo measures better: it drops the region's mean temporal
- * residual to 0.05 against a clean-marble floor of 7.73, an order of magnitude
- * BELOW the surrounding noise. It interpolates rather than recovers, but the
- * marble there carries only 2.24 levels RMS of high-frequency detail, so there
- * is nothing to lose.
+ * WATERMARK (hero). A Gemini sparkle sits at x1135..1184 y574..629 in all 240
+ * frames. Interpolating that 50x56 patch leaves obvious horizontal/vertical
+ * smears when it crosses marble veins, floor reflections and furniture. The
+ * final therefore removes the marked pixels completely: crop the clean
+ * 1120x630 region at x0/y45, then Lanczos-scale it back to 1280x720. Contact
+ * sheets at every half-second confirm the mark is gone and the left/centre
+ * architectural subjects remain framed cleanly.
  *
  * THE VISUALISER's dead tail comes off; its frozen head does NOT. Measured on
  * the marble-20 master (300 frames at 30fps, mean abs frame delta on a 192x108
@@ -90,27 +90,27 @@
  * and mostly goes. The 23-frame head is NOT dead air here — it is exactly the
  * runway the fold needs, which is what sets `fade`.
  *
- * LOOP SEAM (both). Neither clip loops as delivered: the hero's last->first
- * jump is 21x a typical frame delta, the visualiser's 105x — it ends on a
- * fully re-dressed room and restarts on a bare one. Both are fixed by folding
+ * LOOP SEAM (both). Neither clip loops as delivered. Both are fixed by folding
  * the tail back over the head —
  *     O(t) = orig(t)*(t/X) + orig(t+L)*(1 - t/X)   for t < X
  *     O(t) = orig(t)                               for t >= X
  * with L = N - X, which makes the loop point continuous by construction.
  *
- * That fold is only clean if BOTH of its inputs are frozen — otherwise the
- * cursor and its swatch card fade in and out mid-dissolve. So X is pinned to
- * the frozen head: X = 23, no more. `keep` then follows from the length: 9.00s
- * is 270 frames out, output is N - X, so N = 293. Frames 270..292 are the
- * fold's tail side and all sit inside the frozen 218..299 run, as required.
+ * The hero's final dark-marble shot starts at frame 216. Dropping its first four
+ * source frames and folding 20 frames makes the 9-second wrap land between
+ * source frames 219/220, inside that continuous shot instead of on its opening
+ * cut. The visualiser fold is only clean if BOTH inputs are frozen — otherwise
+ * the cursor and its swatch card fade in and out mid-dissolve. So X is pinned
+ * to its frozen head: X = 23, no more. `keep` then follows from the length:
+ * 9.00s is 270 frames out, output is N - X, so N = 293. Frames 270..292 are
+ * the fold's tail side and all sit inside the frozen 218..299 run, as required.
  * What is left over — frames 218..269, 1.73s — is the dwell on the finished
  * room, which is the shot the CTA sits on and the one worth holding.
  *
- * The result measures 1.05 against a 1.60 in-clip maximum: the wrap is now
- * QUIETER than the busiest ordinary frame transition in the clip. The hero
- * lands at 0.7x its median by the same treatment.
+ * The visualiser result measures 1.05 against a 1.60 in-clip maximum: the wrap
+ * is now quieter than the busiest ordinary frame transition in the clip.
  *
- * Usage:  node tools/optimize-video.mjs [--audit]
+ * Usage:  node tools/optimize-video.mjs [--audit] [--clip=hero|visualiser]
  */
 import { spawn } from "node:child_process";
 import sharp from "sharp";
@@ -122,6 +122,7 @@ const RAW_DIR = process.env.RAW_DIR ?? path.resolve("assets-src/video");
 const VIDEO_OUT = path.resolve("public/videos");
 const POSTER_OUT = path.resolve("public/images");
 const AUDIT = process.argv.includes("--audit");
+const CLIP_NAME = process.argv.find((arg) => arg.startsWith("--clip="))?.slice("--clip=".length);
 const POSTER_QUALITY = 82; // transient, so below the plates' 90
 
 /**
@@ -134,23 +135,28 @@ const POSTER_QUALITY = 82; // transient, so below the plates' 90
  */
 const CLIPS = [
   {
-    src: "hero-raw.mp4",
+    src: "hero-cmc-raw.mp4",
     out: "hero",
     poster: "hero-poster.webp",
-    display: [1440, 1071], // 544:4024 — aspect 1.345 vs the clip's 1.778
-    pre: ["delogo=x=1132:y=571:w=57:h=57"], // measured bbox + ~5px margin
-    keep: null, // no dead frames; median delta 3.47, zero frozen transitions
-    retime: null, // 10s of unbroken motion in, 9.00s out — native speed is fine
-    fade: 24, // 1.0s at 24fps
-    crf: { h264: 23, vp9: 31 },
-    note: "8-shot montage, cross-dissolved — loops",
+    display: [1440, 892], // 544:4024 — aspect 1.614 vs the clip's 1.778
+    pre: [
+      "crop=1120:630:0:45",
+      "scale=1280:720:flags=lanczos",
+      "format=yuv420p",
+      "setparams=range=limited:color_primaries=bt709:color_trc=bt709:colorspace=bt709",
+    ],
+    keep: [4, 240], // shifts the loop join four frames inside the final shot
+    retime: null, // preserve the authored 24fps motion
+    fade: 20, // 0.83s dissolve; 236 kept - 20 folded = 216 frames / 9.00s
+    crf: { h264: 22, vp9: 30 },
+    note: "8-shot CMC marble montage — clean crop, seamless loop",
   },
   {
     src: "visualiser-raw.mp4",
     out: "visualiser",
     poster: "visualiser-poster.webp",
     display: [1440, 815], // 544:4015 — aspect 1.767 vs the clip's 1.778, near-exact
-    pre: [],
+    pre: ["setparams=range=limited:color_primaries=bt709:color_trc=bt709:colorspace=bt709"],
     keep: [0, 293], // keep the frozen head (the fold needs it); drop the dead tail
     retime: null, // the authored pace is right — four swaps and their dwells in 6.5s
     fade: 23, // = the frozen head exactly, so the 0.77s dissolve never catches the cursor
@@ -158,6 +164,12 @@ const CLIPS = [
     note: "surface-swap demo — seamless loop",
   },
 ];
+
+const selectedClips = CLIP_NAME ? CLIPS.filter(({ out }) => out === CLIP_NAME) : CLIPS;
+if (CLIP_NAME && selectedClips.length === 0) {
+  console.error(`Unknown clip ${CLIP_NAME}; expected one of ${CLIPS.map(({ out }) => out).join(", ")}`);
+  process.exit(1);
+}
 
 const run = (cmd, args) =>
   new Promise((resolve, reject) => {
@@ -258,7 +270,7 @@ await mkdir(POSTER_OUT, { recursive: true });
 console.log(AUDIT ? "Auditing clips (no files written)\n" : "Building clips\n");
 
 let total = 0;
-for (const clip of CLIPS) {
+for (const clip of selectedClips) {
   const src = path.join(RAW_DIR, clip.src);
   if (!existsSync(src)) {
     console.warn(`  skip ${clip.src} — not found`);
@@ -311,7 +323,10 @@ for (const clip of CLIPS) {
     "-filter_complex", fc, "-map", "[v]", "-r", String(rate),
     "-c:v", "libvpx-vp9", "-crf", String(clip.crf.vp9), "-b:v", "0",
     "-row-mt", "1", "-cpu-used", "2", "-g", gop,
-    "-pix_fmt", "yuv420p", "-an", webm,
+    "-pix_fmt", "yuv420p",
+    "-color_range", "tv", "-colorspace", "bt709",
+    "-color_primaries", "bt709", "-color_trc", "bt709",
+    "-an", webm,
   ]);
 
   // MP4 / H.264 — the fallback. faststart puts the moov atom first so the clip
@@ -320,8 +335,11 @@ for (const clip of CLIPS) {
     "-y", "-v", "error", "-i", src,
     "-filter_complex", fc, "-map", "[v]", "-r", String(rate),
     "-c:v", "libx264", "-preset", "slow", "-crf", String(clip.crf.h264),
-    "-profile:v", "high", "-level", "4.0", "-g", gop,
-    "-pix_fmt", "yuv420p", "-an", "-movflags", "+faststart", mp4,
+    "-profile:v", "high", "-level", "3.1", "-g", gop,
+    "-pix_fmt", "yuv420p",
+    "-color_range", "tv", "-colorspace", "bt709",
+    "-color_primaries", "bt709", "-color_trc", "bt709",
+    "-an", "-movflags", "+faststart", mp4,
   ]);
 
   // Poster = the clip's OWN first frame, not the Figma plate. A poster that
