@@ -72,6 +72,17 @@ const LEFT_BODY = "font-body text-[14px] leading-normal font-light tracking-[1px
 /** 1000:95786 / 1000:98497 — Body Copy, 16 / 1.5 / +1, white. */
 const ROW_TEXT = "font-body text-[16px] leading-[1.5] font-light tracking-[1px] text-white";
 
+/**
+ * The icon rows below the rules stack into one column on a phone, so their
+ * marks have to share a left edge AND their text a left edge — the board's own
+ * per-row gaps (pin 8, contacts 12, socials 10, copyright 5) are set against
+ * DIFFERENT icon widths (17 / 18.125 / 19.5) and only ever sit side by side at
+ * lg, where the mismatch is invisible. Below lg every mark gets the same
+ * 19.5px slot and every row the same 12px gap, so the text starts at 31.5px on
+ * all four. From lg the board's numbers take over unchanged.
+ */
+const ICON_SLOT = "flex w-[19.5px] shrink-0 justify-center lg:w-auto";
+
 /** The rules at 665:8959 and 1000:98103, full content width. */
 function Rule() {
   return <div aria-hidden className="h-px w-full bg-white/25" />;
@@ -184,14 +195,16 @@ export function SiteFooter() {
         <div className="flex flex-col gap-10 lg:flex-row lg:items-center lg:gap-[346px]">
           <div className="flex flex-col gap-[10px] lg:w-[493px] lg:shrink-0">
             {footer.offices.map((office) => (
-              <div key={office} className="flex items-center gap-2">
-                <Image
-                  src="/icons/pin.svg"
-                  alt=""
-                  width={17}
-                  height={20}
-                  className="h-5 w-[17px] shrink-0"
-                />
+              <div key={office} className="flex items-center gap-3 lg:gap-2">
+                <span className={ICON_SLOT}>
+                  <Image
+                    src="/icons/pin.svg"
+                    alt=""
+                    width={17}
+                    height={20}
+                    className="h-5 w-[17px] shrink-0"
+                  />
+                </span>
                 <p className={`${ROW_TEXT} lg:whitespace-nowrap`}>{office}</p>
               </div>
             ))}
@@ -201,8 +214,10 @@ export function SiteFooter() {
               office lines beside them. */}
           <div className="flex flex-col gap-6 sm:flex-row sm:gap-[95px]">
             {footer.contacts.map((c) => (
-              <div key={c.label} className="flex items-center gap-[12px]">
-                <Image src={c.icon} alt="" width={19} height={19} className="size-[18.125px] shrink-0" />
+              <div key={c.label} className="flex items-center gap-3">
+                <span className={ICON_SLOT}>
+                  <Image src={c.icon} alt="" width={19} height={19} className="size-[18.125px] shrink-0" />
+                </span>
                 <p className="font-body text-[19.333px] leading-[1.5] font-light tracking-[1.2083px] text-white">
                   {c.label}
                 </p>
@@ -215,14 +230,14 @@ export function SiteFooter() {
 
         {/* ---------------------------------------- 1000:98921 socials + copyright */}
         <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
-          <ul className="flex flex-wrap items-center gap-x-10 gap-y-4 lg:gap-[41px]">
+          <ul className="grid grid-cols-2 items-center gap-x-10 gap-y-4 lg:flex lg:gap-[41px]">
             {footer.socials.map((s) => (
               <li key={s.name}>
                 <a
                   href={s.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-[10px] transition-opacity hover:opacity-70"
+                  className="flex items-center gap-3 transition-opacity hover:opacity-70 lg:gap-[10px]"
                 >
                   <Image src={s.icon} alt="" width={20} height={20} className="size-[19.5px] shrink-0" />
                   <span className={ROW_TEXT}>{s.name}</span>
@@ -231,7 +246,7 @@ export function SiteFooter() {
             ))}
           </ul>
 
-          <div className="flex items-center gap-[5px]">
+          <div className="flex items-center gap-3 lg:gap-[5px]">
             <Image
               src="/icons/copyright.svg"
               alt=""
@@ -239,11 +254,15 @@ export function SiteFooter() {
               height={20}
               className="size-[19.5px] shrink-0"
             />
-            {footer.copyright.map((line) => (
-              <span key={line} className={ROW_TEXT}>
-                {line}
-              </span>
-            ))}
+            {/* The two legal lines keep the board's own 5px between them; only
+                the gap after the mark widens below lg to match the rows above. */}
+            <div className="flex flex-wrap items-center gap-x-[5px]">
+              {footer.copyright.map((line) => (
+                <span key={line} className={ROW_TEXT}>
+                  {line}
+                </span>
+              ))}
+            </div>
           </div>
         </div>
       </div>

@@ -26,6 +26,12 @@ import { testimonials } from "@/lib/content";
  * momentum — driving scrollLeft from pointermove on top of that would double
  * every swipe. Drag is wired for MOUSE ONLY.
  *
+ * touch-action stays `auto`: it used to be `pan-y`, which told the browser to
+ * handle only vertical gestures here and killed horizontal swiping on mobile
+ * outright — the rail was unpannable by touch. `auto` gives both axes; the
+ * browser picks from the gesture's direction. `overscroll-x-contain` keeps a
+ * swipe past the last card from turning into the back-navigation gesture.
+ *
  * The original posters carried baked-in play marks at inconsistent sizes. The
  * cleaned poster set removes those marks, so this component owns the one and
  * only ring-and-triangle control at a uniform size on every card.
@@ -76,7 +82,7 @@ export function Testimonials() {
         onPointerMove={onPointerMove}
         onPointerUp={endDrag}
         onPointerLeave={endDrag}
-        className={`mt-[40px] flex gap-4 lg:mt-[68px] lg:gap-[28.5px] overflow-x-auto px-6 pb-2 [scrollbar-width:none] touch-pan-y lg:px-[82px] [&::-webkit-scrollbar]:hidden ${
+        className={`mt-[40px] flex gap-4 lg:mt-[68px] lg:gap-[28.5px] overflow-x-auto px-6 pb-2 [scrollbar-width:none] touch-auto overscroll-x-contain lg:px-[82px] [&::-webkit-scrollbar]:hidden ${
           dragging ? "cursor-grabbing select-none" : "cursor-grab"
         }`}
       >
