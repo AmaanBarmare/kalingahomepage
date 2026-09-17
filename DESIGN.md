@@ -643,13 +643,14 @@ visible on the stone. Worth revisiting only if deploy size becomes a problem.
 ## Video
 
 `npm run video` rebuilds `public/videos` from `assets-src/video`;
-`npm run video:audit` reports without writing. Two clips, **4.34 MB** for a
-browser that takes WebM (4.84 MB if it falls back to MP4).
+`npm run video:audit` reports without writing. The hero has a pre-step —
+`npm run video:clean hero-cmc-v2-raw.mp4` — see the watermark note below. Two
+clips, **2.39 MB** for a browser that takes WebM (3.44 MB on the MP4 fallback).
 
 | Clip | Source | Ships | Box | DPR |
 |---|---|---|---|---|
-| `hero` | 1280×720 24fps 10.0s | 216f / 9.00s — webm 870 KB, mp4 1514 KB | 1440×1071 | **0.89×** |
-| `visualiser` | 1920×1080 30fps 10.0s | 276f / 9.20s — webm 3574 KB, mp4 3440 KB | 1440×815 | **1.33×** |
+| `hero` | 1280×720 24fps 10.0s (CMC v2) | 227f / 9.46s — webm 723 KB, mp4 1097 KB | 1440×892 | **0.89×** |
+| `visualiser` | 1920×1080 30fps 10.0s | 270f / 9.00s — webm 1686 KB, mp4 2365 KB | 1440×815 | **1.33×** |
 
 WebM is listed first in the `<source>` order because VP9 won on both axes: at
 matched SSIM it came in ~25% under H.264. CRFs are per-clip, from a sweep —
@@ -664,33 +665,50 @@ the two rows from `optimize-assets.mjs` if you want the ~1.1 MB back.
 
 ### The hero's Gemini watermark
 
-A sparkle at **x1137..1182 y576..622** (46×47, inset 97px from both the right
-and bottom edges). Located by accumulating a high-pass residual over all 240
-frames: the fixed glyph reinforces, the panning marble cancels.
+A sparkle at **x1136..1183 y576..623** (48×48) in every frame of the raw.
+Located by accumulating a high-pass residual over all 240 frames: the fixed
+glyph reinforces, the panning marble cancels. On the v2 raw it peaks at
+**36.8** levels against **8.9** for the busiest real edge in the frame.
 
-It is a constant white composite. Solving per-pixel across the clip gives
-alpha **[0.315, 0.314, 0.315]** over RGB — equal across channels, i.e. a
-neutral overlay, which is what makes the solve trustworthy — peaking at 0.37
-over [241.2, 239.2, 235.9]. Two independent estimators (regression against an
-inpainted background, and a DC root-find) agreed to within 2%.
+It is a constant white composite — `obs = (1−a)·orig + a·C`, with `C` solving
+to [252.5, 253.8, 254.1] and `a` peaking at 0.35 — so the marble underneath is
+*recoverable*, not something to invent. Three approaches have now been tried:
 
-Un-blending that recovers the *true* marble rather than inventing it, and it
-fixes the interior — but the glyph's anti-aliased edge cannot be pinned
-precisely enough, and every variant left a visible rim. **`delogo` measured
-better**: it takes the region's mean temporal residual to 0.06 against a
-clean-marble floor of 8.15, an order of magnitude *below* the surrounding
-noise, with frame-to-frame flicker unchanged at 0.90× the surround.
+1. **Un-blend with a single least-squares alpha** (v1, first attempt). Fixed the
+   interior, but the anti-aliased edge left a visible rim at 4×. The cause is
+   regression dilution: the per-frame inpaint used as the stand-in for `orig`
+   is noisy, and noise in a regressor biases the slope toward zero, so `a` is
+   *under*-estimated exactly where it ramps.
+2. **`delogo`** (v1, considered). Interpolates rather than recovers; measured
+   clean because the marble under the mark carried only ~2 levels of detail.
+   Never shipped — v1 shipped a **crop** instead, 1120×630 at x0/y45 scaled
+   back to 1280×720, which threw away an eighth of the frame and then spent
+   bitrate re-encoding the resampled pixels.
+3. **Un-blend, then iterate on the static residual** (v2, shipped —
+   [tools/dewatermark.py](tools/dewatermark.py)). The criterion that defines
+   success is that after inversion the *temporal mean* is locally smooth,
+   because a static mark is precisely what averaging preserves. So refit: each
+   pass measures what is left of the mark in the mean and folds it back into
+   `a`. Six passes take the residual over the mark from **41.03 → 3.11** peak,
+   **20.70 → 0.41** rms. No rim, no interpolation, full frame.
 
-It interpolates rather than recovers — but the marble there carries only
-**2.24 levels RMS** of high-frequency detail, so there is nothing to preserve.
-That measurement is what settles the choice; without it the "recover the real
-pixels" argument sounds better than it is.
+The tool self-verifies with a whole-frame scan before and after and warns if
+the peak barely moves — which is what caught its own first bug, where "largest
+blob above threshold" seeded a 442×143 patch of veining while the 48×48 mark
+sailed through. It now seeds from the strongest anomaly, not the largest.
+
+Two things the fix bought beyond a clean frame. **Bitrate:** at equal-or-better
+SSIM the v2 hero is 723 KB webm / 1097 KB mp4 against v1's 1292 / 1801 — 44%
+and 39% off — most of it from no longer encoding an upscaled crop. **Encoder
+tuning finally pays:** on this clip `cpu-used 1`, alt-ref 6, lag 25, tiles 2
+gives crf 28's quality for crf 30's bytes, a further 12%. The same args
+measured flat on the visualiser, so they are now per-clip in the pipeline.
 
 ### Neither clip looped, and one had a dead tail
 
 Measured against a *typical* frame delta, not against zero:
 
-- hero last→first = **21×** a normal frame step
+- hero (v1) last→first = **21×** a normal frame step
 - visualiser = **17×** — and it holds **101 frozen frame-transitions of 299**,
   including a 49-frame (1.63 s) completely static tail and a 22-frame freeze
   after the opening. Trimming to frames 23..250 leaves 25 frozen transitions,
@@ -703,9 +721,21 @@ O(t) = orig(t)·(t/X) + orig(t+L)·(1 − t/X)    t < X
 O(t) = orig(t)                                t ≥ X        L = N − X
 ```
 
-which is continuous at the wrap by construction. Shipped: hero **1.04×**,
+which is continuous at the wrap by construction. Shipped: hero (v1) **1.04×**,
 visualiser **1.73×** — the loop point is now no more visible than an ordinary
 frame transition.
+
+**The v2 hero's last shot is 14 frames long** — cuts at 35 / 72 / 104 / 178 /
+204 / 226, so the generator ran out of runtime mid-shot. At 0.58s it cannot
+play as a shot, and it cannot be dropped either: shots 6, 7 and 1 are all
+white Calacatta under raking light, and cutting 6 straight to 1 reads as a jump.
+The fold handles both. The wrap lands at source frame `ke − X`, so `X = 13`
+puts it between 226/227 — one frame *inside* shot 7, not on its opening cut —
+and since that join is continuous, a viewer sees shot 7 run its full 14 frames
+while dissolving into shot 1. The truncation is hidden by the dissolve that
+closes the loop. `X = 13` is a ceiling: 14 lands on the cut. Wrap measures
+**9.04** against a 57.4 in-clip max — six times quieter than the quietest
+authored cut, and it is ordinary shot-7 camera motion, not a seam.
 
 Watch the denominator here. The visualiser's seam first measured as *341×*
 because the "typical" delta was sampled from frames 0→1 — which sit inside
@@ -728,10 +758,11 @@ surface and are kept.
 
 ### The hero clip is 16:9 and its box is not
 
-1.778 against a box of 1.345, so `object-cover` **hides 24.4% of the width** —
-and at 1280px on a 1440px box it is already under 1×. It is an 8-shot montage
-(slab, hand, kitchen, living room, bath, edge, arch, slab), so it is worth
-re-rendering at 1920×1440 or wider rather than cropping harder. The visualiser
+1.778 against the rebuilt band's 1.614 (1440×892), so `object-cover` **hides
+9.2% of the width** — 4.6% a side, which is why the watermark at 89–92% across
+was in shot. At 1280px on a 1440px box it is already under 1× and no encoder
+setting lifts that; a wider render is the only fix. The v2 clip is a 7-shot
+montage (slab, hand, edge, block, terrazzo corner, slab, slab). The visualiser
 has no such problem: 1.778 against 1.767 loses 0.6%.
 
 ---

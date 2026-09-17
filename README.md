@@ -22,7 +22,8 @@ npm run dev          # http://localhost:3000
 | [src/components/home/](src/components/home/) | one file per section |
 | [src/components/ui/](src/components/ui/) | `KsButton`, `TabBar`, `Reveal`, `SectionHeading`, the mark, the logo |
 | [tools/optimize-assets.mjs](tools/optimize-assets.mjs) | the image pipeline |
-| [tools/optimize-video.mjs](tools/optimize-video.mjs) | the video pipeline — watermark, trim, loop, encode |
+| [tools/dewatermark.py](tools/dewatermark.py) | removes the hero raw's Gemini sparkle by inverting the composite |
+| [tools/optimize-video.mjs](tools/optimize-video.mjs) | the video pipeline — trim, loop, encode |
 | [tools/verify.mjs](tools/verify.mjs) | measures the running page against Figma |
 
 ## Scripts
@@ -35,6 +36,7 @@ npm run lint           # eslint
 npm run assets         # rebuild public/images from assets-src/
 npm run assets:audit   # report DPR / size per plate without writing
 
+npm run video:clean    # strip the Gemini mark from a raw -> *-clean.mkv (needs opencv)
 npm run video          # rebuild public/videos from assets-src/video/
 npm run video:audit    # report DPR / crop / loop maths without writing
 

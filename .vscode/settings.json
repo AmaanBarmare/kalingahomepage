@@ -1,0 +1,13 @@
+{
+  // The playbooks (amahafigmapage.md, DESIGN.md) quote Tailwind classes from
+  // code verbatim — some from a different repo. IntelliSense's "can be written
+  // as max-w-191" hints are right for .tsx and noise on a doc, so keep markdown
+  // out of every Tailwind feature. The first four entries are the defaults.
+  "tailwindCSS.files.exclude": [
+    "**/.git/**",
+    "**/node_modules/**",
+    "**/.hg/**",
+    "**/.svn/**",
+    "**/*.md"
+  ]
+}
